@@ -93,10 +93,10 @@
 
                                 <!-- Start XP Breadcrumbbar -->                    
                 <div class="xp-breadcrumbbar text-center">
-                    <h4 class="page-title">Dashboard</h4>  
+                    <h4 class="page-title">@yield('title')</h4>  
                       <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="#">Booster</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                        <li class="breadcrumb-item active" aria-current="page">@yield('title')</li>
                       </ol>                
                 </div>
                 <!-- End XP Breadcrumbbar -->        
