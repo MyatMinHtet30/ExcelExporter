@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,15 +12,15 @@
     <title>Booster - Bootstrap + Laravel Admin Dashboard Template</title>
 
     <!-- Fevicon -->
-    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
 
     <!-- Start CSS -->
     <!-- Chartist Chart CSS -->
-    <link rel="stylesheet" href="assets/plugins/chartist-js/chartist.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/plugins/chartist-js/chartist.min.css') }}">
 
-    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="assets/css/icons.css" rel="stylesheet" type="text/css">
-    <link href="assets/css/style.css" rel="stylesheet" type="text/css">
+    <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('assets/css/icons.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css">
 
 </head>
 
@@ -40,17 +39,21 @@
                 <div class="xp-topbar">
 
                     <!-- Start XP Row -->
-                    <div class="row"> 
+                    <div class="row">
 
                         <!-- Start XP Col -->
                         <div class="col-3 col-md-2 col-lg-2 order-1 order-md-1 align-self-center">
                             <!-- Start XP Logobar -->
                             <div class="xp-logobar">
-                                <a href="index.html" class="xp-small-logo"><img src="assets/images/mobile-logo.svg" class="img-fluid" alt="logo"></a>
-                                <a href="index.html" class="xp-main-logo"><img src="assets/images/logo.svg" class="img-fluid" alt="logo"></a>
-                            </div>                        
+                                <a href="index.html" class="xp-small-logo">
+                                    <img src="{{ asset('assets/images/mobile-logo.svg') }}" class="img-fluid" alt="logo">
+                                </a>
+                                <a href="index.html" class="xp-main-logo">
+                                    <img src="{{ asset('assets/images/logo.svg') }}" class="img-fluid" alt="logo">
+                                </a>
+                            </div>
                             <!-- End XP Logobar -->
-                        </div> 
+                        </div>
                         <!-- End XP Col -->
 
                         <!-- Start XP Col -->
@@ -77,7 +80,7 @@
                                         <form action="{{ route('logout') }}" method="POST">
                                             @csrf
                                             <button type="submit" class="btn btn-danger btn-sm rounded-pill px-4 shadow-sm navbar-toggle">Logout</button>
-                                        </form>                                 
+                                        </form>
                                     </li>
 
                                 </ul>
@@ -85,23 +88,23 @@
                         </div>
                         <!-- End XP Col -->
 
-                    </div> 
+                    </div>
                     <!-- End XP Row -->
 
                 </div>
                 <!-- End XP Topbar -->
 
-                                <!-- Start XP Breadcrumbbar -->                    
+                <!-- Start XP Breadcrumbbar -->
                 <div class="xp-breadcrumbbar text-center">
-                    <h4 class="page-title">@yield('title')</h4>  
+                    <h4 class="page-title">@yield('title')</h4>
                       <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="#">Booster</a></li>
                         <li class="breadcrumb-item active" aria-current="page">@yield('title')</li>
-                      </ol>                
+                      </ol>
                 </div>
-                <!-- End XP Breadcrumbbar -->        
+                <!-- End XP Breadcrumbbar -->
 
-                <!-- Start XP Menubar -->                    
+                <!-- Start XP Menubar -->
                 <div class="xp-menubar text-left">
 
                     <!-- Start XP Nav -->
@@ -124,7 +127,7 @@
                                   <li class="mega-menu-col col-md-4">
                                 </ul>
                               </div>
-                            </li> 
+                            </li>
                           </ul>
                         </div>
 
