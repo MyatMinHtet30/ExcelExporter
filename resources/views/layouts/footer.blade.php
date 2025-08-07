@@ -13,23 +13,23 @@
     <!-- End XP Container -->
 
     <!-- Start JS -->        
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/popper.min.js"></script>
-    <script src="assets/js/bootstrap.min.js"></script>
-    <script src="assets/js/modernizr.min.js"></script>
-    <script src="assets/js/detect.js"></script>
-    <script src="assets/js/jquery.slimscroll.js"></script>
-    <script src="assets/js/horizontal-menu.js"></script>
+    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/popper.min.js') }}"></script>
+    <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('assets/js/modernizr.min.js') }}"></script>
+    <script src="{{ asset('assets/js/detect.js') }}"></script>
+    <script src="{{ asset('assets/js/jquery.slimscroll.js') }}"></script>
+    <script src="{{ asset('assets/js/horizontal-menu.js') }}"></script>
 
     <!-- Chartist Chart JS -->
-    <script src="assets/plugins/chartist-js/chartist.min.js"></script>
-    <script src="assets/plugins/chartist-js/chartist-plugin-tooltip.min.js"></script>
+    <script src="{{ asset('assets/plugins/chartist-js/chartist.min.js') }}"></script>
+    <script src="{{ asset('assets/plugins/chartist-js/chartist-plugin-tooltip.min.js') }}"></script>
 
     <!-- Dashboard JS -->
-    <script src="assets/js/init/dashborad.js"></script>
+    <script src="{{ asset('assets/js/init/dashborad.js') }}"></script>
 
     <!-- Main JS -->
-    <script src="assets/js/main.js"></script>
+    <script src="{{ asset('assets/js/main.js') }}"></script>
 
     
     <!-- End JS -->

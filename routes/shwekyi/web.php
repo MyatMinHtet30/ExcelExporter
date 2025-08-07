@@ -9,7 +9,7 @@ Route::get('shwekyi-web', fn() => 'Shwe Kyi Web is working');
 
 /* guest routes */
 Route::get('/login',  [AuthUserController::class, 'showLogin'])->name('login');
-Route::post('/login',     [AuthUserController::class, 'login'])->name('login.post');
+Route::post('/login',  [AuthUserController::class, 'login'])->name('login.post');
 
 /* protected routes */
 Route::middleware('auth')->group(function () {
@@ -24,6 +24,10 @@ Route::middleware('auth')->group(function () {
     })->name('home');
 
     Route::get('/codo', function(){
-    return view('pages.condo');
+        return view('pages.condo');
     })->name('condo');
+
+    Route::get('/createcondo', function(){
+        return view('pages.createcondo');
+    })->name('condo-form');
 });
