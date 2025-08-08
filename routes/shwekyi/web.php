@@ -8,8 +8,8 @@ Route::get('shwekyi-web', fn() => 'Shwe Kyi Web is working');
 
 
 /* guest routes */
-Route::get('/login',  [AuthUserController::class, 'showLogin'])->name('login');
-Route::post('/login',  [AuthUserController::class, 'login'])->name('login.post');
+Route::get('/',  [AuthUserController::class, 'showLogin'])->name('login');
+Route::post('/',  [AuthUserController::class, 'login'])->name('login.post');
 
 /* protected routes */
 Route::middleware('auth')->group(function () {
@@ -18,10 +18,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', function () {
         return view('pages.dashboard');
     })->name('dashboard');
-
-    Route::get('/home', function(){
-        return view('pages.home');
-    })->name('home');
 
     Route::get('/codo', function(){
         return view('pages.condo');
