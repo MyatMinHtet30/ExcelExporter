@@ -27,7 +27,7 @@
                                 <h2 class="card-title text-black">Default Data Table</h2>
                                 <h6 class="card-subtitle">With DataTables you can alter the ordering characteristics of the table at initialisation time.</h6>
                                 <div class="d-flex justify-content-end px-1.5 mt-n4 mb-1.5">
-                                    <a href="{{route('condo-form') }}" class="btn btn-primary">
+                                    <a href="{{route('condo-form') }}" class="btn btn-primary btn-sm">
                                           + Create Condo
                                     </a>
                                 </div>
