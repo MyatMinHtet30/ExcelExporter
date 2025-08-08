@@ -1,0 +1,14 @@
+  .card-header h5 {
+    white-space: nowrap;
+    margin-bottom: 0.75rem;
+  }
+  .mic-btn {
+    border-left: none;
+  }
+  .input-group .form-control {
+    border-right: 0;
+  }
+  .input-group .mic-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }

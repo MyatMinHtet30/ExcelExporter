@@ -25,15 +25,6 @@
     {{-- Include footer --}}
         @include('layouts.footer')
 
-    <!-- Common JS scripts -->
-    <script src="{{ asset('assets/js/jquery.min.js') }}"></script>
-    <script src="{{ asset('assets/js/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('assets/js/modernizr.min.js') }}"></script>
-    <script src="{{ asset('assets/js/detect.js') }}"></script>
-    <script src="{{ asset('assets/js/jquery.slimscroll.js') }}"></script>
-    <script src="{{ asset('assets/js/horizontal-menu.js') }}"></script>
-    <script src="{{ asset('assets/js/main.js') }}"></script>
 
     {{-- For page-specific JS --}}
     @stack('scripts')

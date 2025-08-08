@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\LoginRequest;
+
 
 class AuthUserController extends Controller
 {
@@ -14,12 +16,9 @@ class AuthUserController extends Controller
     }
 
     // handle login form
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $data = $request->validate([
-            'email'    => ['required','email'],
-            'password' => ['required'],
-        ]);
+        $data = $request->validated();
 
         if (Auth::attempt($data, $request->boolean('remember'))) {
             $request->session()->regenerate();

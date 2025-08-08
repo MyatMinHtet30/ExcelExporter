@@ -77,10 +77,35 @@
                                 <ul class="list-inline mb-0">
 
                                     <li class="list-inline-item mr-0">
-                                        <form action="{{ route('logout') }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="btn btn-danger btn-sm rounded-pill px-4 shadow-sm navbar-toggle">Logout</button>
-                                        </form>
+                                        <div class="dropdown xp-userprofile">
+                                            <a class="dropdown-toggle user-profile-img" href="#" role="button" id="xp-userprofile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="assets/images/topbar/user.jpg" alt="user-profile" class="rounded-circle img-fluid"><span class="xp-user-live"></span></a>
+
+                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="xp-userprofile">
+                                                <a class="dropdown-item" href="#">Welcome, John Doe</a>
+                                                <a class="dropdown-item" href="#"><i class="mdi mdi-account mr-2"></i> Profile</a>
+                                                <a class="dropdown-item" href="#"><i class="mdi mdi-credit-card mr-2"></i> Billing</a>
+                                                <a class="dropdown-item" href="#"><i class="mdi mdi-settings mr-2"></i> Setting</a>
+                                                <a class="dropdown-item" href="#"><i class="mdi mdi-lock mr-2"></i> Lock Screen</a>
+                                                <!-- <form id="logout-form" action="{{ route('logout') }}" method="POST"> -->
+                                                    <!-- @csrf
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="mdi mdi-logout mr-2"></i> Logout
+                                                    </button>
+                                                </form> -->
+                                                <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                    <i class="mdi mdi-logout mr-2"></i> Logout
+                                                </a>
+
+                                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                                    @csrf
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </li>
+                                                                        <li class="list-inline-item xp-horizontal-menu-toggle">
+                                        <button type="button" class="navbar-toggle bg-transparent" data-toggle="collapse" data-target="#navbar-menu">
+                                            <i class="mdi mdi-sort-variant font-24 text-white"></i>
+                                        </button>
                                     </li>
 
                                 </ul>
