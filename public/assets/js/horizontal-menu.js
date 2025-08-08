@@ -1,5 +1,5 @@
 "use strict";
-$(document).ready(function() { 
+$(document).ready(function() {
 
 	$.fn.xpNav = function () {
 		return this.each( function() {
@@ -28,7 +28,7 @@ $(document).ready(function() {
 
 				$menu.find('li.active').removeClass('active');
 				$menu.find( 'a[href="'+ location.href +'"]' ).parent('li').addClass('active');
-			});			
+			});
 
 			/* -----  XP Mobile Navbar  ----- */
 			if( getNav.hasClass('xp-mobile-navbar') ) {
@@ -82,7 +82,7 @@ $(document).ready(function() {
 				if ( getWindow > 991 && $(window).scrollTop() > top ) {
 					getNav.addClass('xp-sticky-navbar');
 				}
-			}			
+			}
 
 			/* -----  Events  ----- */
 			getNav.find('.xp-horizontal-menu, .extension-nav').each(function(){
@@ -135,7 +135,7 @@ $(document).ready(function() {
 						var submenu;
 						for (submenu in $columnMenus) {
 							$columnMenus[ submenu ].stop().fadeIn().addClass(getIn);
-						}	
+						}
 					});
 
 					$(megamenu).on('mouseleave', function() {

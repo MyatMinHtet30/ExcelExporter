@@ -3,342 +3,314 @@
 @section('title', 'New Home Data Entry')
 
 @push('styles')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="{{ asset('assets/css/forminput-table.css') }}" rel="stylesheet" type="text/css" />
 <style>
-    .remove-row-btn {
-        cursor: pointer;
-        color: red;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.9rem;
-    }
+  /* ---------- General polish ---------- */
+  .item-row{position:relative}
+  .item-row .card-header{padding:1rem 1rem .75rem}
+  .item-row .card-body{padding:.25rem 1rem 1rem}
+  .form-label{font-weight:600; color:#495057; margin-bottom:.35rem}
+  .input-group.input-42>.form-control,
+  .input-group.input-42>.btn{height:42px}
+  .readonly-input[readonly]{background:#f1f3f5}
+  .field-col{display:flex; flex-direction:column}
+  .field-col .input-group,
+  .field-col .form-control{width:100%}
+  .g-compact{row-gap:.75rem}
 
-    /* Flex container for input + mic icon */
-    .input-icon-wrapper {
-        display: flex;
-        align-items: center;
-        position: relative;
-    }
+  .remove-row{
+    position: static;
+    line-height:1;
+    margin-top:.5rem;
+    border-radius:4px;
+    padding:.25rem .75rem;
+  }
 
-    /* Make input fill available width */
-    .input-icon-wrapper input.form-control {
-        flex-grow: 1;
-        padding-right: 0.5rem;
+  /* Mobile tweaks for 2nd row fields */
+  @media (max-width: 576px){
+    .item-row .card-header{padding:.75rem .75rem}
+    .g-compact{row-gap:.5rem}
+    .input-group.input-42>.form-control,
+    .input-group.input-42>.btn{height:40px}
+    .mic-btn{min-width:40px}
+    .fields-line-2 > .field-col{flex:0 0 50%;max-width:50%}
+    .readonly-input{height:40px}
+    .item-row .remove-mobile{
+      position:absolute;top:.5rem;right:.5rem;width:32px;height:32px;padding:0;border-radius:6px;
+      display:inline-flex;align-items:center;justify-content:center;
     }
+    .item-row .remove-row{display:none}
+  }
+  @media (min-width: 577px){
+    .item-row .remove-mobile{display:none}
+  }
 
-    /* Mic icon style */
-    .speech-icon {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        margin-left: 0.5rem;
-        user-select: none;
-        pointer-events: none; /* so clicks go to input */
-    }
-
-    /* Default min width for the table */
-    #items-table {
-        min-width: 900px;
-    }
-
-    /* Adjust min width for tablets */
-    @media (max-width: 768px) {
-        #items-table {
-            min-width: 700px;
-        }
-    }
-
-    /* Column widths */
-    #items-table th:nth-child(1),
-    #items-table td.row-no {
-        width: 50px;
-        text-align: center;
-        vertical-align: middle;
-    }
-    #items-table th:last-child,
-    #items-table td:last-child {
-        width: 70px;
-        text-align: center;
-        vertical-align: middle;
-        padding: 0.25rem;
-    }
-    #items-table th:nth-child(2),
-    #items-table td.details-column {
-        width: 50%;
-    }
-    #items-table th:nth-child(3),
-    #items-table td.amount-column {
-        width: 15%;
-    }
-    #items-table th:nth-child(4),
-    #items-table td.input-column:nth-child(4) {
-        width: 10%;
-    }
-    #items-table th:nth-child(5),
-    #items-table td.input-column:nth-child(5) {
-        width: 10%;
-    }
-    #items-table th:nth-child(6),
-    #items-table td.input-column:nth-child(6) {
-        width: 10%;
-    }
-    /* Inputs fill entire cell width */
-    #items-table input.form-control {
-        width: 100%;
-        max-width: none;
-    }
+  /* --- Only for keeping Generate at the bottom on the left --- */
+  .left-controls{display:flex; flex-direction:column; height:100%}
+  .left-controls .btn-generate{margin-top:auto}
 </style>
 @endpush
 
 @section('content')
-<div class="xp-contentbar">
+<form action="{{ route('home.store') }}" method="POST">
+@csrf
+  <div class="xp-contentbar">
     <div class="row">
-        <div class="col-lg-12">
-            <div class="card m-b-30">
-                <div class="card-header bg-white">
-                    <h5 class="card-title text-black">New Home Data Entry</h5>
-                    <h6 class="card-subtitle">Fill the form below to add new home data.</h6>
+
+      <!-- Top info cards -->
+      <div class="col-lg-4 col-md-4 col-12">
+        <div class="card m-b-20">
+          <div class="card-header bg-white">
+            <h5 class="card-title text-black">Project Name</h5>
+            <div class="card-body">
+              <div class="form-group">
+                <div class="input-group input-42">
+                  <input type="text" class="form-control" name="project_name" id="project_name" placeholder="Enter project name" required>
+                  <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
+                    <i class="fas fa-microphone"></i>
+                  </button>
                 </div>
-                <div class="card-body">
-
-                    @if(session('success'))
-                        <div class="alert alert-success">{{ session('success') }}</div>
-                    @endif
-
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-
-                    <form action="{{ route('home.store') }}" method="POST">
-                        @csrf
-
-                        {{-- Main form fields with mic icon and placeholder --}}
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="project_name">Project Name:</label>
-                                <x-input-with-mic
-                                    name="project_name"
-                                    id="project_name"
-                                    placeholder="Enter project name"
-                                    :value="old('project_name')"
-                                    required
-                                />
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="dear">Dear:</label>
-                                <x-input-with-mic
-                                    name="dear"
-                                    id="dear"
-                                    placeholder="Enter recipient's name"
-                                    :value="old('dear')"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="date">Date:</label>
-                                <x-input-with-mic
-                                    type="date"
-                                    name="date"
-                                    id="date"
-                                    placeholder="Select date"
-                                    :value="old('date')"
-                                    required
-                                />
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="house_no">House No:</label>
-                                <x-input-with-mic
-                                    name="house_no"
-                                    id="house_no"
-                                    placeholder="Enter house number"
-                                    :value="old('house_no')"
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="list_name">List Name:</label>
-                                <x-input-with-mic
-                                    name="list_name"
-                                    id="list_name"
-                                    placeholder="Enter list name"
-                                    :value="old('list_name')"
-                                    required
-                                />
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="status">Status:</label>
-                                <select id="status" name="status" class="form-control">
-                                    <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Active</option>
-                                    <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Inactive</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        {{-- Dynamic Rows --}}
-                        <div class="form-group">
-                            <label>Items</label>
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="items-table">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Details</th>
-                                            <th>Amount</th>
-                                            <th>Units</th>
-                                            <th>Material Cost</th>
-                                            <th>Labor Price</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="row-no">1</td>
-                                            <td class="details-column">
-                                                <x-input-with-mic
-                                                    name="items[0][details]"
-                                                    placeholder="Enter details"
-                                                    required
-                                                />
-                                            </td>
-                                            <td class="amount-column">
-                                                <x-input-with-mic
-                                                    type="number"
-                                                    name="items[0][amount]"
-                                                    placeholder="0"
-                                                    required
-                                                />
-                                            </td>
-                                            <td class="input-column">
-                                                <x-input-with-mic
-                                                    name="items[0][units]"
-                                                    placeholder="Unit"
-                                                    required
-                                                />
-                                            </td>
-                                            <td class="input-column">
-                                                <x-input-with-mic
-                                                    type="number"
-                                                    name="items[0][material_cost]"
-                                                    placeholder="0"
-                                                    required
-                                                />
-                                            </td>
-                                            <td class="input-column">
-                                                <x-input-with-mic
-                                                    type="number"
-                                                    name="items[0][labor_price]"
-                                                    placeholder="0"
-                                                    required
-                                                />
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn btn-danger btn-sm remove-row-btn" disabled>&times;</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <button type="button" id="add-row-btn" class="btn btn-primary mt-2">+ Add Row</button>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </form>
-
-                </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+
+      <div class="col-lg-4 col-md-4 col-12">
+        <div class="card m-b-20">
+          <div class="card-header bg-white">
+            <h5 class="card-title text-black">Dear</h5>
+            <div class="card-body">
+              <div class="form-group">
+                <div class="input-group input-42">
+                  <input type="text" class="form-control" name="dear" id="dear" placeholder="Enter recipient name" required>
+                  <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-4 col-12">
+        <div class="card m-b-20">
+          <div class="card-header bg-white">
+            <h5 class="card-title text-black">List Name</h5>
+            <div class="card-body">
+              <div class="form-group">
+                <div class="input-group input-42">
+                  <input type="text" class="form-control" name="list_name" id="list_name" placeholder="Enter list name" required>
+                  <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-12">
+        <div class="card m-b-20">
+          <div class="card-header bg-white">
+            <h5 class="card-title text-black">House No</h5>
+            <div class="card-body">
+              <div class="form-group">
+                <div class="input-group input-42">
+                  <input type="text" class="form-control" name="house_no" id="house_no" placeholder="Enter house no." required>
+                  <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-md-6 col-12">
+        <div class="card m-b-20">
+          <div class="card-header bg-white">
+            <h5 class="card-title text-black">Trooper</h5>
+            <div class="card-body">
+              <div class="form-group">
+                <div class="input-group input-42">
+                  <input type="text" class="form-control" name="trooper" id="trooper" placeholder="Enter trooper" required>
+                  <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- Dynamic item rows ---------- -->
+      <div id="rows-container" class="col-12">
+        <div class="card m-b-2 item-row">
+          <div class="card-header bg-white">
+            <button type="button" class="btn btn-danger btn-sm remove-mobile" disabled>&times;</button>
+
+            <!-- Line 1 -->
+            <div class="row g-3 g-compact align-items-end">
+              <div class="col-3 col-sm-2 col-md-1 field-col">
+                <label class="form-label">No</label>
+                <div class="input-group input-42">
+                  <input type="text" class="form-control readonly-input serial" value="1" readonly>
+                </div>
+              </div>
+
+              <div class="col-12 col-sm-10 col-md-6 field-col">
+                <label class="form-label">Category / Details</label>
+                <div class="input-group input-42">
+                  <input type="text" class="form-control" name="items[0][details]" placeholder="Enter item name" required>
+                  <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-2 field-col">
+                <label class="form-label">Amount</label>
+                <div class="input-group input-42">
+                  <input type="number" step="0.01" class="form-control" name="items[0][amount]" placeholder=".00" required>
+                </div>
+              </div>
+
+              <div class="col-6 col-md-3 field-col">
+                <label class="form-label">Unit</label>
+                <div class="input-group input-42">
+                  <input type="text" class="form-control" name="items[0][unit]" placeholder="Unit" required>
+                  <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
+                    <i class="fas fa-microphone"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Line 2 -->
+            <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
+              <div class="col-12 col-md field-col">
+                <label class="form-label">Material Price / Unit</label>
+                <div class="input-group input-42">
+                  <input type="number" step="0.01" class="form-control" name="items[0][material_unit_price]" placeholder=".00" required>
+                </div>
+              </div>
+
+              <div class="col-12 col-md field-col">
+                <label class="form-label">Material Total</label>
+                <div class="input-group input-42">
+                  <input type="number" step="0.01" name="items[0][material_total]" class="form-control readonly-input" placeholder="0.00" readonly>
+                </div>
+              </div>
+
+              <div class="col-12 col-md field-col">
+                <label class="form-label">Labor Price / Unit</label>
+                <div class="input-group input-42">
+                  <input type="number" step="0.01" class="form-control" name="items[0][labor_unit_price]" placeholder=".00" required>
+                </div>
+              </div>
+
+              <div class="col-12 col-md field-col">
+                <label class="form-label">Labor Total</label>
+                <div class="input-group input-42">
+                  <input type="number" step="0.01" name="items[0][labor_total]" class="form-control readonly-input" placeholder="0.00" readonly>
+                </div>
+              </div>
+
+              <div class="col-12 col-md field-col">
+                <label class="form-label">Grand Total</label>
+                <div class="input-group input-42">
+                  <input type="number" step="0.01" name="items[0][grand_total]" class="form-control readonly-input" placeholder="0.00" readonly>
+                </div>
+              </div>
+            </div>
+
+            <div class="row pt-2">
+              <div class="col-12 d-flex justify-content-end">
+                <button type="button" class="btn btn-sm btn-danger remove-row" disabled>&times;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== Actions + Summary (condo layout) ===== -->
+      <div class="col-lg-12">
+        <div class="card m-b-20">
+          <div class="card-header bg-white">
+            <div class="row">
+              <!-- Left: buttons -->
+              <div class="col-md-8 col-5">
+                <div class="card-body left-controls">
+                  <div class="form-group">
+                    <button type="button" class="btn btn-primary" id="add-row-btn">+ Add Row</button>
+                  </div>
+                  <div class="form-group btn-generate">
+                    <button type="submit" class="btn btn-success" id="generate-btn">Generate</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: compact totals -->
+              <div class="col-md3 col-4">
+                <div class="text-end" style="min-width: 200px; margin-left: auto">
+
+                  <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
+                    <strong>Total:</strong>
+                    <span class="ms-2" id="miscDisplay">0.00</span>
+                  </div>
+
+                  <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
+                    <strong class="text-start">
+                      <span class="d-block">Operating +</span>
+                      <span class="d-block">Profit (15%)</span>
+                    </strong>
+                    <span class="ms-2" id="operatingDisplay">0.00</span>
+                  </div>
+
+                  <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
+                    <strong class="text-start">
+                      <span class="d-block">Category A,B</span>
+                      <span class="d-block">Total</span>
+                    </strong>
+                    <span class="ms-2" id="abDisplay">0.00</span>
+                  </div>
+
+                  <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
+                    <strong>VAT (7%)</strong>
+                    <span class="ms-2" id="vatDisplay">0.00</span>
+                  </div>
+
+                  <div class="d-flex justify-content-between border p-2 bg-light">
+                    <strong>Total Price:</strong>
+                    <span class="ms-2" id="finalDisplay">0.00</span>
+                  </div>
+
+                  <!-- Hidden inputs for backend -->
+                  <input type="hidden" id="misc_total" name="misc_total">
+                  <input type="hidden" id="operating_expenses" name="operating_expenses">
+                  <input type="hidden" id="category_ab_total" name="category_ab_total">
+                  <input type="hidden" id="vat_total" name="vat_total">
+                  <input type="hidden" id="final_total" name="final_total">
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ===== /Actions + Summary ===== -->
+
     </div>
-</div>
+  </div>
+</form>
 @endsection
 
 @push('scripts')
-<script>
-    let rowIndex = 1;
-
-    function updateRowNumbers() {
-        const rows = document.querySelectorAll('#items-table tbody tr');
-        rows.forEach((row, index) => {
-            row.querySelector('.row-no').textContent = index + 1;
-
-            const inputs = row.querySelectorAll('input');
-            inputs.forEach(input => {
-                const name = input.name;
-                const newName = name.replace(/items\[\d+\]/, `items[${index}]`);
-                input.name = newName;
-            });
-        });
-    }
-
-    document.getElementById('add-row-btn').addEventListener('click', function() {
-        const tbody = document.querySelector('#items-table tbody');
-        const newRow = document.createElement('tr');
-
-        newRow.innerHTML = `
-            <td class="row-no"></td>
-            <td class="details-column">
-                <x-input-with-mic
-                    name="items[${rowIndex}][details]"
-                    placeholder="Enter details"
-                    required
-                />
-            </td>
-            <td class="amount-column">
-                <x-input-with-mic
-                    type="number"
-                    name="items[${rowIndex}][amount]"
-                    placeholder="0"
-                    required
-                />
-            </td>
-            <td class="input-column">
-                <x-input-with-mic
-                    name="items[${rowIndex}][units]"
-                    placeholder="Unit"
-                    required
-                />
-            </td>
-            <td class="input-column">
-                <x-input-with-mic
-                    type="number"
-                    name="items[${rowIndex}][material_cost]"
-                    placeholder="0"
-                    required
-                />
-            </td>
-            <td class="input-column">
-                <x-input-with-mic
-                    type="number"
-                    name="items[${rowIndex}][labor_price]"
-                    placeholder="0"
-                    required
-                />
-            </td>
-            <td><button type="button" class="btn btn-danger btn-sm remove-row-btn">&times;</button></td>
-        `;
-
-        tbody.appendChild(newRow);
-
-        newRow.querySelector('.remove-row-btn').addEventListener('click', () => {
-            newRow.remove();
-            updateRowNumbers();
-        });
-
-        rowIndex++;
-        updateRowNumbers();
-    });
-
-    document.addEventListener('DOMContentLoaded', () => {
-        updateRowNumbers();
-    });
-</script>
+<script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
 @endpush

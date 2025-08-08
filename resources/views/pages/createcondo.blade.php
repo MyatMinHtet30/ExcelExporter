@@ -4,7 +4,7 @@
 
 @push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<link href="{{ asset('assets/css/forminput-table.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/css/forminput-table.css') }}   " rel="stylesheet" type="text/css" />
 @endpush
 
 @section('content')
@@ -31,7 +31,7 @@
                                 </div>
                             </div>
                             </div>
-                            
+
                         </div>
                     </div>
                     <!-- End XP Col -->
@@ -89,7 +89,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- End XP Col -->  
+                    <!-- End XP Col -->
 
                     <!-- Start XP Col -->
                     <div class="col-lg-3 col-md-3 col-6">
@@ -141,7 +141,7 @@
                         <div class="card m-b-2 item-row">
                           <div class="card-header bg-white">
                             <div class="row">
-                              
+
                               <div class="col-lg-1 col-md-1 col-2">
                                 <h5 class="card-title text-black">No</h5>
                                 <div class="card-body">
@@ -207,7 +207,7 @@
                                 <div class="card-body">
                                   <div class="form-group">
                                     <input type="text" class="form-control price-per-unit" name="price_per_unit" placeholder=".00">
-                                  </div> 
+                                  </div>
                                 </div>
                               </div>
 
@@ -237,7 +237,7 @@
                             <div class="card-header bg-white">
                               <div class="row">
 
-                              
+
 
                                 <div class="col-md-8 col-5">
                                   <div class="card-body">
@@ -245,16 +245,16 @@
                                           <button type="button" class="btn btn-primary" id="add-row-btn">+ Add Row</button>
                                       </div>
 
-                                      <div class="form-group pt-5"> 
+                                      <div class="form-group pt-5">
                                         <button type="button" class="btn btn-success" id="generate-btn">Generate</button>
                                       </div>
                                   </div>
                                 </div>
 
-                                
+
                                 <div class="col-md3 col-4">
                                   <div class="text-end" style="min-width: 200px; margin-left: auto">
-                                    
+
                                     <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                         <strong>Total:</strong>
                                         <span class="ms-2" id="totalDisplay">0.00</span>
@@ -270,13 +270,13 @@
                                         <span class="ms-2" id="totalPriceDisplay">0.00</span>
                                     </div>
                                 </div>
-                                
+
                               </div>
                             </div>
                         </div>
                     </div>
-                </div> 
-                <!-- end row -->   
+                </div>
+                <!-- end row -->
 
             </div>
 </form>
