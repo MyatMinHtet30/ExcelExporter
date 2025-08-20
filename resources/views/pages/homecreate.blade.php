@@ -36,19 +36,42 @@
     .mic-btn{min-width:40px}
     .fields-line-2 > .field-col{flex:0 0 50%;max-width:50%}
     .readonly-input{height:40px}
-    .item-row .remove-mobile{
-      position:absolute;top:.5rem;right:.5rem;width:32px;height:32px;padding:0;border-radius:6px;
-      display:inline-flex;align-items:center;justify-content:center;
+
+    /* ⬇️ show ONLY bottom X on phones, hide the top-right X */
+    .item-row .remove-mobile{ display:none !important; }
+    .item-row .remove-row{
+      display:inline-flex !important;
+      align-items:center; justify-content:center;
+      width:32px; height:32px; padding:0; border-radius:6px; line-height:1;
     }
-    .item-row .remove-row{display:none}
   }
   @media (min-width: 577px){
     .item-row .remove-mobile{display:none}
   }
 
-  /* --- Only for keeping Generate at the bottom on the left --- */
+  /* --- Keep Generate at the bottom on the left --- */
   .left-controls{display:flex; flex-direction:column; height:100%}
   .left-controls .btn-generate{margin-top:auto}
+
+  /* ===== iPhone SE / narrow phones: keep 2-col layout, widen summary, slim buttons ===== */
+  @media (max-width: 420px){
+    /* make left (buttons) narrower, right (summary) wider */
+    .card-header .row > .col-md-8.col-5{
+      flex:0 0 40% !important; max-width:40% !important; width:40% !important;
+    }
+    .card-header .row > .col-md3.col-4{
+      flex:0 0 60% !important; max-width:60% !important; width:60% !important;
+    }
+    /* let summary panel fit inside its col-4 */
+    .card-header .row > .col-md3.col-4 .text-end{
+      min-width:0 !important; width:100% !important; margin-left:0 !important;
+    }
+    /* slim ONLY Add Row & Generate (not mic buttons) */
+    #add-row-btn, #generate-btn{
+      padding:.35rem .5rem; font-size:.85rem; line-height:1.2;
+    }
+    .left-controls .form-group{ margin-bottom:.5rem; }
+  }
 </style>
 @endpush
 

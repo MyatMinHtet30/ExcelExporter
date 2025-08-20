@@ -8,6 +8,55 @@
     <link href="{{ asset('assets/plugins/datatables/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
     <!-- Responsive Datatable CSS -->
     <link href="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <style>
+      /* iPhone SE / narrow phones: prevent the +Create Home button from covering text */
+      @media (max-width: 420px){
+        .card-header .card-subtitle{ margin-bottom:.5rem; }
+        .card-header .d-flex.justify-content-end.px-1.5.mt-n4.mb-1.5{
+          margin-top:.25rem !important;
+          margin-bottom:.5rem !important;
+          padding-left:0 !important;
+          padding-right:0 !important;
+          width:100%;
+          justify-content:flex-start;
+        }
+        .card-header .d-flex.justify-content-end.px-1.5.mt-n4.mb-1.5 .btn{
+          width:100%;
+          font-size:.9rem;
+          padding:.45rem .75rem;
+        }
+      }
+
+      /* Smooth horizontal scroll + symmetric breathing room on phones */
+      .table-responsive{
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+      }
+      @media (max-width: 420px){
+        /* visual padding on the right side of the scroll area */
+        .table-responsive{ padding-right: 1.25rem; }
+
+        /* real scroll buffer INSIDE the table */
+        #xp-default-datatable{
+          border-collapse: separate;
+          padding-right: 1.25rem;
+          background-color: inherit;
+          position: relative;                /* enable :after border */
+        }
+        /* draw a right border at the very end of the padded table */
+        #xp-default-datatable::after{
+          content: "";
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          width: 1px;
+          background: #dee2e6;              /* bootstrap-ish border color */
+          pointer-events: none;
+        }
+      }
+    </style>
 @endpush
 
 @section('content')

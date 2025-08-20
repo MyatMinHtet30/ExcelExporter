@@ -29,3 +29,4 @@
     {{-- For page-specific JS --}}
     @stack('scripts')
 </body>
+
