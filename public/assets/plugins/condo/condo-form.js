@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('taxDisplay').textContent = formatNumber(tax);
     document.getElementById('totalPriceDisplay').textContent = formatNumber(finalTotal);
   }
-  
+
 
   // Listen to input changes on rows container (event delegation)
   rowsContainer.addEventListener('input', (e) => {
@@ -136,4 +136,39 @@ addRowBtn.addEventListener('click', () => {
     calculateRow(row);
   });
   calculateTotals();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const rowsContainer = document.getElementById('rows-container');
+  if (!rowsContainer) return;
+
+  const enforce = () => {
+    const rows = rowsContainer.querySelectorAll('.item-row');
+    rows.forEach((row, i) => {
+      const btn = row.querySelector('.remove-row');
+      if (!btn) return;
+      if (i === 0) {
+        btn.disabled = true;
+        btn.title = 'First row cannot be removed';
+      } else {
+        btn.disabled = false;
+        btn.removeAttribute('title');
+      }
+    });
+  };
+
+  // run once
+  enforce();
+
+  // keep it enforced if rows are added/removed
+  const mo = new MutationObserver(enforce);
+  mo.observe(rowsContainer, { childList: true, subtree: true });
+
+  // also enforce right after user clicks add/remove
+  rowsContainer.addEventListener('click', (e) => {
+    if (e.target.closest('.remove-row')) setTimeout(enforce, 0);
+  });
+  document.getElementById('add-row-btn')?.addEventListener('click', () => {
+    setTimeout(enforce, 0);
+  });
 });

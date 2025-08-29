@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="{{ app()->getLocale() }}">
 
+<head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="Booster is a bootstrap & laravel admin dashboard template">
-    <meta name="keywords" content="admin, admin dashboard, admin panel, admin template, admin theme, bootstrap 4, laravel, crm, analytics, responsive, sass support, ui kits, web app, clean design, creative">
+    <meta name="keywords"
+        content="admin, admin dashboard, admin panel, admin template, admin theme, bootstrap 4, laravel, crm, analytics, responsive, sass support, ui kits, web app, clean design, creative">
     <meta name="author" content="Themesbox17">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
 
@@ -15,13 +16,44 @@
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
 
     <!-- Start CSS -->
-    <!-- Chartist Chart CSS -->
     <link rel="stylesheet" href="{{ asset('assets/plugins/chartist-js/chartist.min.css') }}">
-
     <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/css/icons.css') }}" rel="stylesheet" type="text/css">
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css">
 
+    <style>
+        .lang-switch .btn-lang {
+            padding: .45rem .9rem;
+            border: 2px solid rgba(255, 255, 255, .9);
+            border-radius: 9999px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            line-height: 1;
+            color: #fff !important;
+            background: rgba(0, 0, 0, .15);
+            backdrop-filter: blur(6px);
+            transition: .15s ease;
+        }
+
+        .lang-switch .btn-lang:hover {
+            border-color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .lang-switch .dropdown-menu {
+            min-width: 160px;
+        }
+
+        @media (max-width:576px) {
+            .lang-switch {
+                margin-right: .25rem;
+            }
+
+            .lang-switch .btn-lang {
+                padding: .4rem .7rem;
+            }
+        }
+    </style>
 </head>
 
 <body class="xp-horizontal">
@@ -43,16 +75,15 @@
 
                         <!-- Start XP Col -->
                         <div class="col-3 col-md-2 col-lg-2 order-1 order-md-1 align-self-center">
-                            <!-- Start XP Logobar -->
                             <div class="xp-logobar">
                                 <a href="index.html" class="xp-small-logo">
-                                    <img src="{{ asset('assets/images/mobile-logo.svg') }}" class="img-fluid" alt="logo">
+                                    <img src="{{ asset('assets/images/mobile-logo.svg') }}" class="img-fluid"
+                                        alt="logo">
                                 </a>
                                 <a href="index.html" class="xp-main-logo">
                                     <img src="{{ asset('assets/images/logo.svg') }}" class="img-fluid" alt="logo">
                                 </a>
                             </div>
-                            <!-- End XP Logobar -->
                         </div>
                         <!-- End XP Col -->
 
@@ -61,10 +92,11 @@
                             <div class="xp-searchbar">
                                 <form>
                                     <div class="input-group">
-                                      <input type="search" class="form-control" placeholder="Search" aria-label="Search" aria-describedby="button-addon2">
-                                      <div class="input-group-append">
-                                        <button class="btn" type="submit" id="button-addon2">GO</button>
-                                      </div>
+                                        <input type="search" class="form-control" placeholder="{{ __('Search') }}"
+                                            aria-label="Search" aria-describedby="button-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn" type="submit" id="button-addon2">{{ __('GO') }}</button>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
@@ -76,34 +108,63 @@
                             <div class="xp-profilebar text-right">
                                 <ul class="list-inline mb-0">
 
+                                    <!-- Language Switcher (ENG / THA) -->
+                                    @php
+                                        $locale = app()->getLocale();
+                                        $currentLang = $locale === 'th' ? 'THA' : 'ENG';
+                                    @endphp
+                                    <li class="list-inline-item lang-switch">
+                                        <div class="dropdown">
+                                            <a class="dropdown-toggle btn-lang" href="#" id="langDropdown"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                                title="{{ __('Change language') }}">
+                                                {{ $currentLang }}
+                                            </a>
+                                            <div class="dropdown-menu dropdown-menu-right shadow"
+                                                aria-labelledby="langDropdown">
+                                                <a class="dropdown-item" href="{{ url('lang/en') }}">English</a>
+                                                <a class="dropdown-item" href="{{ url('lang/th') }}">ไทย</a>
+                                            </div>
+                                        </div>
+                                    </li>
+
                                     <li class="list-inline-item mr-0">
                                         <div class="dropdown xp-userprofile">
-                                            <a class="dropdown-toggle user-profile-img" href="#" role="button" id="xp-userprofile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="assets/images/topbar/user.jpg" alt="user-profile" class="rounded-circle img-fluid"><span class="xp-user-live"></span></a>
+                                            <a class="dropdown-toggle user-profile-img" href="#" role="button"
+                                                id="xp-userprofile" data-toggle="dropdown" aria-haspopup="true"
+                                                aria-expanded="false">
+                                                <img src="{{ asset('assets/images/topbar/user.jpg') }}"
+                                                    alt="user-profile" class="rounded-circle img-fluid">
+                                                <span class="xp-user-live"></span>
+                                            </a>
 
-                                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="xp-userprofile">
-                                                <a class="dropdown-item" href="#">Welcome, John Doe</a>
-                                                <a class="dropdown-item" href="#"><i class="mdi mdi-account mr-2"></i> Profile</a>
-                                                <a class="dropdown-item" href="#"><i class="mdi mdi-credit-card mr-2"></i> Billing</a>
-                                                <a class="dropdown-item" href="#"><i class="mdi mdi-settings mr-2"></i> Setting</a>
-                                                <a class="dropdown-item" href="#"><i class="mdi mdi-lock mr-2"></i> Lock Screen</a>
-                                                <!-- <form id="logout-form" action="{{ route('logout') }}" method="POST"> -->
-                                                    <!-- @csrf
-                                                    <button type="submit" class="dropdown-item">
-                                                        <i class="mdi mdi-logout mr-2"></i> Logout
-                                                    </button>
-                                                </form> -->
-                                                <a href="#" class="dropdown-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                                    <i class="mdi mdi-logout mr-2"></i> Logout
+                                            <div class="dropdown-menu dropdown-menu-right"
+                                                aria-labelledby="xp-userprofile">
+                                                <a class="dropdown-item"
+                                                    href="#">{{ __('Welcome, :name', ['name' => 'John Doe']) }}</a>
+                                                <a class="dropdown-item" href="#"><i class="mdi mdi-account mr-2"></i>
+                                                    {{ __('Profile') }}</a>
+                                                <a class="dropdown-item" href="#"><i
+                                                        class="mdi mdi-credit-card mr-2"></i> {{ __('Billing') }}</a>
+                                                <a class="dropdown-item" href="#"><i class="mdi mdi-settings mr-2"></i>
+                                                    {{ __('Setting') }}</a>
+                                                <a class="dropdown-item" href="#"><i class="mdi mdi-lock mr-2"></i>
+                                                    {{ __('Lock Screen') }}</a>
+                                                <a href="#" class="dropdown-item"
+                                                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                    <i class="mdi mdi-logout mr-2"></i> {{ __('Logout') }}
                                                 </a>
-
-                                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                                    style="display: none;">
                                                     @csrf
                                                 </form>
                                             </div>
                                         </div>
                                     </li>
-                                                                        <li class="list-inline-item xp-horizontal-menu-toggle">
-                                        <button type="button" class="navbar-toggle bg-transparent" data-toggle="collapse" data-target="#navbar-menu">
+
+                                    <li class="list-inline-item xp-horizontal-menu-toggle">
+                                        <button type="button" class="navbar-toggle bg-transparent"
+                                            data-toggle="collapse" data-target="#navbar-menu">
                                             <i class="mdi mdi-sort-variant font-24 text-white"></i>
                                         </button>
                                     </li>
@@ -122,43 +183,39 @@
                 <!-- Start XP Breadcrumbbar -->
                 <div class="xp-breadcrumbbar text-center">
                     <h4 class="page-title">@yield('title')</h4>
-                      <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Booster</a></li>
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#">{{ __('Booster') }}</a></li>
                         <li class="breadcrumb-item active" aria-current="page">@yield('title')</li>
-                      </ol>
+                    </ol>
                 </div>
                 <!-- End XP Breadcrumbbar -->
 
                 <!-- Start XP Menubar -->
                 <div class="xp-menubar text-left">
-
-                    <!-- Start XP Nav -->
                     <nav class="xp-horizontal-nav xp-mobile-navbar xp-fixed-navbar">
-
                         <div class="collapse navbar-collapse" id="navbar-menu">
-                          <ul class="xp-horizontal-menu">
+                            <ul class="xp-horizontal-menu">
+                                <li class="dropdown">
+                                    <a href="{{ route('dashboard') }}"><i
+                                            class="mdi mdi-view-dashboard"></i><span>{{ __('Dashboard') }}</span></a>
+                                </li>
+                                <li class="menu-item-has-mega-menu">
+                                    <a href="{{ route('home') }}"><i
+                                            class="mdi mdi-layers"></i><span>{{ __('Home') }}</span></a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('condo') }}"><i
+                                            class="mdi mdi-package-variant"></i><span>{{ __('Condo') }}</span></a>
+                                </li>
 
-                            <li class="dropdown">
-                              <a href="{{ route('dashboard') }}" ><i class="mdi mdi-view-dashboard"></i><span>Dashboard</span></a>
-                            </li>
-                            <li class="menu-item-has-mega-menu">
-                              <a href="{{ route('home') }}"><i class="mdi mdi-layers"></i><span>Home</span></a>
-                            </li>
-                            <li>
-                              <a href="{{ route('condo') }}"><i class="mdi mdi-package-variant"></i><span>Condo</span></a>
-                            </li>
-                              <div class="mega-menu dropdown-menu">
-                                <ul class="mega-menu-row" role="menu">
-                                  <li class="mega-menu-col col-md-4">
-                                </ul>
-                              </div>
-                            </li>
-                          </ul>
+                                <div class="mega-menu dropdown-menu">
+                                    <ul class="mega-menu-row" role="menu">
+                                        <li class="mega-menu-col col-md-4"></li>
+                                    </ul>
+                                </div>
+                            </ul>
                         </div>
-
                     </nav>
-                    <!-- End XP Nav -->
-
                 </div>
                 <!-- End XP Menubar -->
 

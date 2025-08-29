@@ -1,224 +1,197 @@
-
-   //Speech to text  (Thai)
+// ===== Speech to text (Thai) =====
 function startDictation(btn){
   const input = btn.closest('.input-group')?.querySelector('input');
   if(!input) return;
-
   if(!('webkitSpeechRecognition' in window)){
     alert('เบราว์เซอร์นี้ไม่รองรับการจดจำเสียง (Speech Recognition).');
     return;
   }
-
   const r = new webkitSpeechRecognition();
-  r.lang = 'th-TH';            // ← use Thai for recording incoming information
-  r.interimResults = false;
-  r.maxAlternatives = 1;
+  r.lang = 'th-TH'; r.interimResults = false; r.maxAlternatives = 1;
   r.onresult = e => {
     input.value = e.results[0][0].transcript;
-    input.dispatchEvent(new Event('input', {bubbles:true}));
+    input.dispatchEvent(new Event('input',{bubbles:true}));
   };
   r.start();
 }
 window.startDictation = startDictation;
 
+// ===== Helpers =====
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const to2 = n => (isFinite(n)?Number(n):0).toFixed(2);
 
-/* =======================
-   Rows & totals
-   ======================= */
-let rowIndex = 1;
-
-function to2(n){ return (isFinite(n) ? Number(n) : 0).toFixed(2); }
-
+// ===== Row & totals calc =====
 function calcRow(row){
-  if(!row) return;
-
-  const amount = parseFloat(row.querySelector('input[name*="[amount]"]')?.value) || 0;
-  const mUnit  = parseFloat(row.querySelector('input[name*="[material_unit_price]"]')?.value) || 0;
-  const lUnit  = parseFloat(row.querySelector('input[name*="[labor_unit_price]"]')?.value) || 0;
-
+  const v = sel => parseFloat($(sel,row)?.value)||0;
+  const amount = v('input[name*="[amount]"]');
+  const mUnit  = v('input[name*="[material_unit_price]"]');
+  const lUnit  = v('input[name*="[labor_unit_price]"]');
   const mTotal = amount * mUnit;
   const lTotal = amount * lUnit;
   const gTotal = mTotal + lTotal;
-
-  const mTotalEl = row.querySelector('input[name*="[material_total]"]');
-  const lTotalEl = row.querySelector('input[name*="[labor_total]"]');
-  const gTotalEl = row.querySelector('input[name*="[grand_total]"]');
-
-  if(mTotalEl) mTotalEl.value = to2(mTotal);
-  if(lTotalEl) lTotalEl.value = to2(lTotal);
-  if(gTotalEl) gTotalEl.value = to2(gTotal);
+  const set = (sel,val)=>{ const el=$(sel,row); if(el) el.value = to2(val); };
+  set('input[name*="[material_total]"]', mTotal);
+  set('input[name*="[labor_total]"]',    lTotal);
+  set('input[name*="[grand_total]"]',    gTotal);
 }
 
 function recalcSummary(){
-  const grandInputs = document.querySelectorAll('input[name*="[grand_total]"]');
-  const sum = Array.from(grandInputs).reduce((acc, el)=> acc + (parseFloat(el.value)||0), 0);
-
+  const sum = $$('input[name*="[grand_total]"]').reduce((a,el)=>a+(parseFloat(el.value)||0),0);
   const operating = sum * 0.15;
   const ab        = sum + operating;
   const vat       = ab * 0.07;
   const finalT    = ab + vat;
-
-  const byId  = id => document.getElementById(id);
-  const setTxt = (id,val)=>{ const el=byId(id); if(el) el.textContent = to2(val); };
-  const setVal = (id,val)=>{ const el=byId(id); if(el) el.value = to2(val); };
-
-  // UI labels
-  setTxt('miscDisplay', sum);
-  setTxt('operatingDisplay', operating);
-  setTxt('abDisplay', ab);
-  setTxt('vatDisplay', vat);
-  setTxt('finalDisplay', finalT);
-
-  // Hidden inputs (backend)
-  setVal('misc_total', sum);
-  setVal('operating_expenses', operating);
-  setVal('category_ab_total', ab);
-  setVal('vat_total', vat);
-  setVal('final_total', finalT);
+  const setTxt=id=>val=>{ const el=$(id.startsWith('#')?id:'#'+id); if(el) el.textContent = to2(val); };
+  const setVal=id=>val=>{ const el=$(id.startsWith('#')?id:'#'+id); if(el) el.value      = to2(val); };
+  setTxt('miscDisplay')(sum);
+  setTxt('operatingDisplay')(operating);
+  setTxt('abDisplay')(ab);
+  setTxt('vatDisplay')(vat);
+  setTxt('finalDisplay')(finalT);
+  setVal('misc_total')(sum);
+  setVal('operating_expenses')(operating);
+  setVal('category_ab_total')(ab);
+  setVal('vat_total')(vat);
+  setVal('final_total')(finalT);
 }
 
 function recalcAll(){
-  document.querySelectorAll('#rows-container .item-row').forEach(calcRow);
+  $$('#rows-container .item-row').forEach(calcRow);
   recalcSummary();
 }
 
+// ===== Renumber + reindex names =====
 function renumberRows(){
-  const rows = document.querySelectorAll('#rows-container .item-row');
-  rows.forEach((row, i) => {
-    const serial = row.querySelector('.serial');
-    if(serial) serial.value = i + 1;
-
-    row.querySelectorAll('input[name^="items["]').forEach(inp => {
-      if (inp.name) inp.name = inp.name.replace(/items\[\d+\]/, `items[${i}]`);
+  $$('#rows-container .item-row').forEach((row,i)=>{
+    const serial = $('.serial',row);
+    if(serial) serial.value = i+1;
+    $$('input[name^="items["]',row).forEach(inp=>{
+      inp.name = inp.name.replace(/items\[\d+\]/, `items[${i}]`);
     });
-
-    row.querySelectorAll('.remove-row, .remove-mobile').forEach(btn=>{
-      if(i === 0) btn.setAttribute('disabled','disabled'); else btn.removeAttribute('disabled');
-    });
+    const del = $('.remove-row',row);
+    if(del){ i===0 ? del.setAttribute('disabled','disabled') : del.removeAttribute('disabled'); }
   });
   recalcAll();
 }
 
-
-/* =======================
-   Add Row
-   ======================= */
+// ===== Add row (clone first, like condo) =====
 function addRow(){
-  const container = document.getElementById('rows-container');
-  const card = document.createElement('div');
-  card.className = 'card m-b-2 item-row';
-  card.innerHTML = `
-    <div class="card-header bg-white">
-      <button type="button" class="btn btn-danger btn-sm remove-mobile">&times;</button>
-
-      <div class="row g-3 g-compact align-items-end">
-        <div class="col-3 col-sm-2 col-md-1 field-col">
-          <label class="form-label">No</label>
-          <div class="input-group input-42">
-            <input type="text" class="form-control readonly-input serial" value="${rowIndex+1}" readonly>
-          </div>
-        </div>
-
-        <div class="col-12 col-sm-10 col-md-6 field-col">
-          <label class="form-label">Category / Details</label>
-          <div class="input-group input-42">
-            <input type="text" class="form-control" name="items[${rowIndex}][details]" placeholder="Enter item name" required>
-            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
-              <i class="fas fa-microphone"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="col-6 col-md-2 field-col">
-          <label class="form-label">Amount</label>
-          <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control" name="items[${rowIndex}][amount]" placeholder=".00" required>
-          </div>
-        </div>
-
-        <div class="col-6 col-md-3 field-col">
-          <label class="form-label">Unit</label>
-          <div class="input-group input-42">
-            <input type="text" class="form-control" name="items[${rowIndex}][unit]" placeholder="Unit" required>
-            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)" title="Speak">
-              <i class="fas fa-microphone"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
-        <div class="col-12 col-md field-col">
-          <label class="form-label">Material Price / Unit</label>
-          <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control" name="items[${rowIndex}][material_unit_price]" placeholder=".00" required>
-          </div>
-        </div>
-
-        <div class="col-12 col-md field-col">
-          <label class="form-label">Material Total</label>
-          <div class="input-group input-42">
-            <input type="number" step="0.01" name="items[${rowIndex}][material_total]" class="form-control readonly-input" placeholder="0.00" readonly>
-          </div>
-        </div>
-
-        <div class="col-12 col-md field-col">
-          <label class="form-label">Labor Price / Unit</label>
-          <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control" name="items[${rowIndex}][labor_unit_price]" placeholder=".00" required>
-          </div>
-        </div>
-
-        <div class="col-12 col-md field-col">
-          <label class="form-label">Labor Total</label>
-          <div class="input-group input-42">
-            <input type="number" step="0.01" name="items[${rowIndex}][labor_total]" class="form-control readonly-input" placeholder="0.00" readonly>
-          </div>
-        </div>
-
-        <div class="col-12 col-md field-col">
-          <label class="form-label">Grand Total</label>
-          <div class="input-group input-42">
-            <input type="number" step="0.01" name="items[${rowIndex}][grand_total]" class="form-control readonly-input" placeholder="0.00" readonly>
-          </div>
-        </div>
-      </div>
-
-      <div class="row pt-2">
-        <div class="col-12 d-flex justify-content-end">
-          <button type="button" class="btn btn-sm btn-danger remove-row">&times;</button>
-        </div>
-      </div>
-    </div>
-  `;
-  container.appendChild(card);
-
-  card.querySelectorAll('input[name*="[material_total]"],input[name*="[labor_total]"],input[name*="[grand_total]"]').forEach(inp=>{
-    inp.value = '0.00';
+  const container = $('#rows-container');
+  const firstRow  = $('.item-row', container);
+  if(!container || !firstRow) return;
+  const clone = firstRow.cloneNode(true);
+  $$('input', clone).forEach(inp=>{
+    if(inp.classList.contains('serial')) return;
+    const isRO = /\[(material_total|labor_total|grand_total)\]/.test(inp.name||'');
+    inp.value = isRO ? '0.00' : '';
   });
-
-  card.querySelector('.remove-mobile')?.addEventListener('click', () => { card.remove(); renumberRows(); });
-  card.querySelector('.remove-row')?.addEventListener('click', () => { card.remove(); renumberRows(); });
-
-  rowIndex++;
+  const del = $('.remove-row', clone);
+  if(del) del.removeAttribute('disabled');
+  container.appendChild(clone);
   renumberRows();
 }
+window.addRow = addRow; // (optional) allow calling from HTML if ever needed
 
+// ===== Persist across language switch (localStorage) =====
+(function persist(){
+  const KEY = 'homeFormDraft';
+  const form = () => $('form[action*="home"]') || $('form');
+  const rows = () => $$('#rows-container .item-row');
+
+  function collect(){
+    const f = form(); if(!f) return null;
+    const topNames = ['project_name','dear','list_name','house_no','trooper'];
+    const data = { fields:{}, items:[] };
+    topNames.forEach(n=> data.fields[n] = $(`[name="${n}"]`, f)?.value || '');
+    rows().forEach((row,i)=>{
+      const get = n => $(`input[name="items[${i}][${n}]"]`,row)?.value || '';
+      data.items.push({
+        details:get('details'),
+        amount:get('amount'),
+        unit:get('unit'),
+        material_unit_price:get('material_unit_price'),
+        material_total:get('material_total'),
+        labor_unit_price:get('labor_unit_price'),
+        labor_total:get('labor_total'),
+        grand_total:get('grand_total')
+      });
+    });
+    ['misc_total','operating_expenses','category_ab_total','vat_total','final_total'].forEach(id=>{
+      const el = $('#'+id); if(el) data[id] = el.value;
+    });
+    return data;
+  }
+
+  function fill(data){
+    if(!data) return;
+    const f = form(); if(!f) return;
+
+    // top
+    Object.entries(data.fields||{}).forEach(([n,v])=>{ const el=$(`[name="${n}"]`,f); if(el) el.value=v; });
+
+    // ensure enough rows
+    const need = (data.items||[]).length;
+    while(rows().length < need) addRow();
+
+    // fill rows
+    (data.items||[]).forEach((it,i)=>{
+      const row = rows()[i]; if(!row) return;
+      const set = (n,v)=>{ const el = $(`input[name="items[${i}][${n}]"]`,row); if(el) el.value = v??''; };
+      set('details', it.details);
+      set('amount', it.amount);
+      set('unit', it.unit);
+      set('material_unit_price', it.material_unit_price);
+      set('material_total', it.material_total || '0.00');
+      set('labor_unit_price', it.labor_unit_price);
+      set('labor_total', it.labor_total || '0.00');
+      set('grand_total', it.grand_total || '0.00');
+    });
+
+    renumberRows();
+    recalcAll();
+
+    // summary hidden
+    ['misc_total','operating_expenses','category_ab_total','vat_total','final_total'].forEach(id=>{
+      if(data[id]) { const el=$('#'+id); if(el) el.value=data[id]; }
+    });
+  }
+
+  function save(){ const d=collect(); if(d) localStorage.setItem(KEY, JSON.stringify(d)); }
+  function load(){ try{ const r=localStorage.getItem(KEY); return r?JSON.parse(r):null; }catch{return null;} }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    // Restore if present
+    const draft = load();
+    if(draft && draft.items?.length){ fill(draft); }
+
+    // Save just before language link navigates
+    $$('a[href*="/lang/"]').forEach(a=>{
+      a.addEventListener('click', save);
+    });
+  });
+})();
+
+// ===== Boot (events) =====
 document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('add-row-btn')?.addEventListener('click', addRow);
+  const container = $('#rows-container');
+  $('#add-row-btn')?.addEventListener('click', addRow);
 
-  document.getElementById('rows-container')?.addEventListener('input', (e) => {
+  // recalc when key fields change
+  container?.addEventListener('input', e=>{
     if(e.target.matches('input[name*="[amount]"], input[name*="[material_unit_price]"], input[name*="[labor_unit_price]"]')){
-      const row = e.target.closest('.item-row');
-      if(row){ calcRow(row); recalcSummary(); }
+      const row = e.target.closest('.item-row'); if(row){ calcRow(row); recalcSummary(); }
     }
   });
 
-  const first = document.querySelector('#rows-container .item-row');
-  if(first){
-    first.querySelector('.remove-row')?.addEventListener('click', () => { first.remove(); renumberRows(); });
-    first.querySelector('.remove-mobile')?.addEventListener('click', () => { first.remove(); renumberRows(); });
-  }
+  // remove row (keep at least one)
+  container?.addEventListener('click', e=>{
+    const btn = e.target.closest('.remove-row'); if(!btn) return;
+    const all = $$('#rows-container .item-row');
+    if(all.length <= 1){ alert('ต้องมีอย่างน้อย 1 แถว'); return; }
+    const row = btn.closest('.item-row'); row?.remove(); renumberRows();
+  });
 
+  // initial
   renumberRows();
 });

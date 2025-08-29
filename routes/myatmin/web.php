@@ -1,25 +1,33 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\AuthUserController;
 
-// Authenticated routes: require user to be logged in
-Route::middleware('auth')->group(function () {
+Route::middleware('web')->group(function () {
+    Route::get('lang/{locale}', function (string $locale) {
+        if (! in_array($locale, ['en', 'th'], true)) {
+            $locale = 'en';
+        }
+        Session::put('locale', $locale);
+        return redirect()->back();
+    })->name('lang.switch');
+});
 
-    // User logout
+Route::middleware(['web', 'auth'])->group(function () {
     Route::post('/logout', [AuthUserController::class, 'logout'])->name('logout');
 
-    // Static pages
     Route::get('/home', function () {
+        App::setLocale(Session::get('locale', config('app.locale')));
         return view('pages.home');
     })->name('home');
 
-    // Home data entry form (custom URL: /createhome)
     Route::get('/createhome', function () {
+        App::setLocale(Session::get('locale', config('app.locale')));
         return view('pages.homecreate');
     })->name('home.create');
 
-    // Temporary POST handler for home.store (no save logic)
     Route::post('/home', function () {
         return redirect()->route('home.create');
     })->name('home.store');

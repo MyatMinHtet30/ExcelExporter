@@ -1,0 +1,21 @@
+/* --- Mobile tweaks for login card (iPhone SE & small phones) --- */
+@media (max-width: 420px) {
+  .login-card {
+    min-width: 90% !important;
+    max-width: 95% !important;
+  }
+
+  .login-card h3 {
+    font-size: 1.4rem;
+  }
+
+  .login-card .form-control {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+
+  .login-card button {
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+}

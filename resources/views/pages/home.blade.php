@@ -1,62 +1,42 @@
 @extends('layouts.master')
 
-@section('title', 'House')
+@section('title', __('House'))
 
 @push('styles')
-    <!-- DataTables CSS -->
-    <link href="{{ asset('assets/plugins/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('assets/plugins/datatables/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- Responsive Datatable CSS -->
-    <link href="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+<!-- DataTables CSS -->
+<link href="{{ asset('assets/plugins/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/plugins/datatables/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+<!-- Responsive Datatable CSS -->
+<link href="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+<style>
+    @media (max-width: 576px) {
+        .card-header .d-flex.justify-content-end {
+            margin-top: 0 !important;
+            margin-bottom: 1rem !important;
+        }
 
-    <style>
-      /* iPhone SE / narrow phones: prevent the +Create Home button from covering text */
-      @media (max-width: 420px){
-        .card-header .card-subtitle{ margin-bottom:.5rem; }
-        .card-header .d-flex.justify-content-end.px-1.5.mt-n4.mb-1.5{
-          margin-top:.25rem !important;
-          margin-bottom:.5rem !important;
-          padding-left:0 !important;
-          padding-right:0 !important;
-          width:100%;
-          justify-content:flex-start;
+        .custom-table-wrapper{
+            margin-left:  -15px;   /* extend wrapper beyond card padding */
+            margin-right: -15px;
+            padding-left: 15px;    /* bring content back in with equal space */
+            padding-right:15px;
+            box-sizing: border-box;
+            background: #fff;      /* match card so the gap is white */
         }
-        .card-header .d-flex.justify-content-end.px-1.5.mt-n4.mb-1.5 .btn{
-          width:100%;
-          font-size:.9rem;
-          padding:.45rem .75rem;
+        #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-5,
+        #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-7 {
+            margin-left: 175px; /* adjust value as needed */
         }
-      }
+    }
 
-      /* Smooth horizontal scroll + symmetric breathing room on phones */
-      .table-responsive{
-        overflow-x:auto;
-        -webkit-overflow-scrolling:touch;
+    @media (max-width: 768px) {
+        .card-header .d-flex.justify-content-end {
+        margin-top: 0 !important;       /* remove the negative top margin */
+        margin-bottom: 1rem !important; /* add spacing like mb-3 */
+        justify-content: flex-end !important; /* keep it aligned right */
       }
-      @media (max-width: 420px){
-        /* visual padding on the right side of the scroll area */
-        .table-responsive{ padding-right: 1.25rem; }
-
-        /* real scroll buffer INSIDE the table */
-        #xp-default-datatable{
-          border-collapse: separate;
-          padding-right: 1.25rem;
-          background-color: inherit;
-          position: relative;                /* enable :after border */
-        }
-        /* draw a right border at the very end of the padded table */
-        #xp-default-datatable::after{
-          content: "";
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          width: 1px;
-          background: #dee2e6;              /* bootstrap-ish border color */
-          pointer-events: none;
-        }
-      }
-    </style>
+    }
+</style>
 @endpush
 
 @section('content')
@@ -65,29 +45,29 @@
         <div class="col-lg-12">
             <div class="card m-b-30">
                 <div class="card-header bg-white">
-                    <h5 class="card-title text-black">Default Data Table</h5>
+                    <h5 class="card-title text-black">{{ __('Default Data Table') }}</h5>
                     <h6 class="card-subtitle">
-                        With DataTables you can alter the ordering characteristics of the table at initialisation time.
+                        {{ __('With DataTables you can alter the ordering characteristics of the table at initialisation time.') }}
                     </h6>
                     <div class="d-flex justify-content-end px-1.5 mt-n4 mb-1.5">
                         {{-- Go to /createhome --}}
                         <a href="{{ route('home.create') }}" class="btn btn-primary">
-                            + Create Home
+                            {{ __('+ Create Home') }}
                         </a>
                     </div>
                 </div>
 
                 <div class="card-body">
-                    <div class="table-responsive">
+                    <div class="table-responsive custom-table-wrapper">
                         <table id="xp-default-datatable" class="display table table-striped table-bordered">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                    <th>Age</th>
-                                    <th>Start date</th>
-                                    <th>Salary</th>
+                                    <th>{{ __('Name') }}</th>
+                                    <th>{{ __('Position') }}</th>
+                                    <th>{{ __('Office') }}</th>
+                                    <th>{{ __('Age') }}</th>
+                                    <th>{{ __('Start date') }}</th>
+                                    <th>{{ __('Salary') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -550,12 +530,12 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                    <th>Age</th>
-                                    <th>Start date</th>
-                                    <th>Salary</th>
+                                    <th>{{ __('Name') }}</th>
+                                    <th>{{ __('Position') }}</th>
+                                    <th>{{ __('Office') }}</th>
+                                    <th>{{ __('Age') }}</th>
+                                    <th>{{ __('Start date') }}</th>
+                                    <th>{{ __('Salary') }}</th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -586,6 +566,22 @@
     <!-- Responsive Examples -->
     <script src="{{ asset('assets/plugins/datatables/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.js') }}"></script>
+
+    <!-- Set DataTables language based on locale BEFORE init -->
+    <script>
+      (function(){
+        var lang = document.documentElement.lang || '{{ app()->getLocale() }}' || 'en';
+        var urls = {
+          th: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/th.json',
+          en: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/en-GB.json'
+        };
+        if (window.jQuery && jQuery.fn && jQuery.fn.dataTable) {
+          jQuery.extend(true, jQuery.fn.dataTable.defaults, {
+            language: { url: urls[lang] || urls.en }
+          });
+        }
+      })();
+    </script>
 
     <!-- Datatable init JS -->
     <script src="{{ asset('assets/js/init/table-datatable-init.js') }}"></script>
