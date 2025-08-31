@@ -1,3 +1,23 @@
+function formatNumberLive(input) {
+    let value = input.value.replace(/,/g, '');       // remove existing commas
+    if (value === '' || isNaN(value) && value !== '.') {
+        input.value = '';
+        return;
+    }
+
+    let parts = value.split('.');
+    let intPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ','); // add commas
+    let decPart = parts[1] ? parts[1].slice(0, 3) : '';
+
+    input.value = decPart ? intPart + '.' + decPart : intPart;
+
+    if (value.endsWith('.') && decPart === '') {
+        input.value = intPart + '.';
+    } else {
+        input.value = decPart ? intPart + '.' + decPart : intPart;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const rowsContainer = document.getElementById('rows-container');
   const addRowBtn = document.getElementById('add-row-btn');
@@ -75,7 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
     ) {
       // Clean input to allow only numbers and dot
       input.value = input.value.replace(/[^0-9.]/g, '');
-
+      
+      formatNumberLive(input);
       calculateRow(row);
       calculateTotals();
     }
@@ -172,3 +193,27 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(enforce, 0);
   });
 });
+
+function startDictation(btn) {
+    const input = btn.closest('.input-group')?.querySelector('input');
+    if(!input) return;
+
+    if(!('webkitSpeechRecognition' in window)) {
+        alert('เบราว์เซอร์นี้ไม่รองรับการจดจำเสียง (Speech Recognition).');
+        return;
+    }
+
+    const recognition = new webkitSpeechRecognition();
+    recognition.lang = 'th-TH'; // Thai language
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onresult = (e) => {
+        input.value = e.results[0][0].transcript;
+        input.dispatchEvent(new Event('input', {bubbles:true}));
+    };
+
+    recognition.start();
+}
+
+window.startDictation = startDictation; // make it global for onclick

@@ -1,0 +1,32 @@
+
+@media (max-width: 576px) {
+    .card-header .d-flex.justify-content-end {
+        margin-top: 0 !important;
+        margin-bottom: 1rem !important;
+    }
+
+    /* keep equal left/right white space when table overflows */
+    .custom-table-wrapper {
+        margin-left: -15px;
+        margin-right: -15px;
+        padding-left: 15px;
+        padding-right: 15px;
+        box-sizing: border-box;
+        background: #fff;
+    }
+
+    /* nudge the two bottom columns (info + pagination) to the right on phones */
+    #xp-default-datatable_wrapper .row:last-child>.col-sm-12.col-md-5,
+    #xp-default-datatable_wrapper .row:last-child>.col-sm-12.col-md-7 {
+        margin-left: 175px;
+        /* tweak if you want more/less */
+    }
+}
+
+@media (max-width: 768px) {
+    .card-header .d-flex.justify-content-end {
+        margin-top: 0 !important;
+        margin-bottom: 1rem !important;
+        justify-content: flex-end !important;
+    }
+}

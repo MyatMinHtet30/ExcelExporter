@@ -1,143 +1,10 @@
 @extends('layouts.master')
 
-@section('title', __('New Home Data Entry'))
+@section('title', __('Generate Home Excel Form'))
 
 @push('styles')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ asset('assets/css/forminput-table.css') }}" rel="stylesheet" type="text/css" />
-    <style>
-        /* ---------- General polish ---------- */
-        .item-row {
-            position: relative
-        }
-
-        .item-row .card-header {
-            padding: 1rem 1rem .75rem
-        }
-
-        .item-row .card-body {
-            padding: .25rem 1rem 1rem
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: .35rem
-        }
-
-        .input-group.input-42>.form-control,
-        .input-group.input-42>.btn {
-            height: 42px
-        }
-
-        .readonly-input[readonly] {
-            background: #f1f3f5
-        }
-
-        .field-col {
-            display: flex;
-            flex-direction: column
-        }
-
-        .field-col .input-group,
-        .field-col .form-control {
-            width: 100%
-        }
-
-        .g-compact {
-            row-gap: .75rem
-        }
-
-        .remove-row {
-            position: static;
-            line-height: 1;
-            margin-top: .5rem;
-            border-radius: 4px;
-            padding: .25rem .75rem;
-        }
-
-        /* Mobile tweaks for 2nd row fields */
-        @media (max-width: 576px) {
-            .item-row .card-header {
-                padding: .75rem .75rem
-            }
-
-            .g-compact {
-                row-gap: .5rem
-            }
-
-            .input-group.input-42>.form-control,
-            .input-group.input-42>.btn {
-                height: 40px
-            }
-
-            .mic-btn {
-                min-width: 40px
-            }
-
-            .fields-line-2>.field-col {
-                flex: 0 0 50%;
-                max-width: 50%
-            }
-
-            .readonly-input {
-                height: 40px
-            }
-        }
-
-        @media (min-width: 577px) {
-            .item-row .remove-mobile {
-                display: none
-            }
-        }
-
-        /* --- Keep Generate at the bottom on the left --- */
-        .left-controls {
-            display: flex;
-            flex-direction: column;
-            height: 100%
-        }
-
-        .left-controls .btn-generate {
-            margin-top: auto
-        }
-
-        /* ===== iPhone SE / narrow phones: keep 2-col layout, widen summary, slim buttons ===== */
-        @media (max-width: 420px) {
-
-            /* make left (buttons) narrower, right (summary) wider */
-            .card-header .row>.col-md-8.col-5 {
-                flex: 0 0 40% !important;
-                max-width: 40% !important;
-                width: 40% !important;
-            }
-
-            .card-header .row>.col-md3.col-4 {
-                flex: 0 0 60% !important;
-                max-width: 60% !important;
-                width: 60% !important;
-            }
-
-            /* let summary panel fit inside its col-4 */
-            .card-header .row>.col-md3.col-4 .text-end {
-                min-width: 0 !important;
-                width: 100% !important;
-                margin-left: 0 !important;
-            }
-
-            /* slim ONLY Add Row & Generate (not mic buttons) */
-            #add-row-btn,
-            #generate-btn {
-                padding: .35rem .5rem;
-                font-size: .85rem;
-                line-height: 1.2;
-            }
-
-            .left-controls .form-group {
-                margin-bottom: .5rem;
-            }
-        }
-    </style>
+    <link href="{{ asset('assets/css/home-forminput-table.css') }}   " rel="stylesheet" type="text/css" />
 @endpush
 
 @section('content')
@@ -186,6 +53,58 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-lg-4 col-md-4 col-12">
+                    <div class="card m-b-20">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="input-group input-42">
+                                        <input type="text" class="form-control" name="trooper" id="trooper"
+                                            placeholder="{{ __('Enter trooper') }}" required>
+                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-6">
+                    <div class="card m-b-20">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title text-black">{{ __('Date') }}</h5>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <input type="date" class="form-control" name="inputDate" id="inputDate">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-6">
+                    <div class="card m-b-20">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title text-black">{{ __('House No') }}</h5>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="input-group input-42">
+                                        <input type="text" class="form-control" name="house_no" id="house_no"
+                                            placeholder="{{ __('Enter house no.') }}" required>
+                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
@@ -206,46 +125,7 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="col-lg-6 col-md-6 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('House No') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="house_no" id="house_no"
-                                            placeholder="{{ __('Enter house no.') }}" required>
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 col-md-6 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="trooper" id="trooper"
-                                            placeholder="{{ __('Enter trooper') }}" required>
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <!-- ---------- Dynamic item rows ---------- -->
                 <div id="rows-container" class="col-12">
@@ -255,14 +135,14 @@
                             <!-- Line 1 -->
                             <div class="row g-3 g-compact align-items-end">
                                 <div class="col-3 col-sm-2 col-md-1 field-col">
-                                    <label class="form-label">{{ __('No') }}</label>
+                                    <label class="card-title text-black">{{ __('No') }}</label>
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control readonly-input serial" value="1" readonly>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-sm-10 col-md-6 field-col">
-                                    <label class="form-label">{{ __('Category / Details') }}</label>
+                                    <label class="card-title text-black">{{ __('Category / Details') }}</label>
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="items[0][details]"
                                             placeholder="{{ __('Enter item name') }}" required>
@@ -274,22 +154,22 @@
                                 </div>
 
                                 <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Amount') }}</label>
+                                    <label class="card-title text-black">{{ __('Amount') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control" name="items[0][amount]"
+                                        <input type="text" step="0.01" class="form-control number-input" name="items[0][amount]"
                                             placeholder=".00" required>
                                     </div>
                                 </div>
 
                                 <div class="col-6 col-md-3 field-col">
-                                    <label class="form-label">{{ __('Unit') }}</label>
+                                    <label class="card-title text-black">{{ __('Unit') }}</label>
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="items[0][unit]"
                                             placeholder="{{ __('Unit') }}" required>
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                        <!-- <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
-                                        </button>
+                                        </button> -->
                                     </div>
                                 </div>
                             </div>
@@ -297,42 +177,42 @@
                             <!-- Line 2 -->
                             <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
                                 <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Material Price / Unit') }}</label>
+                                    <label class="card-title text-black">{{ __('Material Price / Unit') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control"
+                                        <input type="text" step="0.01" class="form-control number-input"
                                             name="items[0][material_unit_price]" placeholder=".00" required>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Material Total') }}</label>
+                                    <label class="card-title text-black">{{ __('Material Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" name="items[0][material_total]"
-                                            class="form-control readonly-input" placeholder="0.00" readonly>
+                                        <input type="text" step="0.01" name="items[0][material_total]"
+                                            class="form-control readonly-input number-input" placeholder="0.00" readonly>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+                                    <label class="card-title text-black">{{ __('Labor Price / Unit') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control"
+                                        <input type="text" step="0.01" class="form-control number-input"
                                             name="items[0][labor_unit_price]" placeholder=".00" required>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Labor Total') }}</label>
+                                    <label class="card-title text-black">{{ __('Labor Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" name="items[0][labor_total]"
-                                            class="form-control readonly-input" placeholder="0.00" readonly>
+                                        <input type="text" step="0.01" name="items[0][labor_total]"
+                                            class="form-control readonly-input number-input" placeholder="0.00" readonly>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Grand Total') }}</label>
+                                    <label class="card-title text-black">{{ __('Grand Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" name="items[0][grand_total]"
-                                            class="form-control readonly-input" placeholder="0.00" readonly>
+                                        <input type="text" step="0.01" name="items[0][grand_total]"
+                                            class="form-control readonly-input number-input" placeholder="0.00" readonly>
                                     </div>
                                 </div>
                             </div>
@@ -376,22 +256,20 @@
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                                <span class="d-block">{{ __('Operating +') }}</span>
-                                                <span class="d-block">{{ __('Profit (15%)') }}</span>
+                                                <span class="d-block">{{ __('Operating Profit 15%') }}:</span>
                                             </strong>
                                             <span class="ms-2" id="operatingDisplay">0.00</span>
                                         </div>
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                                <span class="d-block">{{ __('Category A,B') }}</span>
-                                                <span class="d-block">{{ __('Total') }}</span>
+                                                <span class="d-block">{{ __('Category A,B Total') }}:</span>
                                             </strong>
                                             <span class="ms-2" id="abDisplay">0.00</span>
                                         </div>
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
-                                            <strong>{{ __('VAT (7%)') }}</strong>
+                                            <strong>{{ __('VAT 7%') }}</strong>
                                             <span class="ms-2" id="vatDisplay">0.00</span>
                                         </div>
 

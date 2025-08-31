@@ -7,40 +7,8 @@
     <link href="{{ asset('assets/plugins/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/plugins/datatables/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/plugins/condo/condo-table.css') }}" rel="stylesheet" type="text/css" />
 
-    <style>
-        @media (max-width: 576px) {
-            .card-header .d-flex.justify-content-end {
-                margin-top: 0 !important;
-                margin-bottom: 1rem !important;
-            }
-
-            /* keep equal left/right white space when table overflows */
-            .custom-table-wrapper {
-                margin-left: -15px;
-                margin-right: -15px;
-                padding-left: 15px;
-                padding-right: 15px;
-                box-sizing: border-box;
-                background: #fff;
-            }
-
-            /* nudge the two bottom columns (info + pagination) to the right on phones */
-            #xp-default-datatable_wrapper .row:last-child>.col-sm-12.col-md-5,
-            #xp-default-datatable_wrapper .row:last-child>.col-sm-12.col-md-7 {
-                margin-left: 175px;
-                /* tweak if you want more/less */
-            }
-        }
-
-        @media (max-width: 768px) {
-            .card-header .d-flex.justify-content-end {
-                margin-top: 0 !important;
-                margin-bottom: 1rem !important;
-                justify-content: flex-end !important;
-            }
-        }
-    </style>
 @endpush
 
 @section('content')
@@ -51,11 +19,10 @@
             <div class="col-lg-12">
                 <div class="card m-b-30">
                     <div class="card-header bg-white">
-                        <h2 class="card-title text-black">Default Data Table</h2>
-                        <h6 class="card-subtitle">With DataTables you can alter the ordering characteristics of the table at
-                            initialisation time.</h6>
+                        <h2 class="card-title text-black">{{ __('Default Data Table') }}</h2>
+                        <h6 class="card-subtitle">{{ __('With DataTables you can alter the ordering characteristics of the table at initialisation time.') }}</h6>
                         <div class="d-flex justify-content-end px-1.5 mt-n4 mb-1.5">
-                            <a href="{{route('condo-form') }}" class="btn btn-primary">+ Create Condo</a>
+                            <a href="{{route('condo-form') }}" class="btn btn-primary">{{ __('+ Create Condo') }}</a>
                         </div>
                     </div>
 
@@ -65,12 +32,12 @@
                             <table id="xp-default-datatable" class="display table table-striped table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Position</th>
-                                        <th>Office</th>
-                                        <th>Age</th>
-                                        <th>Start date</th>
-                                        <th>Salary</th>
+                                        <th>{{ __('Name') }}</th>
+                                        <th>{{ __('Position') }}</th>
+                                        <th>{{ __('Office') }}</th>
+                                        <th>{{ __('Age') }}</th>
+                                        <th>{{ __('Start date') }}</th>
+                                        <th>{{ __('Salary') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -533,12 +500,12 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <th>Name</th>
-                                        <th>Position</th>
-                                        <th>Office</th>
-                                        <th>Age</th>
-                                        <th>Start date</th>
-                                        <th>Salary</th>
+                                        <th>{{ __('Name') }}</th>
+                                        <th>{{ __('Position') }}</th>
+                                        <th>{{ __('Office') }}</th>
+                                        <th>{{ __('Age') }}</th>
+                                        <th>{{ __('Start date') }}</th>
+                                        <th>{{ __('Salary') }}</th>
                                     </tr>
                                 </tfoot>
                             </table>

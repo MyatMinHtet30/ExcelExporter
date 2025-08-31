@@ -8,35 +8,7 @@
 <link href="{{ asset('assets/plugins/datatables/buttons.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
 <!-- Responsive Datatable CSS -->
 <link href="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.css') }}" rel="stylesheet" type="text/css" />
-<style>
-    @media (max-width: 576px) {
-        .card-header .d-flex.justify-content-end {
-            margin-top: 0 !important;
-            margin-bottom: 1rem !important;
-        }
-
-        .custom-table-wrapper{
-            margin-left:  -15px;   /* extend wrapper beyond card padding */
-            margin-right: -15px;
-            padding-left: 15px;    /* bring content back in with equal space */
-            padding-right:15px;
-            box-sizing: border-box;
-            background: #fff;      /* match card so the gap is white */
-        }
-        #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-5,
-        #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-7 {
-            margin-left: 175px; /* adjust value as needed */
-        }
-    }
-
-    @media (max-width: 768px) {
-        .card-header .d-flex.justify-content-end {
-        margin-top: 0 !important;       /* remove the negative top margin */
-        margin-bottom: 1rem !important; /* add spacing like mb-3 */
-        justify-content: flex-end !important; /* keep it aligned right */
-      }
-    }
-</style>
+<link href="{{ asset('assets/plugins/home/home-table.css') }}" rel="stylesheet" type="text/css" />
 @endpush
 
 @section('content')
@@ -566,22 +538,6 @@
     <!-- Responsive Examples -->
     <script src="{{ asset('assets/plugins/datatables/dataTables.responsive.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables/responsive.bootstrap4.min.js') }}"></script>
-
-    <!-- Set DataTables language based on locale BEFORE init -->
-    <script>
-      (function(){
-        var lang = document.documentElement.lang || '{{ app()->getLocale() }}' || 'en';
-        var urls = {
-          th: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/th.json',
-          en: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/en-GB.json'
-        };
-        if (window.jQuery && jQuery.fn && jQuery.fn.dataTable) {
-          jQuery.extend(true, jQuery.fn.dataTable.defaults, {
-            language: { url: urls[lang] || urls.en }
-          });
-        }
-      })();
-    </script>
 
     <!-- Datatable init JS -->
     <script src="{{ asset('assets/js/init/table-datatable-init.js') }}"></script>

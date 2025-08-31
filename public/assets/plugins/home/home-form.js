@@ -23,27 +23,37 @@ const to2 = n => (isFinite(n)?Number(n):0).toFixed(2);
 
 // ===== Row & totals calc =====
 function calcRow(row){
-  const v = sel => parseFloat($(sel,row)?.value)||0;
+  const v = sel => parseFloat($(sel,row)?.value.replace(/,/g,''))||0;
   const amount = v('input[name*="[amount]"]');
   const mUnit  = v('input[name*="[material_unit_price]"]');
   const lUnit  = v('input[name*="[labor_unit_price]"]');
   const mTotal = amount * mUnit;
   const lTotal = amount * lUnit;
   const gTotal = mTotal + lTotal;
-  const set = (sel,val)=>{ const el=$(sel,row); if(el) el.value = to2(val); };
+  // const set = (sel,val)=>{ const el=$(sel,row); if(el) el.value = to2(val); };
+  // set('input[name*="[material_total]"]', mTotal);
+  // set('input[name*="[labor_total]"]',    lTotal);
+  // set('input[name*="[grand_total]"]',    gTotal);
+  const set = (sel,val)=>{
+    const el=$(sel,row); 
+    if(el) el.value = parseFloat(val).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  };
+
   set('input[name*="[material_total]"]', mTotal);
   set('input[name*="[labor_total]"]',    lTotal);
   set('input[name*="[grand_total]"]',    gTotal);
 }
 
 function recalcSummary(){
-  const sum = $$('input[name*="[grand_total]"]').reduce((a,el)=>a+(parseFloat(el.value)||0),0);
+  const sum = $$('input[name*="[grand_total]"]').reduce((a,el)=>a+(parseFloat(el.value.replace(/,/g,''))||0),0);
   const operating = sum * 0.15;
   const ab        = sum + operating;
   const vat       = ab * 0.07;
   const finalT    = ab + vat;
-  const setTxt=id=>val=>{ const el=$(id.startsWith('#')?id:'#'+id); if(el) el.textContent = to2(val); };
-  const setVal=id=>val=>{ const el=$(id.startsWith('#')?id:'#'+id); if(el) el.value      = to2(val); };
+  const fmt = n => parseFloat(n).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+  const setTxt=id=>val=>{ const el=$(id.startsWith('#')?id:'#'+id); if(el) el.textContent = fmt(val); };
+  const setVal=id=>val=>{ const el=$(id.startsWith('#')?id:'#'+id); if(el) el.value      = fmt(val); };
+
   setTxt('miscDisplay')(sum);
   setTxt('operatingDisplay')(operating);
   setTxt('abDisplay')(ab);
@@ -194,4 +204,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // initial
   renumberRows();
+
+  // ===== Number formatting (like your original code) =====
+function formatNumberInput(input) {
+  // strip commas
+  let value = input.value.replace(/,/g, '');
+  if (value === '' || isNaN(value)) {
+    input.value = '';
+    return;
+  }
+
+  // split integer/decimal
+  let parts = value.split('.');
+  let intPart = parts[0];
+  let decPart = parts[1] ? parts[1].slice(0, 3) : '';
+
+  intPart = parseInt(intPart, 10).toLocaleString('en-US');
+
+  if (decPart.length > 0) {
+    input.value = intPart + '.' + decPart;
+  } else {
+    input.value = intPart;
+  }
+}
+
+// Global event delegation for all .number-input
+  document.addEventListener('input', function(e){
+    if(e.target.classList.contains('number-input')){
+      formatNumberInput(e.target);
+    }
+  });
+  document.addEventListener('blur', function(e){
+    if(e.target.classList.contains('number-input')){
+      let value = e.target.value.replace(/,/g, '');
+      if (value && !isNaN(value)) {
+        e.target.value = parseFloat(value).toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+    }
+  }, true);
+
 });
