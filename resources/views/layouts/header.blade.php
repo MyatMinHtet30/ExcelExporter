@@ -133,7 +133,7 @@
                                         @php
                                             $locale = app()->getLocale();
                                             $toggleLang = $locale === 'th' ? 'en' : 'th'; // switch to the opposite
-                                            $toggleLabel = $locale === 'th' ? 'ไทย' : 'ENG';
+                                            $toggleLabel = $locale === 'th' ? 'THA' : 'ENG';
                                         @endphp
                                         <a class="btn-lang"
                                         href="{{ url('lang/' . $toggleLang) }}"
