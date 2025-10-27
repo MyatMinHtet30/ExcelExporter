@@ -112,14 +112,14 @@
                 width: 40% !important;
             }
 
-            .card-header .row>.col-md3.col-4 {
+            .card-header .row>.col-md-3.col-4 {
                 flex: 0 0 60% !important;
                 max-width: 60% !important;
                 width: 60% !important;
             }
 
             /* let summary panel fit inside its col-4 */
-            .card-header .row>.col-md3.col-4 .text-end {
+            .card-header .row>.col-md-3.col-4 .text-end {
                 min-width: 0 !important;
                 width: 100% !important;
                 margin-left: 0 !important;
@@ -155,7 +155,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="project_name" id="project_name"
-                                            placeholder="{{ __('Enter project name') }}" required>
+                                            placeholder="{{ __('Enter project name') }}" value="{{ old('project_name') }}" required>
+                                        @error('project_name') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
@@ -174,8 +175,9 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="dear" id="dear"
-                                            placeholder="{{ __('Enter recipient name') }}" required>
+                                        <input type="text" class="form-control" name="dear" id="dear" placeholder="{{ __('Enter recipient name') }}"
+                                            value="{{ old('dear') }}" required>
+                                        @error('dear') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
@@ -194,8 +196,9 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="list_name" id="list_name"
-                                            placeholder="{{ __('Enter list name') }}" required>
+                                        <input type="text" class="form-control" name="list_name" id="list_name" placeholder="{{ __('Enter list name') }}"
+                                            value="{{ old('list_name') }}" required>
+                                        @error('list_name') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
@@ -214,8 +217,9 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="house_no" id="house_no"
-                                            placeholder="{{ __('Enter house no.') }}" required>
+                                        <input type="text" class="form-control" name="house_no" id="house_no" placeholder="{{ __('Enter house no.') }}"
+                                            value="{{ old('house_no') }}" required>
+                                        @error('house_no') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
@@ -234,8 +238,9 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="trooper" id="trooper"
-                                            placeholder="{{ __('Enter trooper') }}" required>
+                                        <input type="text" class="form-control" name="trooper" id="trooper" placeholder="{{ __('Enter trooper') }}"
+                                            value="{{ old('trooper') }}" required>
+                                        @error('trooper') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
@@ -257,17 +262,27 @@
                                 <div class="col-3 col-sm-2 col-md-1 field-col">
                                     <label class="form-label">{{ __('No') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control readonly-input serial" value="1" readonly>
+                                        <input type="number" class="form-control readonly-input serial" name="details[0][no]" value="1"
+                                            min="1" readonly>
                                     </div>
                                 </div>
 
-                                <div class="col-12 col-sm-10 col-md-6 field-col">
-                                    <label class="form-label">{{ __('Category / Details') }}</label>
+                                <!-- OPTIONAL: category -->
+                                <div class="col-12 col-sm-4 col-md-3 field-col">
+                                    <label class="form-label">{{ __('Category') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="items[0][details]"
+                                        <input type="text" class="form-control" name="details[0][category_name]"
+                                            placeholder="{{ __('Category A / B / ...') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-sm-8 col-md-4 field-col">
+                                    <label class="form-label">{{ __('Item Name') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="text" class="form-control" name="details[0][item_name]"
                                             placeholder="{{ __('Enter item name') }}" required>
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
+                                        <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
+                                            title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
                                         </button>
                                     </div>
@@ -276,18 +291,18 @@
                                 <div class="col-6 col-md-2 field-col">
                                     <label class="form-label">{{ __('Amount') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control" name="items[0][amount]"
-                                            placeholder=".00" required>
+                                        <input type="number" step="0.01" class="form-control" name="details[0][amount]" placeholder=".00"
+                                            required>
                                     </div>
                                 </div>
 
-                                <div class="col-6 col-md-3 field-col">
+                                <div class="col-6 col-md-2 field-col">
                                     <label class="form-label">{{ __('Unit') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="items[0][unit]"
-                                            placeholder="{{ __('Unit') }}" required>
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
+                                        <input type="text" class="form-control" name="details[0][unit]" placeholder="{{ __('Unit') }}"
+                                            required>
+                                        <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
+                                            title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
                                         </button>
                                     </div>
@@ -299,47 +314,44 @@
                                 <div class="col-12 col-md field-col">
                                     <label class="form-label">{{ __('Material Price / Unit') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control"
-                                            name="items[0][material_unit_price]" placeholder=".00" required>
+                                        <input type="number" step="0.01" class="form-control" name="details[0][mc_price]" placeholder=".00"
+                                            required>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
                                     <label class="form-label">{{ __('Material Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" name="items[0][material_total]"
-                                            class="form-control readonly-input" placeholder="0.00" readonly>
+                                        <input type="number" step="0.01" class="form-control readonly-input js-mat-total" placeholder="0.00" readonly>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
                                     <label class="form-label">{{ __('Labor Price / Unit') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control"
-                                            name="items[0][labor_unit_price]" placeholder=".00" required>
+                                        <input type="number" step="0.01" class="form-control" name="details[0][lc_price]" placeholder=".00"
+                                            required>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
                                     <label class="form-label">{{ __('Labor Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" name="items[0][labor_total]"
-                                            class="form-control readonly-input" placeholder="0.00" readonly>
+                                        <input type="number" step="0.01" class="form-control readonly-input js-lab-total" placeholder="0.00" readonly>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
                                     <label class="form-label">{{ __('Grand Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" name="items[0][grand_total]"
-                                            class="form-control readonly-input" placeholder="0.00" readonly>
+                                        <input type="number" step="0.01" class="form-control readonly-input js-grand-total" placeholder="0.00" readonly>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row pt-2">
                                 <div class="col-12 d-flex justify-content-end">
-                                    <button type="button" class="btn btn-sm btn-danger remove-row" disabled>&times;</button>
+                                    <button type="button" class="btn btn-sm btn-danger remove-row">&times;</button>
                                 </div>
                             </div>
                         </div>
@@ -366,7 +378,7 @@
                                 </div>
 
                                 <!-- Right: compact totals -->
-                                <div class="col-md3 col-4">
+                                <div class="col-md-3 col-4">
                                     <div class="text-end" style="min-width: 200px; margin-left: auto">
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
