@@ -1,0 +1,156 @@
+/* ---------- General polish ---------- */
+.btn-generate {
+    display: flex;
+    gap: 6px;
+}
+
+.item-row {
+    position: relative;
+}
+
+.item-row .card-header {
+    padding: 1rem 1rem .75rem;
+}
+
+.item-row .card-body {
+    padding: .25rem 1rem 1rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: .35rem;
+}
+
+.input-group.input-42>.form-control,
+.input-group.input-42>.btn {
+    height: 42px;
+}
+
+.readonly-input[readonly] {
+    background: #f1f3f5;
+}
+
+.field-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-col .input-group,
+.field-col .form-control {
+    width: 100%;
+}
+
+.g-compact {
+    row-gap: .75rem;
+}
+
+.remove-row {
+    position: static;
+    line-height: 1;
+    margin-top: .5rem;
+    border-radius: 4px;
+    padding: .25rem .75rem;
+}
+
+
+/* ---------- Mobile <=480 ---------- */
+@media (max-width: 480px) {
+    .btn-generate {
+        display: flex;
+        gap: 6px;
+    }
+
+    .btn-generate .btn {
+        flex: 1 1 50%;
+        height: 42px;
+    }
+}
+
+
+/* ---------- Mobile <=576 ---------- */
+@media (max-width: 576px) {
+    .item-row .card-header {
+        padding: .75rem .75rem;
+    }
+
+    .g-compact {
+        row-gap: .5rem;
+    }
+
+    .input-group.input-42>.form-control,
+    .input-group.input-42>.btn {
+        height: 40px;
+    }
+
+    .mic-btn {
+        min-width: 40px;
+    }
+
+    .fields-line-2>.field-col {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .readonly-input {
+        height: 40px;
+    }
+}
+
+
+/* Hide .remove-mobile only on larger screens */
+@media (min-width: 577px) {
+    .item-row .remove-mobile {
+        display: none;
+    }
+}
+
+
+/* ---------- Keep Generate bottom left ---------- */
+.left-controls {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.left-controls .btn-generate {
+    margin-top: auto;
+}
+
+
+/* ---------- Narrow screens <=420px ---------- */
+@media (max-width: 420px) {
+
+    /* Make left side smaller, right bigger */
+    .card-header .row>.col-md-8.col-5 {
+        flex: 0 0 40% !important;
+        max-width: 40% !important;
+        width: 40% !important;
+    }
+
+    .card-header .row>.col-md-3.col-4 {
+        flex: 0 0 60% !important;
+        max-width: 60% !important;
+        width: 60% !important;
+    }
+
+    /* Ensure summary fits */
+    .card-header .row>.col-md-3.col-4 .text-end {
+        min-width: 0 !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+
+    /* Slim ONLY Add-row + Generate — NOT mic buttons */
+    #add-row-btn,
+    #generate-btn {
+        padding: .35rem .5rem;
+        font-size: .85rem;
+        line-height: 1.2;
+    }
+
+    .left-controls .form-group {
+        margin-bottom: .5rem;
+    }
+}
+

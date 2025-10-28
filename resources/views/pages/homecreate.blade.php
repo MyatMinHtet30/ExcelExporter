@@ -3,141 +3,9 @@
 @section('title', __('New Home Data Entry'))
 
 @push('styles')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <link href="{{ asset('assets/css/forminput-table.css') }}" rel="stylesheet" type="text/css" />
-    <style>
-        /* ---------- General polish ---------- */
-        .item-row {
-            position: relative
-        }
-
-        .item-row .card-header {
-            padding: 1rem 1rem .75rem
-        }
-
-        .item-row .card-body {
-            padding: .25rem 1rem 1rem
-        }
-
-        .form-label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: .35rem
-        }
-
-        .input-group.input-42>.form-control,
-        .input-group.input-42>.btn {
-            height: 42px
-        }
-
-        .readonly-input[readonly] {
-            background: #f1f3f5
-        }
-
-        .field-col {
-            display: flex;
-            flex-direction: column
-        }
-
-        .field-col .input-group,
-        .field-col .form-control {
-            width: 100%
-        }
-
-        .g-compact {
-            row-gap: .75rem
-        }
-
-        .remove-row {
-            position: static;
-            line-height: 1;
-            margin-top: .5rem;
-            border-radius: 4px;
-            padding: .25rem .75rem;
-        }
-
-        /* Mobile tweaks for 2nd row fields */
-        @media (max-width: 576px) {
-            .item-row .card-header {
-                padding: .75rem .75rem
-            }
-
-            .g-compact {
-                row-gap: .5rem
-            }
-
-            .input-group.input-42>.form-control,
-            .input-group.input-42>.btn {
-                height: 40px
-            }
-
-            .mic-btn {
-                min-width: 40px
-            }
-
-            .fields-line-2>.field-col {
-                flex: 0 0 50%;
-                max-width: 50%
-            }
-
-            .readonly-input {
-                height: 40px
-            }
-        }
-
-        @media (min-width: 577px) {
-            .item-row .remove-mobile {
-                display: none
-            }
-        }
-
-        /* --- Keep Generate at the bottom on the left --- */
-        .left-controls {
-            display: flex;
-            flex-direction: column;
-            height: 100%
-        }
-
-        .left-controls .btn-generate {
-            margin-top: auto
-        }
-
-        /* ===== iPhone SE / narrow phones: keep 2-col layout, widen summary, slim buttons ===== */
-        @media (max-width: 420px) {
-
-            /* make left (buttons) narrower, right (summary) wider */
-            .card-header .row>.col-md-8.col-5 {
-                flex: 0 0 40% !important;
-                max-width: 40% !important;
-                width: 40% !important;
-            }
-
-            .card-header .row>.col-md-3.col-4 {
-                flex: 0 0 60% !important;
-                max-width: 60% !important;
-                width: 60% !important;
-            }
-
-            /* let summary panel fit inside its col-4 */
-            .card-header .row>.col-md-3.col-4 .text-end {
-                min-width: 0 !important;
-                width: 100% !important;
-                margin-left: 0 !important;
-            }
-
-            /* slim ONLY Add Row & Generate (not mic buttons) */
-            #add-row-btn,
-            #generate-btn {
-                padding: .35rem .5rem;
-                font-size: .85rem;
-                line-height: 1.2;
-            }
-
-            .left-controls .form-group {
-                margin-bottom: .5rem;
-            }
-        }
-    </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="{{ asset('assets/css/forminput-table.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/home-common.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -370,16 +238,20 @@
                                             <button type="button" class="btn btn-primary" id="add-row-btn">+
                                                 {{ __('Add Row') }}</button>
                                         </div>
-                                        <div class="form-group btn-generate">
-                                            <button type="submit" class="btn btn-success"
-                                                id="generate-btn">{{ __('Generate') }}</button>
+                                        <div class="form-group btn-generate d-flex flex-wrap gap-2">
+                                            <a href="{{ route('home') }}" class="btn btn-secondary">
+                                                {{ __('Cancel') }}
+                                            </a>
+                                            <button type="submit" class="btn btn-success" id="generate-btn">
+                                                {{ __('Generate') }}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Right: compact totals -->
-                                <div class="col-md-3 col-4">
-                                    <div class="text-end" style="min-width: 200px; margin-left: auto">
+                                <div class="col-4 col-sm-4 col-md-3 col-lg-4 ms-md-auto summary-col">
+                                    <div class="text-end" style="min-width:200px">
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong>{{ __('Total') }}:</strong>

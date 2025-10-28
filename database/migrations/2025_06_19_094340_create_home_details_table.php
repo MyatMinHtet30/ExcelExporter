@@ -33,6 +33,7 @@ return new class extends Migration
             $table->decimal('grand_total', 14, 2)->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['home_id', 'category_name']);
         });

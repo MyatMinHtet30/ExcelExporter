@@ -21,11 +21,13 @@ Route::middleware(['web','auth'])->group(function () {
     Route::post('/logout', [AuthUserController::class, 'logout'])->name('logout');
 
     Route::resource('homes', HomeController::class)
-    ->only(['index','create','store','destroy'])
+    ->only(['index','create','store','edit','update','destroy'])
     ->names([
         'index'   => 'home',
         'create'  => 'home.create',
         'store'   => 'home.store',
+        'edit'    => 'home.edit',
+        'update'  => 'home.update',
         'destroy' => 'home.destroy',
     ]);
 
