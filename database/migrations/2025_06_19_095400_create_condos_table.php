@@ -11,15 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('condos', function (Blueprint $table) {
+         Schema::create('condos', function (Blueprint $table) {
             $table->id();
             $table->string('customer_name')->nullable();
             $table->string('address')->nullable();
             $table->string('job_name')->nullable();
-            $table->integer('quotation_number')->nullable();
-            $table->date('date')->nullable();
-            $table->string('payment_terms')->nullable();
-            $table->string('credit')->nullable();
+            $table->string('quotation_number')->nullable();
+            $table->date('quotation_date')->nullable();
+            $table->string('payment_term')->nullable();
+            $table->string('credits')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

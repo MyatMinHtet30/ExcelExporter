@@ -22,7 +22,7 @@
                         <h2 class="card-title text-black">{{ __('Default Data Table') }}</h2>
                         <h6 class="card-subtitle">{{ __('With DataTables you can alter the ordering characteristics of the table at initialisation time.') }}</h6>
                         <div class="d-flex justify-content-end px-1.5 mt-n4 mb-1.5">
-                            <a href="{{route('condo-form') }}" class="btn btn-primary">{{ __('+ Create Condo') }}</a>
+                            <a href="{{route('condo.create') }}" class="btn btn-primary">{{ __('+ Create Condo') }}</a>
                         </div>
                     </div>
 
