@@ -13,15 +13,29 @@ return new class extends Migration
     {
         Schema::create('home_details', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('home_id')->constrained('homes')->cascadeOnDelete();
             $table->boolean('status')->default(true);
-            $table->integer('no')->nullable();
-            $table->foreignId('home_id')->constrained('homes')->onDelete('cascade');
+
+            $table->unsignedInteger('no')->nullable();
             $table->string('category_name')->nullable();
-            $table->integer('amount')->nullable();
-            $table->string('unit')->nullable();
-            $table->decimal('mc_price')->nullable();
-            $table->decimal('lc_price')->nullable(); // <-- this was missing
+            $table->string('item_name')->nullable(); // Enter item name
+
+            // quantities & prices
+            $table->decimal('amount', 12, 2)->nullable();
+            $table->string('unit', 50)->nullable();
+            $table->decimal('mc_price', 12, 2)->nullable(); // Material price / unit
+            $table->decimal('lc_price', 12, 2)->nullable(); // Labor price / unit
+
+            // optional: store computed totals for convenience
+            $table->decimal('material_total', 14, 2)->nullable();
+            $table->decimal('labor_total', 14, 2)->nullable();
+            $table->decimal('grand_total', 14, 2)->nullable();
+
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->index(['home_id', 'category_name']);
         });
     }
 
@@ -30,6 +44,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('home_deatils');
+        Schema::dropIfExists('home_details'); // fixed typo
     }
 };

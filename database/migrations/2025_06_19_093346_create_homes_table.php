@@ -16,10 +16,13 @@ return new class extends Migration
             $table->string('project_name')->nullable();
             $table->string('dear')->nullable();
             $table->date('date')->nullable();
+            $table->string('trooper')->nullable();
             $table->string('house_no')->nullable();
             $table->string('list_name')->nullable();
+            $table->decimal('total_price', 15, 2)->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
