@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', __('Generate Condo Excel Form'))
+@section('title', __('Edit Condo Excel Form'))
 
 @push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -8,21 +8,20 @@
 @endpush
 
 @section('content')
-  <form action="{{ route('condo.store') }}" method="POST" id="condo-form">
+  <form action="{{ route('condo.update', $condo) }}" method="POST" id="condo-form">
     @csrf
+    @method('PUT')
+
     <div class="xp-contentbar">
 
-      {{-- Top-level validation summary (optional) --}}
       @if ($errors->any())
         <div class="alert alert-danger">
           <strong>{{ __('Please fix the errors below.') }}</strong>
         </div>
       @endif
 
-      <!-- Start XP Row -->
       <div class="row">
-
-        <!-- Start XP Col -->
+        <!-- Customer -->
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
@@ -30,8 +29,12 @@
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
-                    <!-- bind: customer_name -->
-                    <input type="text" class="form-control" name="customer_name" id="inputText" placeholder="{{ __('Enter Customer name') }}" value="{{ old('customer_name') }}">
+                    <input type="text"
+                           class="form-control"
+                           name="customer_name"
+                           id="inputText"
+                           placeholder="{{ __('Enter Customer name') }}"
+                           value="{{ old('customer_name', $condo->customer_name) }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -42,9 +45,8 @@
             </div>
           </div>
         </div>
-        <!-- End XP Col -->
 
-        <!-- Start XP Col -->
+        <!-- Address -->
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
@@ -52,8 +54,12 @@
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
-                    <!-- bind: address -->
-                    <input type="text" class="form-control" name="address" id="inputEmail" placeholder="{{ __('Enter Address') }}" value="{{ old('address') }}">
+                    <input type="text"
+                           class="form-control"
+                           name="address"
+                           id="inputEmail"
+                           placeholder="{{ __('Enter Address') }}"
+                           value="{{ old('address', $condo->address) }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -64,9 +70,8 @@
             </div>
           </div>
         </div>
-        <!-- End XP Col -->
 
-        <!-- Start XP Col -->
+        <!-- Job Name -->
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
@@ -74,8 +79,12 @@
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
-                    <!-- bind: job_name -->
-                    <input type="text" class="form-control" name="job_name" id="inputPassword" placeholder="{{ __('Job Name') }}" value="{{ old('job_name') }}">
+                    <input type="text"
+                           class="form-control"
+                           name="job_name"
+                           id="inputPassword"
+                           placeholder="{{ __('Job Name') }}"
+                           value="{{ old('job_name', $condo->job_name) }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -86,9 +95,8 @@
             </div>
           </div>
         </div>
-        <!-- End XP Col -->
 
-        <!-- Start XP Col -->
+        <!-- Quotation Number -->
         <div class="col-lg-3 col-md-3 col-6">
           <div class="card m-b-20">
             <div class="card-header bg-white">
@@ -96,8 +104,12 @@
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
-                    <!-- bind: quotation_number -->
-                    <input type="text" class="form-control" name="quotation_number" id="inputNumber" placeholder="{{ __('Enter QN') }}" value="{{ old('quotation_number') }}">
+                    <input type="text"
+                           class="form-control"
+                           name="quotation_number"
+                           id="inputNumber"
+                           placeholder="{{ __('Enter QN') }}"
+                           value="{{ old('quotation_number', $condo->quotation_number) }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -108,26 +120,27 @@
             </div>
           </div>
         </div>
-        <!-- End XP Col -->
 
-        <!-- Start XP Col -->
+        <!-- Date -->
         <div class="col-lg-3 col-md-3 col-6">
           <div class="card m-b-20">
             <div class="card-header bg-white">
               <h5 class="card-title text-black">{{ __('Date') }}</h5>
               <div class="card-body">
                 <div class="form-group">
-                  <!-- bind: quotation_date -->
-                  <input type="date" class="form-control" name="quotation_date" id="inputDate" value="{{ old('quotation_date') }}">
+                  <input type="date"
+                         class="form-control"
+                         name="quotation_date"
+                         id="inputDate"
+                         value="{{ old('quotation_date', optional($condo->quotation_date)->format('Y-m-d')) }}">
                   @error('quotation_date')<small class="text-danger">{{ $message }}</small>@enderror
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- End XP Col -->
 
-        <!-- Start XP Col -->
+        <!-- Payment Term -->
         <div class="col-lg-3 col-md-3 col-6">
           <div class="card m-b-20">
             <div class="card-header bg-white">
@@ -135,8 +148,12 @@
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
-                    <!-- bind: payment_term -->
-                    <input type="text" class="form-control" name="payment_term" id="inputSearch" placeholder="{{ __('Enter PT') }}" value="{{ old('payment_term') }}">
+                    <input type="text"
+                           class="form-control"
+                           name="payment_term"
+                           id="inputSearch"
+                           placeholder="{{ __('Enter PT') }}"
+                           value="{{ old('payment_term', $condo->payment_term) }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -147,9 +164,8 @@
             </div>
           </div>
         </div>
-        <!-- End XP Col -->
 
-        <!-- Start XP Col -->
+        <!-- Credits -->
         <div class="col-lg-3 col-md-3 col-6">
           <div class="card m-b-20">
             <div class="card-header bg-white">
@@ -157,8 +173,12 @@
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
-                    <!-- bind: credits -->
-                    <input type="text" class="form-control" name="credits" id="inputUrl" placeholder="{{ __('Enter Credits') }}" value="{{ old('credits') }}">
+                    <input type="text"
+                           class="form-control"
+                           name="credits"
+                           id="inputUrl"
+                           placeholder="{{ __('Enter Credits') }}"
+                           value="{{ old('credits', $condo->credits) }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -169,31 +189,43 @@
             </div>
           </div>
         </div>
-        <!-- End XP Col -->
 
         {{-- =========================
-             LINE ITEMS (rows)
+             LINE ITEMS (prefilled)
         ========================== --}}
         @php
-          // Repopulate rows if validation failed; otherwise render one blank row
-          $oldItems = old('items', [
-            ['no' => 1, 'details' => null, 'amount' => null, 'unit' => null, 'material_cost' => null, 'labor_cost' => null, 'price_per_unit_total' => null]
-          ]);
+          $oldItems = old('items');
+          $items = $oldItems ?? $condo->details->map(function($d) {
+              return [
+                'no' => $d->no,
+                'details' => $d->details,
+                'amount' => $d->amount,
+                'unit' => $d->unit,
+                'material_cost' => $d->material_cost,
+                'labor_cost' => $d->labor_cost,
+                'price_per_unit_total' => $d->price_per_unit_total,
+              ];
+          })->values()->toArray();
+
+          if (empty($items)) {
+            $items = [
+              ['no' => 1, 'details' => null, 'amount' => null, 'unit' => null, 'material_cost' => null, 'labor_cost' => null, 'price_per_unit_total' => null]
+            ];
+          }
         @endphp
 
         <div id="rows-container" class="w-100">
-          @foreach ($oldItems as $i => $row)
+          @foreach ($items as $i => $row)
           <div class="col-lg-12">
             <div class="card m-b-2 item-row">
               <div class="card-header bg-white">
                 <div class="row">
-
                   <div class="col-lg-1 col-md-1 col-2">
                     <h5 class="card-title text-black">{{ __('No') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control serial" value="{{ $i + 1 }}" readonly>
-                        <input type="hidden" name="items[{{ $i }}][no]" value="{{ $i + 1 }}">
+                        <input type="text" class="form-control serial" value="{{ $row['no'] ?? $i + 1 }}" readonly>
+                        <input type="hidden" name="items[{{ $i }}][no]" value="{{ $row['no'] ?? $i + 1 }}">
                       </div>
                     </div>
                   </div>
@@ -202,7 +234,11 @@
                     <h5 class="card-title text-black">{{ __('Details') }}</h5>
                     <div class="card-body">
                       <div class="input-group">
-                        <input type="text" class="form-control detail" name="items[{{ $i }}][details]" placeholder="{{ __('Details') }}" value="{{ $row['details'] }}">
+                        <input type="text"
+                               class="form-control detail"
+                               name="items[{{ $i }}][details]"
+                               placeholder="{{ __('Details') }}"
+                               value="{{ $row['details'] }}">
                         <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                           <i class="fas fa-microphone"></i>
                         </button>
@@ -215,7 +251,11 @@
                     <h5 class="card-title text-black">{{ __('Amount') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control amount" name="items[{{ $i }}][amount]" placeholder=".00" value="{{ $row['amount'] }}">
+                        <input type="text"
+                               class="form-control amount"
+                               name="items[{{ $i }}][amount]"
+                               placeholder=".00"
+                               value="{{ $row['amount'] }}">
                       </div>
                       @error("items.$i.amount")<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
@@ -225,7 +265,11 @@
                     <h5 class="card-title text-black">{{ __('Unit') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control units" name="items[{{ $i }}][unit]" placeholder="{{ __('Units') }}" value="{{ $row['unit'] }}">
+                        <input type="text"
+                               class="form-control units"
+                               name="items[{{ $i }}][unit]"
+                               placeholder="{{ __('Units') }}"
+                               value="{{ $row['unit'] }}">
                       </div>
                     </div>
                   </div>
@@ -234,7 +278,11 @@
                     <h5 class="card-title text-black">{{ __('Material Cost') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control material" name="items[{{ $i }}][material_cost]" placeholder=".00" value="{{ $row['material_cost'] }}">
+                        <input type="text"
+                               class="form-control material"
+                               name="items[{{ $i }}][material_cost]"
+                               placeholder=".00"
+                               value="{{ $row['material_cost'] }}">
                       </div>
                     </div>
                   </div>
@@ -243,7 +291,11 @@
                     <h5 class="card-title text-black">{{ __('Labor Cost') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control labor" name="items[{{ $i }}][labor_cost]" placeholder=".00" value="{{ $row['labor_cost'] }}">
+                        <input type="text"
+                               class="form-control labor"
+                               name="items[{{ $i }}][labor_cost]"
+                               placeholder=".00"
+                               value="{{ $row['labor_cost'] }}">
                       </div>
                     </div>
                   </div>
@@ -254,7 +306,11 @@
                     <h5 class="card-title text-black">{{ __('Price Amount') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control price-per-unit" name="items[{{ $i }}][price_per_unit_total]" placeholder=".00" value="{{ $row['price_per_unit_total'] }}">
+                        <input type="text"
+                               class="form-control price-per-unit"
+                               name="items[{{ $i }}][price_per_unit_total]"
+                               placeholder=".00"
+                               value="{{ $row['price_per_unit_total'] }}">
                       </div>
                     </div>
                   </div>
@@ -263,7 +319,6 @@
                     <h5 class="card-title text-black">{{ __('Subtotal') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <!-- UI-only; no name -->
                         <input type="text" class="form-control subtotal" placeholder=".00" readonly>
                       </div>
                     </div>
@@ -275,35 +330,32 @@
                     </div>
                   </div>
 
-                </div>
+                </div> <!-- row -->
               </div>
             </div>
           </div>
           @endforeach
         </div>
 
+        <!-- Footer actions + totals -->
         <div class="col-lg-12 ">
           <div class="card m-b-20">
             <div class="card-header bg-white">
               <div class="row">
-
                 <div class="col-md-8 col-5">
                   <div class="card-body">
                     <div class="form-group">
                       <button type="button" class="btn btn-primary" id="add-row-btn">{{ __('+ Add Row') }}</button>
                     </div>
 
-                   <div class="form-group d-flex flex-column flex-sm-row pt-1 pt-md-5">
-                    {{-- Cancel back to condo list --}}
-                    <a href="{{ route('condo') }}" class="btn btn-secondary mb-2 mb-sm-0">
-                      {{ __('Cancel') }}
-                    </a>
-
-                    {{-- Generate submit --}}
-                    <button type="submit" class="btn btn-success ml-sm-2" id="generate-btn">
-                      {{ __('Generate') }}
-                    </button>
-                  </div>
+                    <div class="form-group d-flex flex-column flex-sm-row pt-1 pt-md-5">
+                      <a href="{{ route('condo') }}" class="btn btn-secondary mb-2 mb-sm-0">
+                        {{ __('Cancel') }}
+                      </a>
+                      <button type="submit" class="btn btn-success ml-sm-2" id="generate-btn">
+                        {{ __('Update') }}
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -324,17 +376,16 @@
                   </div>
                 </div>
 
-              </div>
+              </div> <!-- row -->
             </div>
           </div>
         </div>
 
-      </div>
-      <!-- end row -->
+      </div> <!-- /row -->
 
     </div>
 
-    {{-- Hidden template for new rows (JS will replace __INDEX__) --}}
+    {{-- Hidden template for adding new rows --}}
     <template id="row-template">
       <div class="col-lg-12">
         <div class="card m-b-2 item-row">
@@ -436,4 +487,17 @@
 
 @push('scripts')
 <script src="{{ asset('assets/plugins/condo/condo-form.js') }}"></script>
+<script>
+  // Ensure totals are recalculated on page load with prefilled values
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.CondoForm && typeof CondoForm.recalcAll === 'function') {
+      CondoForm.recalcAll();
+    } else {
+      // fallback: trigger input events to recalc if your JS listens to 'input'
+      document.querySelectorAll('#rows-container input').forEach(el => {
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    }
+  });
+</script>
 @endpush

@@ -16,16 +16,21 @@ class CondoController extends Controller
     // GET /condos
     public function index(Request $request)
     {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
         $q = $request->get('q');
+
         $condos = Condo::query()
-            ->when($q, fn($qq) => $qq->where('quotation_number', 'like', "%{$q}%")
-                ->orWhere('customer_name','like',"%{$q}%")
-                ->orWhere('job_name','like',"%{$q}%"))
+            ->with(['details']) // <- important to avoid N+1
+            ->when($q, fn ($qq) => $qq
+                ->where('quotation_number', 'like', "%{$q}%")
+                ->orWhere('customer_name', 'like', "%{$q}%")
+                ->orWhere('job_name', 'like', "%{$q}%"))
             ->latest()
             ->paginate(12)
             ->withQueryString();
 
-        return view('pages.condo', compact('condos','q'));
+        return view('pages.condo', compact('condos', 'q'));
     }
 
     // GET /condos/create
@@ -101,7 +106,7 @@ class CondoController extends Controller
         $condo->load(['details' => fn($q) => $q->orderBy('no')]);
 
         // Your edit page: resources/views/pages/condoedit.blade.php (create this)
-        return view('pages.condoedit', compact('condo'));
+        return view('pages.editcondo', compact('condo'));
     }
 
     // POST /condos/{condo}/update  (your POST-style update route)
@@ -109,23 +114,71 @@ class CondoController extends Controller
     {
         App::setLocale(Session::get('locale', config('app.locale')));
 
-        $data = $request->validated();
+        $data  = $request->validated();
+        // Keep items even if some fields fail strict casting
+        $items = $request->input('items', []);
 
         $payload = [
-            'customer_name'    => $data['customer_name'] ?? $condo->customer_name,
-            'address'          => $data['address'] ?? $condo->address,
-            'job_name'         => $data['job_name'] ?? $condo->job_name,
+            'customer_name'    => $data['customer_name']    ?? $condo->customer_name,
+            'address'          => $data['address']          ?? $condo->address,
+            'job_name'         => $data['job_name']         ?? $condo->job_name,
             'quotation_number' => $data['quotation_number'] ?? $condo->quotation_number,
-            'date'             => $data['quotation_date'] ?? $condo->date,            // map
-            'payment_terms'    => $data['payment_term'] ?? $condo->payment_terms,     // map
-            'credit'           => $data['credits'] ?? $condo->credit,                 // map
-            'status'           => $data['status'] ?? $condo->status,
+            'quotation_date'   => $data['quotation_date']   ?? optional($condo->quotation_date)->format('Y-m-d'),
+            'payment_term'     => $data['payment_term']     ?? $condo->payment_term,
+            'credits'          => $data['credits']          ?? $condo->credits,
+            'status'           => $data['status']           ?? $condo->status,
         ];
 
-        $condo->update($payload);
+        DB::transaction(function () use ($condo, $payload, $items) {
+            $condo->update($payload);
 
-        return back()->with('success', 'Condo updated.');
+            // Upsert details:
+            $keepIds = [];
+
+            foreach ($items as $i => $row) {
+                // detect empty rows (ignore)
+                $hasAny = false;
+                foreach (['details','amount','unit','material_cost','labor_cost','price_per_unit_total'] as $k) {
+                    if (isset($row[$k]) && trim((string)$row[$k]) !== '') { $hasAny = true; break; }
+                }
+                if (! $hasAny) continue;
+
+                $attrs = [
+                    'no'                   => $row['no'] ?? ($i + 1),
+                    'details'              => $row['details'] ?? null,
+                    'amount'               => $row['amount'] ?? null,
+                    'unit'                 => $row['unit'] ?? null,
+                    'material_cost'        => $row['material_cost'] ?? null,
+                    'labor_cost'           => $row['labor_cost'] ?? null,
+                    'price_per_unit_total' => $row['price_per_unit_total'] ?? null,
+                    'status'               => true,
+                ];
+
+                if (!empty($row['id'])) {
+                    // update existing
+                    $detail = $condo->details()->whereKey($row['id'])->first();
+                    if ($detail) {
+                        $detail->update($attrs);
+                        $keepIds[] = $detail->id;
+                    }
+                } else {
+                    // create new
+                    $detail = $condo->details()->create($attrs);
+                    $keepIds[] = $detail->id;
+                }
+            }
+
+            // delete rows user actually removed from the form
+            if (count($keepIds) > 0) {
+                $condo->details()->whereNotIn('id', $keepIds)->delete();
+            } else {
+
+            }
+        });
+
+        return redirect()->route('condo')->with('success', 'Condo updated.');
     }
+
 
 
     // DELETE /condos/{condo}

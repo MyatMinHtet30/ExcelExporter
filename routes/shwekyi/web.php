@@ -37,7 +37,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/create',         [CondoController::class, 'create'])->name('condo.create');  // form
         Route::post('/',              [CondoController::class, 'store'])->name('condo.store');    // save
         Route::get('/{condo}/edit',   [CondoController::class, 'edit'])->name('condo.edit');      // edit form
-        Route::post('/{condo}',       [CondoController::class, 'update'])->name('condo.update');  // update (POST style)
+        Route::match(['put','patch'],'/{condo}', [CondoController::class, 'update'])->name('condo.update'); // 👈
         Route::delete('/{condo}',     [CondoController::class, 'destroy'])->name('condo.destroy');// delete
     });
 
