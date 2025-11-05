@@ -78,7 +78,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6 col-md-6 col-12">
+                <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <h5 class="card-title text-black">{{ __('House No') }}</h5>
@@ -99,7 +99,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6 col-md-6 col-12">
+                <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
@@ -113,6 +113,22 @@
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-12">
+                    <div class="card m-b-20">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title text-black">{{ __('Date') }}</h5>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="input-group input-42">
+                                        <input type="date" class="form-control" name="date" id="date" value="{{ old('date') }}"  required>
+                                        @error('date') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                     </div>
                                 </div>
                             </div>
@@ -135,20 +151,11 @@
                                     </div>
                                 </div>
 
-                                <!-- OPTIONAL: category -->
-                                <div class="col-12 col-sm-4 col-md-3 field-col">
+                                <div class="col-12 col-sm-6 col-md-6 field-col">
                                     <label class="form-label">{{ __('Category') }}</label>
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="details[0][category_name]"
                                             placeholder="{{ __('Category A / B / ...') }}">
-                                    </div>
-                                </div>
-
-                                <div class="col-12 col-sm-8 col-md-4 field-col">
-                                    <label class="form-label">{{ __('Item Name') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="details[0][item_name]"
-                                            placeholder="{{ __('Enter item name') }}" required>
                                         <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
                                             title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
@@ -242,6 +249,9 @@
                                             <a href="{{ route('home') }}" class="btn btn-secondary">
                                                 {{ __('Cancel') }}
                                             </a>
+                                            <button type="submit" class="btn btn-primary" formaction="{{ route('home.preview') }}">
+                                                {{ __('Preview') }}
+                                            </button>
                                             <button type="submit" class="btn btn-success" id="generate-btn">
                                                 {{ __('Generate') }}
                                             </button>

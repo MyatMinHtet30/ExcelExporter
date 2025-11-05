@@ -20,6 +20,9 @@ Route::middleware('web')->group(function () {
 Route::middleware(['web','auth'])->group(function () {
     Route::post('/logout', [AuthUserController::class, 'logout'])->name('logout');
 
+    Route::post('homes/preview', [HomeController::class, 'preview'])
+        ->name('home.preview');
+
     Route::resource('homes', HomeController::class)
     ->only(['index','create','store','edit','update','destroy'])
     ->names([

@@ -37,7 +37,6 @@ class HomeController extends Controller
             'details.*.status'        => ['nullable','boolean'],
             'details.*.no'            => ['nullable','integer','min:1'],
             'details.*.category_name' => ['nullable','string','max:255'],
-            'details.*.item_name'     => ['nullable','string','max:255'],
             'details.*.amount'        => ['nullable','numeric','min:0'],
             'details.*.unit'          => ['nullable','string','max:50'],
             'details.*.mc_price'      => ['nullable','numeric','min:0'],
@@ -50,6 +49,7 @@ class HomeController extends Controller
 
         DB::transaction(function () use ($parent, $v, $totals) {
             $home = Home::create($parent + [
+                'date'        => $parent['date'] ?? null,
                 'status'      => $parent['status'] ?? true,
                 'total_price' => isset($totals['final_total'])
                     ? round((float)$totals['final_total'], 2)
@@ -115,7 +115,6 @@ class HomeController extends Controller
             'details.*.status'          => ['nullable','boolean'],
             'details.*.no'              => ['nullable','integer','min:1'],
             'details.*.category_name'   => ['nullable','string','max:255'],
-            'details.*.item_name'       => ['nullable','string','max:255'],
             'details.*.amount'          => ['nullable','numeric','min:0'],
             'details.*.unit'            => ['nullable','string','max:50'],
             'details.*.mc_price'        => ['nullable','numeric','min:0'],
@@ -125,6 +124,7 @@ class HomeController extends Controller
         DB::transaction(function () use ($home, $parent, $v, $totals) {
             // Update parent
             $home->update($parent + [
+            'date'        => $parent['date'] ?? $home->date,
             'total_price' => isset($totals['final_total'])
                 ? round((float)$totals['final_total'], 2)
                 : $home->total_price,
@@ -175,7 +175,6 @@ class HomeController extends Controller
                     'status'         => (bool)($r['status'] ?? true),
                     'no'             => $r['no'] ?? ($i + 1),
                     'category_name'  => $r['category_name'] ?? null,
-                    'item_name'      => $r['item_name'] ?? null,
                     'amount'         => $amount ?: null,
                     'unit'           => $r['unit'] ?? null,
                     'mc_price'       => $mc ?: null,
@@ -203,6 +202,67 @@ class HomeController extends Controller
         });
 
         return redirect()->route('home')->with('success', __('Deleted successfully.'));
+    }
+
+    public function preview(Request $request)
+    {
+        $data = $request->validate([
+            'project_name' => ['nullable','string','max:255'],
+            'dear'         => ['nullable','string','max:255'],
+            'list_name'    => ['nullable','string','max:255'],
+            'house_no'     => ['nullable','string','max:255'],
+            'trooper'      => ['nullable','string','max:255'],
+            'details'      => ['required','array','min:1'],
+            'details.*.no' => ['nullable','integer','min:1'],
+            'details.*.category_name' => ['nullable','string','max:255'],
+            'details.*.item_name'     => ['nullable','string','max:255'],
+            'details.*.amount'        => ['nullable','numeric','min:0'],
+            'details.*.unit'          => ['nullable','string','max:50'],
+            'details.*.mc_price'      => ['nullable','numeric','min:0'],
+            'details.*.lc_price'      => ['nullable','numeric','min:0'],
+            'date'         => ['nullable','date'],
+        ]);
+
+        $rows = collect($data['details'])->values()->map(function ($r, $i) {
+            $amt = (float)($r['amount'] ?? 0);
+            $mc  = (float)($r['mc_price'] ?? 0);
+            $lc  = (float)($r['lc_price'] ?? 0);
+            return [
+                'no'          => $r['no'] ?? ($i+1),
+                'category_name'=> $r['category_name'] ?? null,
+                'item_name'   => $r['item_name'] ?? '',
+                'amount'      => $amt,
+                'unit'        => $r['unit'] ?? '',
+                'mc_price'    => $mc,
+                'lc_price'    => $lc,
+                'mat_total'   => round($amt*$mc,2),
+                'lab_total'   => round($amt*$lc,2),
+                'grand_total' => round($amt*$mc + $amt*$lc,2),
+            ];
+        });
+
+        $misc = $rows->sum('grand_total');
+        $op   = round($misc * 0.15, 2);
+        $ab   = round($misc + $op, 2);
+        $vat  = round($ab * 0.07, 2);
+        $final= round($ab + $vat, 2);
+
+        return view('pages.homepreview', [
+            'project_name'=>$data['project_name'] ?? '',
+            'dear'        =>$data['dear'] ?? '',
+            'list_name'   =>$data['list_name'] ?? '',
+            'house_no'    =>$data['house_no'] ?? '',
+            'trooper'     =>$data['trooper'] ?? '',
+            'rows'        =>$rows,
+            'miscTotal'   =>$misc,
+            'operating'   =>$op,
+            'abTotal'     =>$ab,
+            'vat'         =>$vat,
+            'finalTotal'  =>$final,
+            'date'        => !empty($data['date'])
+                        ? \Carbon\Carbon::parse($data['date'])->format('m-d-y')
+                        : '',
+        ]);
     }
 
     /** Shared validation */
