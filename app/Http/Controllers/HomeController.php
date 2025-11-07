@@ -206,41 +206,65 @@ class HomeController extends Controller
 
     public function preview(Request $request)
     {
+        // Validate incoming fields from both Create and Edit forms
         $data = $request->validate([
             'project_name' => ['nullable','string','max:255'],
             'dear'         => ['nullable','string','max:255'],
             'list_name'    => ['nullable','string','max:255'],
             'house_no'     => ['nullable','string','max:255'],
             'trooper'      => ['nullable','string','max:255'],
-            'details'      => ['required','array','min:1'],
-            'details.*.no' => ['nullable','integer','min:1'],
+            'date'         => ['nullable','date'],
+
+            // details
+            'details'                 => ['required','array','min:1'],
+            'details.*.id'            => ['nullable','integer'],
+            'details.*._delete'       => ['nullable','boolean'],   // ← from Edit
+            'details.*.no'            => ['nullable','integer','min:1'],
             'details.*.category_name' => ['nullable','string','max:255'],
             'details.*.item_name'     => ['nullable','string','max:255'],
             'details.*.amount'        => ['nullable','numeric','min:0'],
             'details.*.unit'          => ['nullable','string','max:50'],
             'details.*.mc_price'      => ['nullable','numeric','min:0'],
             'details.*.lc_price'      => ['nullable','numeric','min:0'],
-            'date'         => ['nullable','date'],
         ]);
 
-        $rows = collect($data['details'])->values()->map(function ($r, $i) {
-            $amt = (float)($r['amount'] ?? 0);
-            $mc  = (float)($r['mc_price'] ?? 0);
-            $lc  = (float)($r['lc_price'] ?? 0);
-            return [
-                'no'          => $r['no'] ?? ($i+1),
-                'category_name'=> $r['category_name'] ?? null,
-                'item_name'   => $r['item_name'] ?? '',
-                'amount'      => $amt,
-                'unit'        => $r['unit'] ?? '',
-                'mc_price'    => $mc,
-                'lc_price'    => $lc,
-                'mat_total'   => round($amt*$mc,2),
-                'lab_total'   => round($amt*$lc,2),
-                'grand_total' => round($amt*$mc + $amt*$lc,2),
-            ];
-        });
+        // Build rows: skip deleted and empty
+        $rows = collect($data['details'])
+            ->filter(function ($r) {
+                // remove rows toggled for deletion in Edit
+                if (!empty($r['_delete'])) return false;
 
+                // consider empty if no name and all numbers are zero/empty
+                $hasName = trim($r['category_name'] ?? '') !== '';
+                $amt = (float)($r['amount'] ?? 0);
+                $mc  = (float)($r['mc_price'] ?? 0);
+                $lc  = (float)($r['lc_price'] ?? 0);
+                return $hasName || ($amt>0 || $mc>0 || $lc>0);
+            })
+            ->values()
+            ->map(function ($r, $i) {
+                $amt = (float)($r['amount'] ?? 0);
+                $mc  = (float)($r['mc_price'] ?? 0);
+                $lc  = (float)($r['lc_price'] ?? 0);
+
+                $mat = round($amt * $mc, 2);
+                $lab = round($amt * $lc, 2);
+
+                return [
+                    'no'           => $r['no'] ?? ($i + 1),
+                    'category_name'=> $r['category_name'] ?? '',
+                    'item_name'    => $r['item_name'] ?? '',
+                    'amount'       => $amt,
+                    'unit'         => $r['unit'] ?? '',
+                    'mc_price'     => $mc,
+                    'lc_price'     => $lc,
+                    'mat_total'    => $mat,
+                    'lab_total'    => $lab,
+                    'grand_total'  => round($mat + $lab, 2),
+                ];
+            });
+
+        // Totals
         $misc = $rows->sum('grand_total');
         $op   = round($misc * 0.15, 2);
         $ab   = round($misc + $op, 2);
@@ -248,20 +272,20 @@ class HomeController extends Controller
         $final= round($ab + $vat, 2);
 
         return view('pages.homepreview', [
-            'project_name'=>$data['project_name'] ?? '',
-            'dear'        =>$data['dear'] ?? '',
-            'list_name'   =>$data['list_name'] ?? '',
-            'house_no'    =>$data['house_no'] ?? '',
-            'trooper'     =>$data['trooper'] ?? '',
-            'rows'        =>$rows,
-            'miscTotal'   =>$misc,
-            'operating'   =>$op,
-            'abTotal'     =>$ab,
-            'vat'         =>$vat,
-            'finalTotal'  =>$final,
-            'date'        => !empty($data['date'])
-                        ? \Carbon\Carbon::parse($data['date'])->format('m-d-y')
-                        : '',
+            'project_name' => $data['project_name'] ?? '',
+            'dear'         => $data['dear'] ?? '',
+            'list_name'    => $data['list_name'] ?? '',
+            'house_no'     => $data['house_no'] ?? '',
+            'trooper'      => $data['trooper'] ?? '',
+            'rows'         => $rows,
+            'miscTotal'    => $misc,
+            'operating'    => $op,
+            'abTotal'      => $ab,
+            'vat'          => $vat,
+            'finalTotal'   => $final,
+            'date'         => !empty($data['date'])
+                ? \Carbon\Carbon::parse($data['date'])->format('m-d-y')
+                : '',
         ]);
     }
 

@@ -269,13 +269,17 @@
                                 <div class="col-md-8 col-5">
                                     <div class="card-body left-controls">
                                         <div class="form-group">
-                                            <button type="button" class="btn btn-primary" id="add-row-btn">+
-                                                {{ __('Add Row') }}</button>
+                                            <button type="button" class="btn btn-primary" id="add-row-btn-edit">
+                                                + {{ __('Add Row') }}
+                                            </button>
                                         </div>
                                         <div class="form-group btn-generate d-flex flex-wrap gap-2">
                                             <a href="{{ route('home') }}" class="btn btn-secondary">
                                                 {{ __('Cancel') }}
                                             </a>
+                                            <button type="button" class="btn btn-primary" id="preview-btn">
+                                                {{ __('Preview') }}
+                                            </button>
                                             <button type="submit" class="btn btn-success" id="generate-btn">
                                                 {{ __('Update') }}
                                             </button>
@@ -453,5 +457,52 @@
                 window.recomputeSummary();
             }
         })();
+
+        (function () {
+                const previewBtn = document.getElementById('preview-btn');
+                if (!previewBtn) return;
+
+                previewBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const form = this.form;
+                    if (!form) return;
+
+                    // Disable Laravel's method spoofing so it's a real POST
+                    const spoof = form.querySelector('input[name="_method"]');
+                    let spoofWasDisabled = false;
+                    if (spoof) { spoof.disabled = true; spoofWasDisabled = true; }
+
+                    // Switch to preview route (POST) and optionally open in new tab
+                    const originalAction = form.getAttribute('action');
+                    const originalMethod = form.getAttribute('method');
+
+                    form.setAttribute('action', '{{ route('home.preview') }}');
+                    form.setAttribute('method', 'POST');
+
+                    form.submit();
+
+                    // Restore for normal Update after coming back
+                    form.setAttribute('action', originalAction);
+                    form.setAttribute('method', originalMethod || 'POST');
+                    form.removeAttribute('target');
+                    if (spoof && spoofWasDisabled) spoof.disabled = false;
+                });
+            })();
+
+        let nextIndex = {{ count($home->details) }};
+
+            const addBtn = document.getElementById('add-row-btn-edit');
+            if (addBtn) {
+                addBtn.addEventListener('click', function () {
+                    const tpl = document.getElementById('row-template').innerHTML;
+                    const ser = nextIndex + 1;
+                    const html = tpl.replaceAll('__INDEX__', nextIndex).replaceAll('__SER__', ser);
+                    const wrap = document.createElement('div');
+                    wrap.innerHTML = html;
+                    const row = wrap.firstElementChild;
+                    document.getElementById('rows-container').appendChild(row);
+                    nextIndex++;
+                });
+            }
     </script>
 @endpush
