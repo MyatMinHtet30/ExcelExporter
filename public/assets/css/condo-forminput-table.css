@@ -1,0 +1,69 @@
+  .card-header h5 {
+    white-space: nowrap;
+    margin-bottom: 0.75rem;
+  }
+  .mic-btn {
+    border-left: none;
+  }
+  .input-group .form-control {
+    border-right: 0;
+  }
+  .input-group .mic-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  /* ===== iPhone SE / narrow phones: keep 2-col layout, widen summary, slim buttons ===== */
+@media (max-width: 420px) {
+
+  /* make left (buttons) narrower, right (summary) wider */
+  .card-header .row>.col-md-8.col-5 {
+    flex: 0 0 40% !important;
+    max-width: 40% !important;
+    width: 40% !important;
+  }
+
+  .card-header .row>.col-md3.col-4 {
+    flex: 0 0 60% !important;
+    max-width: 60% !important;
+    width: 60% !important;
+  }
+
+  /* let summary panel fit inside its col-4 */
+  .card-header .row>.col-md3.col-4 .text-end {
+    min-width: 0 !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  /* slim ONLY Add Row & Generate (not mic buttons) */
+  #add-row-btn,
+  #generate-btn {
+    padding: .35rem .5rem;
+    font-size: .85rem;
+    line-height: 1.2;
+  }
+.card-header h5,
+  .col-lg-3.col-md-3.col-6 h5,
+  .col-md-2.col-4 h5,
+  .col-lg-4.col-md-4.col-12 h5,
+  .col-lg-1.col-md-1.col-2 h5,
+  .col-lg-5.col-md-4.col-10 h5,
+  .col-md-1.col-3 h5 {
+    font-size: 0.88rem;    /* slightly smaller font */
+    line-height: 1.1;      /* tighter spacing */
+  }
+
+  /* Add consistent side padding for ALL headers */
+  .card-header,
+  .col-lg-3.col-md-3.col-6 .card-header,
+  .col-md-2.col-4 .card-header,
+  .col-lg-4.col-md-4.col-12 .card-header,
+  .col-lg-1.col-md-1.col-2 .card-header,
+  .col-lg-5.col-md-4.col-10 .card-header,
+  .col-md-1.col-3 .card-header {
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+  }
+  
+}

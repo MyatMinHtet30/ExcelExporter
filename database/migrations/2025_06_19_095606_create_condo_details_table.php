@@ -11,16 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::create('condo_details', function (Blueprint $table) {
-            $table->id(); // Condo_Detail_Id
-            $table->foreignId('condo_id')->constrained('condos')->onDelete('cascade'); // CQ_Id
+            $table->id();
+            $table->foreignId('condo_id')->constrained('condos')->cascadeOnDelete();
             $table->integer('no')->nullable();
-            $table->string('details')->nullable(); // typo fixed
-            $table->integer('amount')->nullable();
+            $table->string('details')->nullable();
+            $table->decimal('amount', 18, 2)->nullable();
             $table->string('unit')->nullable();
-            $table->float('material_cost')->nullable(); // typo fixed
-            $table->float('labor_price')->nullable();
-            $table->float('price_per_unit_total')->nullable();
+            $table->decimal('material_cost', 18, 2)->nullable();
+            $table->decimal('labor_cost', 18, 2)->nullable();
+            $table->decimal('price_per_unit_total', 18, 2)->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

@@ -15,9 +15,11 @@
 @endpush
 
 @section('content')
-    <form action="{{ route('home.update', $home) }}" method="POST">
+    <form action="{{ route('home.update', $home) }}" method="POST" data-preview-action="{{ route('home.preview') }}">
         @csrf
         @method('PUT')
+
+        <div id="deleted-bin"></div>
 
         <div class="xp-contentbar">
             <div class="row">
@@ -251,8 +253,7 @@
 
                                 <div class="row pt-2">
                                     <div class="col-12 d-flex justify-content-end">
-                                        <button type="button" class="btn btn-sm btn-danger remove-row"
-                                            onclick="markRowDeleted(this)">&times;</button>
+                                        <button type="button" class="btn btn-sm btn-danger remove-row">&times;</button>
                                     </div>
                                 </div>
                             </div>
@@ -426,83 +427,4 @@
 
 @push('scripts')
     <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
-    <script>
-        (function () {
-            // Reuse your existing calc logic; just add helpers for add/remove
-
-            let nextIndex = {{ count($home->details) }};
-
-            document.getElementById('add-row-btn')?.addEventListener('click', function () {
-                const tpl = document.getElementById('row-template').innerHTML;
-                const ser = nextIndex + 1; // serial display
-                const html = tpl.replaceAll('__INDEX__', nextIndex).replaceAll('__SER__', ser);
-                const wrap = document.createElement('div');
-                wrap.innerHTML = html;
-                const row = wrap.firstElementChild;
-                document.getElementById('rows-container').appendChild(row);
-                nextIndex++;
-            });
-
-            window.markRowDeleted = function (btn) {
-                const card = btn.closest('.item-row');
-                const del = card.querySelector('.js-delete-flag');
-                if (!del) return;
-                // toggle delete
-                const isDeleted = del.value === '1';
-                del.value = isDeleted ? '0' : '1';
-                card.classList.toggle('row-deleted', !isDeleted);
-            };
-
-            if (typeof window.recomputeSummary === 'function') {
-                window.recomputeSummary();
-            }
-        })();
-
-        (function () {
-                const previewBtn = document.getElementById('preview-btn');
-                if (!previewBtn) return;
-
-                previewBtn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const form = this.form;
-                    if (!form) return;
-
-                    // Disable Laravel's method spoofing so it's a real POST
-                    const spoof = form.querySelector('input[name="_method"]');
-                    let spoofWasDisabled = false;
-                    if (spoof) { spoof.disabled = true; spoofWasDisabled = true; }
-
-                    // Switch to preview route (POST) and optionally open in new tab
-                    const originalAction = form.getAttribute('action');
-                    const originalMethod = form.getAttribute('method');
-
-                    form.setAttribute('action', '{{ route('home.preview') }}');
-                    form.setAttribute('method', 'POST');
-
-                    form.submit();
-
-                    // Restore for normal Update after coming back
-                    form.setAttribute('action', originalAction);
-                    form.setAttribute('method', originalMethod || 'POST');
-                    form.removeAttribute('target');
-                    if (spoof && spoofWasDisabled) spoof.disabled = false;
-                });
-            })();
-
-        let nextIndex = {{ count($home->details) }};
-
-            const addBtn = document.getElementById('add-row-btn-edit');
-            if (addBtn) {
-                addBtn.addEventListener('click', function () {
-                    const tpl = document.getElementById('row-template').innerHTML;
-                    const ser = nextIndex + 1;
-                    const html = tpl.replaceAll('__INDEX__', nextIndex).replaceAll('__SER__', ser);
-                    const wrap = document.createElement('div');
-                    wrap.innerHTML = html;
-                    const row = wrap.firstElementChild;
-                    document.getElementById('rows-container').appendChild(row);
-                    nextIndex++;
-                });
-            }
-    </script>
 @endpush

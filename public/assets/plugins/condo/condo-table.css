@@ -1,0 +1,145 @@
+/* =========================
+   Condo table (DataTables)
+   ========================= */
+
+/* Header button spacing & table wrapper on phones (same idea as Home page) */
+@media (max-width: 576px) {
+  .card-header .d-flex.justify-content-end {
+    margin-top: 0 !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* keep equal left/right white space when table overflows */
+  .custom-table-wrapper {
+    margin-left: -15px;
+    margin-right: -15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    box-sizing: border-box;
+    background: #fff;
+  }
+
+  /* nudge "Showing X of Y" + pagination to the right a bit */
+  #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-5,
+  #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-7 {
+    margin-left: 175px; /* adjust if you want more/less */
+  }
+}
+
+@media (max-width: 768px) {
+  .card-header .d-flex.justify-content-end {
+    margin-top: 0 !important;
+    margin-bottom: 1rem !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* -------------------------
+   Table sizing & alignment
+   ------------------------- */
+
+/* Bigger header row padding, compact body rows */
+#xp-default-datatable thead th {
+  padding-top: 0.80rem;
+  padding-bottom: 0.80rem;
+  padding-left: 0.8rem;
+  vertical-align: middle !important;
+  line-height: 1.25;
+  text-align: left;
+}
+
+#xp-default-datatable tbody td {
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  padding-left: 0.8rem;
+  vertical-align: middle !important;  /* center top/bottom */
+  line-height: 1.25;
+  text-align: left;
+}
+
+/* “No.” column: narrow + centered */
+#xp-default-datatable th:nth-child(1),
+#xp-default-datatable td:nth-child(1) {
+  width: 56px;        /* try 48–64px if you want */
+  min-width: 56px;
+  text-align: center;
+}
+
+/* Actions column: tight + centered */
+#xp-default-datatable th.actions-col,
+#xp-default-datatable td.actions-col {
+  width: 92px;
+  white-space: nowrap;
+  text-align: center !important;
+}
+
+/* Slightly smaller paddings on very small screens for both header & body */
+@media (max-width: 576px) {
+  #xp-default-datatable thead th {
+    padding-top: 0.65rem;
+    padding-bottom: 0.65rem;
+  }
+  #xp-default-datatable tbody td {
+    padding-top: 0.40rem;
+    padding-bottom: 0.40rem;
+  }
+}
+
+/* -------------------------
+   Action buttons look & feel
+   (match your Home page)
+   ------------------------- */
+.action-buttons {
+  display: inline-flex;
+  gap: .5rem;
+  justify-content: center;
+  white-space: nowrap;
+}
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  padding: .55rem;       /* square(ish) button */
+  font-size: 1.1rem;
+  border-radius: .6rem;
+  border-width: 2px;
+}
+.btn-action svg { width: 22px; height: 22px; }
+
+.btn-edit {
+  color: #0b4c8c;
+  background: #e6f0ff;
+  border-color: #0b4c8c;
+}
+.btn-edit:hover,
+.btn-edit:focus {
+  color: #083a6a;
+  background: #d7e8ff;
+  border-color: #083a6a;
+}
+
+.btn-delete {
+  color: #8c0b0b;
+  background: #ffe6e6;
+  border-color: #8c0b0b;
+}
+.btn-delete:hover,
+.btn-delete:focus {
+  color: #6a0808;
+  background: #ffd7d7;
+  border-color: #6a0808;
+}
+.btn-action:focus {
+  outline: 3px solid #111 !important;
+  outline-offset: 2px;
+}
+
+/* Smaller buttons on tiny screens */
+@media (max-width: 576px) {
+  .action-buttons { gap: .25rem; }
+  .btn-action { padding: .35rem; font-size: .85rem; border-width: 1px; border-radius: .4rem; }
+  .btn-action svg { width: 16px; height: 16px; }
+}
+@media (max-width: 400px) {
+  .btn-action { padding: .25rem; }
+  .btn-action svg { width: 14px; height: 14px; }
+}

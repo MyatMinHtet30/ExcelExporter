@@ -95,7 +95,9 @@
                                         <input type="search" class="form-control" placeholder="{{ __('Search') }}"
                                             aria-label="Search" aria-describedby="button-addon2">
                                         <div class="input-group-append">
-                                            <button class="btn" type="submit" id="button-addon2">{{ __('GO') }}</button>
+                                            <button class="btn" type="submit" id="button-addon2">
+                                                <i class="fa fa-search"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </form>
@@ -109,7 +111,7 @@
                                 <ul class="list-inline mb-0">
 
                                     <!-- Language Switcher (ENG / THA) -->
-                                    @php
+                                    <!-- @php
                                         $locale = app()->getLocale();
                                         $currentLang = $locale === 'th' ? 'THA' : 'ENG';
                                     @endphp
@@ -126,6 +128,18 @@
                                                 <a class="dropdown-item" href="{{ url('lang/th') }}">ไทย</a>
                                             </div>
                                         </div>
+                                    </li> -->
+                                    <li class="list-inline-item lang-switch">
+                                        @php
+                                            $locale = app()->getLocale();
+                                            $toggleLang = $locale === 'th' ? 'en' : 'th'; // switch to the opposite
+                                            $toggleLabel = $locale === 'th' ? 'THA' : 'ENG';
+                                        @endphp
+                                        <a class="btn-lang"
+                                        href="{{ url('lang/' . $toggleLang) }}"
+                                        title="{{ __('Change language') }}">
+                                            {{ $toggleLabel }}
+                                        </a>
                                     </li>
 
                                     <li class="list-inline-item mr-0">

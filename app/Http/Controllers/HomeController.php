@@ -98,72 +98,98 @@ class HomeController extends Controller
 
     /** Update */
     public function update(Request $request, Home $home)
-    {
-        App::setLocale(Session::get('locale', config('app.locale')));
+{
+    App::setLocale(Session::get('locale', config('app.locale')));
 
-        $parent = $this->validated($request);
-        $parent['status'] = $parent['status'] ?? $home->status;
+    $parent = $this->validated($request);
+    $parent['status'] = $parent['status'] ?? $home->status;
 
-        $totals = $request->validate([
-            'final_total' => ['nullable','numeric','min:0'],
-        ]);
+    $totals = $request->validate([
+        'final_total' => ['nullable','numeric','min:0'],
+    ]);
 
-        $v = $request->validate([
-            'details'                   => ['nullable','array'],
-            'details.*.id'              => ['nullable','integer','exists:home_details,id'],
-            'details.*._delete'         => ['nullable','boolean'],
-            'details.*.status'          => ['nullable','boolean'],
-            'details.*.no'              => ['nullable','integer','min:1'],
-            'details.*.category_name'   => ['nullable','string','max:255'],
-            'details.*.amount'          => ['nullable','numeric','min:0'],
-            'details.*.unit'            => ['nullable','string','max:50'],
-            'details.*.mc_price'        => ['nullable','numeric','min:0'],
-            'details.*.lc_price'        => ['nullable','numeric','min:0'],
-        ]);
+    // NEW: bin of ids coming from the front-end when user removed rows visually
+    $deleteBag = $request->validate([
+        'deleted_detail_ids'   => ['nullable','array'],
+        'deleted_detail_ids.*' => ['integer','exists:home_details,id'],
+    ]);
 
-        DB::transaction(function () use ($home, $parent, $v, $totals) {
-            // Update parent
-            $home->update($parent + [
+    $v = $request->validate([
+        'details'                   => ['nullable','array'],
+        'details.*.id'              => ['nullable','integer','exists:home_details,id'],
+        'details.*._delete'         => ['nullable','boolean'],   // still supported
+        'details.*.status'          => ['nullable','boolean'],
+        'details.*.no'              => ['nullable','integer','min:1'],
+        'details.*.category_name'   => ['nullable','string','max:255'],
+        'details.*.amount'          => ['nullable','numeric','min:0'],
+        'details.*.unit'            => ['nullable','string','max:50'],
+        'details.*.mc_price'        => ['nullable','numeric','min:0'],
+        'details.*.lc_price'        => ['nullable','numeric','min:0'],
+    ]);
+
+    DB::transaction(function () use ($home, $parent, $v, $totals, $deleteBag) {
+        // 1) Update parent
+        $home->update($parent + [
             'date'        => $parent['date'] ?? $home->date,
             'total_price' => isset($totals['final_total'])
                 ? round((float)$totals['final_total'], 2)
                 : $home->total_price,
         ]);
 
-            $rows = collect($v['details'] ?? []);
+        // 2) Collect rows from request
+        $rows = collect($v['details'] ?? []);
 
-            $toDelete = $rows->filter(fn ($r) => !empty($r['_delete']) && !empty($r['id']))->pluck('id');
-            if ($toDelete->isNotEmpty()) {
-                HomeDetail::where('home_id', $home->id)->whereIn('id', $toDelete)->delete();
-            }
+        // 3) Compute ids to delete (new way + old flag way) and delete them
+        $toDeleteFromBin  = collect($deleteBag['deleted_detail_ids'] ?? []);
+        $toDeleteFromFlag = $rows
+            ->filter(fn ($r) => !empty($r['_delete']) && !empty($r['id']))
+            ->pluck('id');
 
-            $rows->filter(fn ($r) => empty($r['_delete']) && !empty($r['id']))->each(function ($r) use ($home) {
-                $detail = HomeDetail::where('home_id', $home->id)->where('id', $r['id'])->first();
-                if (!$detail) return;
+        $toDelete = $toDeleteFromBin
+            ->merge($toDeleteFromFlag)
+            ->unique()
+            ->values();
 
-                $amount = (float)($r['amount'] ?? 0);
-                $mc     = (float)($r['mc_price'] ?? 0);
-                $lc     = (float)($r['lc_price'] ?? 0);
-                $mat    = $amount * $mc;
-                $lab    = $amount * $lc;
-                $grand  = $mat + $lab;
+        if ($toDelete->isNotEmpty()) {
+            HomeDetail::where('home_id', $home->id)
+                ->whereIn('id', $toDelete)
+                ->delete();
+        }
 
-                $detail->update([
-                    'status'         => (bool)($r['status'] ?? $detail->status),
-                    'no'             => $r['no'] ?? $detail->no,
-                    'category_name'  => $r['category_name'] ?? $detail->category_name,
-                    'item_name'      => $r['item_name'] ?? $detail->item_name,
-                    'amount'         => $r['amount'] ?? $detail->amount,
-                    'unit'           => $r['unit'] ?? $detail->unit,
-                    'mc_price'       => $r['mc_price'] ?? $detail->mc_price,
-                    'lc_price'       => $r['lc_price'] ?? $detail->lc_price,
-                    'material_total' => $amount ? round($mat, 2) : null,
-                    'labor_total'    => $amount ? round($lab, 2) : null,
-                    'grand_total'    => ($amount && ($mc || $lc)) ? round($grand, 2) : null,
-                ]);
-            });
+        // 4) Exclude deleted rows from further processing
+        $rows = $rows->reject(fn ($r) => !empty($r['id']) && $toDelete->contains($r['id']));
 
-            $newRows = $rows->filter(fn ($r) => empty($r['_delete']) && empty($r['id']))->map(function ($r, $i) {
+        // 5) Update existing non-deleted rows
+        $rows->filter(fn ($r) => !empty($r['id']))->each(function ($r) use ($home) {
+            $detail = HomeDetail::where('home_id', $home->id)->where('id', $r['id'])->first();
+            if (!$detail) return;
+
+            $amount = (float)($r['amount'] ?? 0);
+            $mc     = (float)($r['mc_price'] ?? 0);
+            $lc     = (float)($r['lc_price'] ?? 0);
+            $mat    = $amount * $mc;
+            $lab    = $amount * $lc;
+            $grand  = $mat + $lab;
+
+            $detail->update([
+                'status'         => (bool)($r['status'] ?? $detail->status),
+                'no'             => $r['no'] ?? $detail->no,
+                'category_name'  => $r['category_name'] ?? $detail->category_name,
+                'item_name'      => $r['item_name'] ?? $detail->item_name,
+                'amount'         => $r['amount'] ?? $detail->amount,
+                'unit'           => $r['unit'] ?? $detail->unit,
+                'mc_price'       => $r['mc_price'] ?? $detail->mc_price,
+                'lc_price'       => $r['lc_price'] ?? $detail->lc_price,
+                'material_total' => $amount ? round($mat, 2) : null,
+                'labor_total'    => $amount ? round($lab, 2) : null,
+                'grand_total'    => ($amount && ($mc || $lc)) ? round($grand, 2) : null,
+            ]);
+        });
+
+        // 6) Create new rows (no id)
+        $newRows = $rows
+            ->filter(fn ($r) => empty($r['id']))
+            ->map(function ($r, $i) {
                 $amount = (float)($r['amount'] ?? 0);
                 $mc     = (float)($r['mc_price'] ?? 0);
                 $lc     = (float)($r['lc_price'] ?? 0);
@@ -185,13 +211,13 @@ class HomeController extends Controller
                 ];
             })->all();
 
-            if (!empty($newRows)) {
-                $home->details()->createMany($newRows);
-            }
-        });
+        if (!empty($newRows)) {
+            $home->details()->createMany($newRows);
+        }
+    });
 
-        return redirect()->route('home')->with('success', __('Updated successfully.'));
-    }
+    return redirect()->route('home')->with('success', __('Updated successfully.'));
+}
 
     /** Delete */
     public function destroy(Home $home)

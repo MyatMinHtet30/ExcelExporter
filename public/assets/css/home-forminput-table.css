@@ -1,0 +1,199 @@
+
+        /* ---------- General polish ---------- */
+        .item-row {
+            position: relative
+        }
+        /* Make senior code spacing match your original code */
+        #rows-container .field-col {
+            padding-left: 18px;  
+            padding-right: 18px;
+        }
+
+        #rows-container .field-col .input-group {
+            padding-left: 0;     
+            padding-right: 0;
+        }
+
+        .item-row .card-header {
+            padding: 1rem 1rem .75rem
+        }
+
+        .item-row .card-body {
+            padding: .25rem 1rem 1rem
+        }
+
+        .input-group.input-42>.form-control,
+        .input-group.input-42>.btn {
+            height: 42px
+        }
+
+        .readonly-input[readonly] {
+            background: #f1f3f5
+        }
+
+        .field-col {
+            display: flex;
+            flex-direction: column
+        }
+
+        .field-col .input-group,
+        .field-col .form-control {
+            width: 100%
+        }
+
+        .g-compact {
+            row-gap: .75rem
+        }
+
+        .remove-row {
+            position: static;
+            line-height: 1;
+            margin-top: .5rem;
+            border-radius: 4px;
+            padding: .25rem .75rem;
+        }
+
+        /* Mobile tweaks for 2nd row fields */
+        @media (max-width: 576px) {
+            .item-row .card-header {
+                padding: .75rem .75rem
+            }
+
+            .g-compact {
+                row-gap: .5rem
+            }
+
+            .input-group.input-42>.form-control,
+            .input-group.input-42>.btn {
+                height: 40px
+            }
+
+            .mic-btn {
+                min-width: 40px
+            }
+
+            .fields-line-2>.field-col {
+                flex: 0 0 50%;
+                max-width: 50%
+            }
+
+            .readonly-input {
+                height: 40px
+            }
+        }
+
+        @media (min-width: 577px) {
+            .item-row .remove-mobile {
+                display: none
+            }
+        }
+
+        /* --- Keep Generate at the bottom on the left --- */
+        .left-controls {
+            display: flex;
+            flex-direction: column;
+            height: 100%
+        }
+
+        .left-controls .btn-generate {
+            margin-top: auto
+        }
+
+        /* ===== iPhone SE / narrow phones: match your style ===== */
+        @media (max-width: 420px) {
+
+            /* Card header padding like your original code */
+            .item-row .card-header,
+            .card.m-b-20 .card-header {
+                padding-left: 1.25rem;
+                padding-right: 1.25rem;
+                padding-top: 0.75rem;
+            }
+
+            /* Labels font size & line height like your original code */
+            .item-row .card-header h5,
+            .card.m-b-20 .card-header h5,
+            .field-col label.card-title {
+                font-size: 0.88rem;
+                line-height: 1;
+            }
+
+            /* Field columns padding */
+            #rows-container .field-col,
+            .card.m-b-20 .field-col,
+            .card.m-b-20 input.form-control,
+            .card.m-b-20 .input-group {
+                padding-left: 0.6rem;
+                padding-right: 0.6rem;
+            }
+
+            /* Input & button height like your original code */
+            .input-group.input-42>.form-control,
+            .input-group.input-42>.btn,
+            .readonly-input,
+            #rows-container input.form-control,
+            .card.m-b-20 input.form-control {
+                height: 38px;
+            }
+
+            /* Mic button */
+            .mic-btn {
+                min-width: 38px;
+                border-left: none;
+            }
+
+            /* Row gap compact */
+            .g-compact {
+                row-gap: 0.5rem;
+            }
+
+            /* 2nd row fields: 2-column layout */
+            .fields-line-2>.field-col {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            /* Add row / Generate buttons slim */
+            #add-row-btn,
+            #generate-btn {
+                padding: .35rem .5rem;
+                font-size: .85rem;
+                line-height: 1.2;
+            }
+
+            /* Remove row button */
+            .remove-row {
+                padding: .25rem .75rem;
+                font-size: 0.85rem;
+                margin-top: 0.5rem;
+            }
+
+            /* Summary (right panel) width adjustment */
+            .card-header .row>.col-md-8.col-5 {
+                flex: 0 0 40% !important;
+                max-width: 40% !important;
+                width: 40% !important;
+            }
+            .card-header .row>.col-md3.col-4 {
+                flex: 0 0 60% !important;
+                max-width: 60% !important;
+                width: 60% !important;
+            }
+            .card-header .row>.col-md3.col-4 .text-end {
+                min-width: 0 !important;
+                width: 100% !important;
+                margin-left: 0 !important;
+            }
+
+            /* Top info cards (Project Name / Dear / List Name / House No / Trooper) */
+            .col-lg-4.col-md-4.col-12 .card-header,
+            .col-lg-6.col-md-6.col-12 .card-header {
+                padding-left: 0.6rem;
+                padding-right: 0.6rem;
+            }
+
+            .col-lg-4.col-md-4.col-12 input.form-control,
+            .col-lg-6.col-md-6.col-12 input.form-control {
+                height: 38px;
+            }
+        }

@@ -1,0 +1,28 @@
+
+@media (max-width: 576px) {
+    .card-header .d-flex.justify-content-end {
+        margin-top: 0 !important;
+        margin-bottom: 1rem !important;
+    }
+
+    .custom-table-wrapper{
+        margin-left:  -15px;   /* extend wrapper beyond card padding */
+        margin-right: -15px;
+        padding-left: 15px;    /* bring content back in with equal space */
+        padding-right:15px;
+        box-sizing: border-box;
+        background: #fff;      /* match card so the gap is white */
+    }
+    #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-5,
+    #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-7 {
+        margin-left: 175px; /* adjust value as needed */
+    }
+}
+
+@media (max-width: 768px) {
+    .card-header .d-flex.justify-content-end {
+    margin-top: 0 !important;       /* remove the negative top margin */
+    margin-bottom: 1rem !important; /* add spacing like mb-3 */
+    justify-content: flex-end !important; /* keep it aligned right */
+  }
+}
