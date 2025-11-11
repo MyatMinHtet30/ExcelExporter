@@ -14,7 +14,7 @@
 
   "Home": "บ้าน",
   "Condo": "คอนโด",
-  "Generate Home Excel Form": "สร้าง Excel สำหลับบ้าน", 
+  "Generate Home Excel Form": "สร้าง Excel สำหลับบ้าน",
   "Generate Condo Excel Form": "สร้าง Excel สำหลับคอนโด",
   "Project Name": "โครงการ",
   "Enter project name": "กรอกชื่อโครงการ",
@@ -74,5 +74,11 @@
   "Office": "สำนักงาน",
   "Age": "อายุ",
   "Start date": "วันที่เริ่มงาน",
-  "Salary": "เงินเดือน"
+  "Salary": "เงินเดือน",
+  "Category": "หมวดหมู่",
+  "Cancel": "ยกเลิก",
+  "Preview": "ดูตัวอย่าง",
+  "Operating +": "ค่าใช้จ่ายในการดำเนินงาน +",
+  "Profit (15%)": "กำไร (15%)",
+  "VAT (7%)": "ภาษีมูลค่าเพิ่ม (7%)"
 }
