@@ -15,9 +15,11 @@
 @endpush
 
 @section('content')
-    <form action="{{ route('home.update', $home) }}" method="POST">
+    <form action="{{ route('home.update', $home) }}" method="POST" data-preview-action="{{ route('home.preview') }}">
         @csrf
         @method('PUT')
+
+        <div id="deleted-bin"></div>
 
         <div class="xp-contentbar">
             <div class="row">
@@ -92,7 +94,7 @@
                 </div>
 
                 {{-- House No + Trooper --}}
-                <div class="col-lg-6 col-md-6 col-12">
+                <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <h5 class="card-title text-black">{{ __('House No') }}</h5>
@@ -114,7 +116,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6 col-md-6 col-12">
+                <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
@@ -129,6 +131,23 @@
                                             onclick="startDictation(this)">
                                             <i class="fas fa-microphone"></i>
                                         </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-12">
+                    <div class="card m-b-20">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title text-black">{{ __('Date') }}</h5>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="input-group input-42">
+                                        <input type="date" class="form-control" name="date" id="date"
+                                            value="{{ old('date', $home->date?->format('Y-m-d')) }}" required>
+                                        @error('date') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                     </div>
                                 </div>
                             </div>
@@ -155,21 +174,13 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-12 col-sm-4 col-md-3 field-col">
+                                    <div class="col-12 col-sm-6 col-md-6 field-col">
                                         <label class="form-label">{{ __('Category') }}</label>
                                         <div class="input-group input-42">
                                             <input type="text" class="form-control" name="details[{{ $i }}][category_name]"
                                                 value="{{ $detail->category_name }}">
-                                        </div>
-                                    </div>
-
-                                    <div class="col-12 col-sm-8 col-md-4 field-col">
-                                        <label class="form-label">{{ __('Item Name') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="text" class="form-control" name="details[{{ $i }}][item_name]"
-                                                value="{{ $detail->item_name }}" required>
-                                            <button type="button" class="btn btn-outline-secondary mic-btn"
-                                                onclick="startDictation(this)">
+                                            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
+                                                title="{{ __('Speak') }}">
                                                 <i class="fas fa-microphone"></i>
                                             </button>
                                         </div>
@@ -242,8 +253,7 @@
 
                                 <div class="row pt-2">
                                     <div class="col-12 d-flex justify-content-end">
-                                        <button type="button" class="btn btn-sm btn-danger remove-row"
-                                            onclick="markRowDeleted(this)">&times;</button>
+                                        <button type="button" class="btn btn-sm btn-danger remove-row">&times;</button>
                                     </div>
                                 </div>
                             </div>
@@ -260,13 +270,17 @@
                                 <div class="col-md-8 col-5">
                                     <div class="card-body left-controls">
                                         <div class="form-group">
-                                            <button type="button" class="btn btn-primary" id="add-row-btn">+
-                                                {{ __('Add Row') }}</button>
+                                            <button type="button" class="btn btn-primary" id="add-row-btn-edit">
+                                                + {{ __('Add Row') }}
+                                            </button>
                                         </div>
                                         <div class="form-group btn-generate d-flex flex-wrap gap-2">
                                             <a href="{{ route('home') }}" class="btn btn-secondary">
                                                 {{ __('Cancel') }}
                                             </a>
+                                            <button type="button" class="btn btn-primary" id="preview-btn">
+                                                {{ __('Preview') }}
+                                            </button>
                                             <button type="submit" class="btn btn-success" id="generate-btn">
                                                 {{ __('Update') }}
                                             </button>
@@ -333,21 +347,17 @@
                                 value="__SER__" min="1" readonly>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-4 col-md-3 field-col">
+                    <div class="col-12 col-sm-6 col-md-6 field-col">
                         <label class="form-label">{{ __('Category') }}</label>
                         <div class="input-group input-42">
                             <input type="text" class="form-control" name="details[__INDEX__][category_name]">
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-8 col-md-4 field-col">
-                        <label class="form-label">{{ __('Item Name') }}</label>
-                        <div class="input-group input-42">
-                            <input type="text" class="form-control" name="details[__INDEX__][item_name]" required>
-                            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)">
+                            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
+                                title="{{ __('Speak') }}">
                                 <i class="fas fa-microphone"></i>
                             </button>
                         </div>
                     </div>
+
                     <div class="col-6 col-md-2 field-col">
                         <label class="form-label">{{ __('Amount') }}</label>
                         <div class="input-group input-42">
@@ -417,36 +427,4 @@
 
 @push('scripts')
     <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
-    <script>
-        (function () {
-            // Reuse your existing calc logic; just add helpers for add/remove
-
-            let nextIndex = {{ count($home->details) }};
-
-            document.getElementById('add-row-btn')?.addEventListener('click', function () {
-                const tpl = document.getElementById('row-template').innerHTML;
-                const ser = nextIndex + 1; // serial display
-                const html = tpl.replaceAll('__INDEX__', nextIndex).replaceAll('__SER__', ser);
-                const wrap = document.createElement('div');
-                wrap.innerHTML = html;
-                const row = wrap.firstElementChild;
-                document.getElementById('rows-container').appendChild(row);
-                nextIndex++;
-            });
-
-            window.markRowDeleted = function (btn) {
-                const card = btn.closest('.item-row');
-                const del = card.querySelector('.js-delete-flag');
-                if (!del) return;
-                // toggle delete
-                const isDeleted = del.value === '1';
-                del.value = isDeleted ? '0' : '1';
-                card.classList.toggle('row-deleted', !isDeleted);
-            };
-
-            if (typeof window.recomputeSummary === 'function') {
-                window.recomputeSummary();
-            }
-        })();
-    </script>
 @endpush

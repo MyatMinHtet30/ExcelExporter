@@ -1,173 +1,261 @@
-// ===== Speech to text (Thai) =====
-function startDictation(btn){
-  const input = btn.closest('.input-group')?.querySelector('input');
-  if(!input) return;
-  if(!('webkitSpeechRecognition' in window)){
-    alert('เบราว์เซอร์นี้ไม่รองรับการจดจำเสียง (Speech Recognition).');
-    return;
+/* -------------------------------------------------------
+ * Home Form – unified logic for Create + Edit pages
+ * - Row add/remove (with soft-delete on Edit)
+ * - Reindexing details[i][...]
+ * - Totals + summary
+ * - Preview-on-Edit (POST without _method=PUT)
+ * - Speech-to-text (Thai)
+ * - Number formatting
+ * -----------------------------------------------------*/
+
+(function () {
+  // ====== Shortcuts ======
+  const $  = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const to2 = n => (isFinite(n) ? Number(n) : 0).toFixed(2);
+
+  const rowsContainer = $('#rows-container');
+  if (!rowsContainer) return;
+
+  const addBtns = [
+    $('#add-row-btn'),       // Create page
+    $('#add-row-btn-edit'),  // Edit page
+  ].filter(Boolean);
+
+  const rowTemplate = $('#row-template'); // Present on Edit page
+  const previewBtn  = $('#preview-btn');  // Present on Edit page
+
+  // ====== Speech-to-text (Thai) ======
+  function startDictation(btn){
+    const input = btn.closest('.input-group')?.querySelector('input');
+    if(!input) return;
+    if(!('webkitSpeechRecognition' in window)){
+      alert('เบราว์เซอร์นี้ไม่รองรับการจดจำเสียง (Speech Recognition).');
+      return;
+    }
+    const r = new webkitSpeechRecognition();
+    r.lang = 'th-TH'; r.interimResults = false; r.maxAlternatives = 1;
+    r.onresult = e => {
+      input.value = e.results[0][0].transcript;
+      input.dispatchEvent(new Event('input',{bubbles:true}));
+    };
+    r.start();
   }
-  const r = new webkitSpeechRecognition();
-  r.lang = 'th-TH'; r.interimResults = false; r.maxAlternatives = 1;
-  r.onresult = e => {
-    input.value = e.results[0][0].transcript;
-    input.dispatchEvent(new Event('input',{bubbles:true}));
+  // expose for inline buttons
+  window.startDictation = startDictation;
+
+  // ====== Helpers about soft-delete (Edit page) ======
+  const isSoftRow  = (row) => !!row.querySelector('.js-delete-flag');
+  const isDeleted  = (row) => {
+    const f = row.querySelector('.js-delete-flag');
+    return f ? f.value === '1' : false;
   };
-  r.start();
-}
-window.startDictation = startDictation;
+  const setDeleted = (row, val) => {
+    const f = row.querySelector('.js-delete-flag');
+    if (!f) return;
+    f.value = val ? '1' : '0';
+    row.classList.toggle('row-deleted', !!val);
+  };
 
-// ===== Helpers =====
-const $  = (s, r=document) => r.querySelector(s);
-const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-const to2 = n => (isFinite(n)?Number(n):0).toFixed(2);
+  const getRows = () => $$('.item-row', rowsContainer);
 
-// ===== Row & totals calc (aligned to details[*]) =====
-function calcRow(row){
-  const val = sel => parseFloat($(sel,row)?.value)||0;
+  // ====== Per-row totals ======
+  function calcRow(row){
+    const val = sel => parseFloat($(sel,row)?.value) || 0;
 
-  const amount = val('input[name*="[amount]"]');   // details[*][amount]
-  const mc     = val('input[name*="[mc_price]"]'); // details[*][mc_price]
-  const lc     = val('input[name*="[lc_price]"]'); // details[*][lc_price]
+    const amount = val('input[name*="[amount]"]');
+    const mc     = val('input[name*="[mc_price]"]');
+    const lc     = val('input[name*="[lc_price]"]');
 
-  const mTotal = amount * mc;
-  const lTotal = amount * lc;
-  const gTotal = mTotal + lTotal;
+    const mTotal = amount * mc;
+    const lTotal = amount * lc;
+    const gTotal = mTotal + lTotal;
 
-  const set = (cls, v) => { const el = $(cls, row); if(el) el.value = to2(v); };
+    const set = (cls, v) => { const el = $(cls, row); if(el) el.value = to2(v); };
+    set('.js-mat-total',   mTotal);
+    set('.js-lab-total',   lTotal);
+    set('.js-grand-total', gTotal);
+  }
 
-  // display-only totals (no name=)
-  set('.js-mat-total',  mTotal);
-  set('.js-lab-total',  lTotal);
-  set('.js-grand-total',gTotal);
-}
+  // ====== Summary ======
+  function recalcSummary(){
+    // Sum only ACTIVE (non-deleted) rows' grand totals
+    const sum = getRows()
+   .map(r => $('.js-grand-total', r))
+   .reduce((a,el) => a + (parseFloat(el?.value) || 0), 0);
 
-function recalcSummary(){
-  // Sum grand totals from each row (read from display-only inputs)
-  const sum = $$('#rows-container .item-row .js-grand-total')
-    .reduce((a,el)=> a + (parseFloat(el.value)||0), 0);
+    const operating = sum * 0.15;
+    const ab        = sum + operating;
+    const vat       = ab * 0.07;
+    const finalT    = ab + vat;
 
-  const operating = sum * 0.15;
-  const ab        = sum + operating;
-  const vat       = ab * 0.07;
-  const finalT    = ab + vat;
+    const setTxt=id=>val=>{ const el=$('#'+id); if(el) el.textContent = to2(val); };
+    const setVal=id=>val=>{ const el=$('#'+id); if(el) el.value      = to2(val); };
 
-  const setTxt=id=>val=>{ const el=$(id.startsWith('#')?id:'#'+id); if(el) el.textContent = to2(val); };
-  const setVal=id=>val=>{ const el=$(id.startsWith('#')?id:'#'+id); if(el) el.value      = to2(val); };
+    setTxt('miscDisplay')(sum);
+    setTxt('operatingDisplay')(operating);
+    setTxt('abDisplay')(ab);
+    setTxt('vatDisplay')(vat);
+    setTxt('finalDisplay')(finalT);
 
-  setTxt('miscDisplay')(sum);
-  setTxt('operatingDisplay')(operating);
-  setTxt('abDisplay')(ab);
-  setTxt('vatDisplay')(vat);
-  setTxt('finalDisplay')(finalT);
+    setVal('misc_total')(sum);
+    setVal('operating_expenses')(operating);
+    setVal('category_ab_total')(ab);
+    setVal('vat_total')(vat);
+    setVal('final_total')(finalT);
+  }
+  function recalcAll(){
+    getRows().forEach(calcRow);
+    recalcSummary();
+  }
+  // Keep old name for compatibility if you used window.recomputeSummary elsewhere
+  window.recomputeSummary = recalcSummary;
 
-  // Hidden inputs (safe to keep; backend ignores if not used)
-  setVal('misc_total')(sum);
-  setVal('operating_expenses')(operating);
-  setVal('category_ab_total')(ab);
-  setVal('vat_total')(vat);
-  setVal('final_total')(finalT);
-}
+  // ====== Reindex + serials ======
+  function reindexRows(){
+    const rows = getRows();
 
-function recalcAll(){
-  $$('#rows-container .item-row').forEach(calcRow);
-  recalcSummary();
-}
-
-// ===== Renumber + reindex names (items[*] -> details[*]) =====
-function renumberRows(){
-  $$('#rows-container .item-row').forEach((row,i)=>{
-    // Serial number
-    const serial = $('.serial',row);
-    if(serial) serial.value = i+1;
-
-    // Update names to details[i][...]
-    $$('input[name^="details["]',row).forEach(inp=>{
-      inp.name = inp.name.replace(/details\[\d+\]/, `details[${i}]`);
+    // Update name indices
+    rows.forEach((row, idx) => {
+      $$('input, select, textarea', row).forEach(el => {
+        if (!el.name) return;
+        el.name = el.name.replace(/details\[\d+\]/, `details[${idx}]`);
+      });
     });
 
-    // Enable remove except first row
-    const del = $('.remove-row',row);
-    if(del){ i===0 ? del.setAttribute('disabled','disabled') : del.removeAttribute('disabled'); }
-  });
-  recalcAll();
-}
+    // Serial numbers for ACTIVE rows only
+    let serialCounter = 1;
+    rows.forEach(row => {
+      const serial = $('.serial', row);
+      if (!serial) return;
+      if (!isDeleted(row)) {
+        serial.value = serialCounter++;
+      } else {
+        // keep its shown number or blank—choose your UX
+        // serial.value = '';
+      }
+    });
 
-// ===== Add row (clone first, clear inputs properly) =====
-function addRow(){
-  const container = $('#rows-container');
-  const firstRow  = $('.item-row', container);
-  if(!container || !firstRow) return;
+    updateRemoveButtons();
+    recalcAll();
+  }
 
-  const clone = firstRow.cloneNode(true);
+  // ====== Hide delete when only one ACTIVE row ======
+  function updateRemoveButtons() {
+    const rows = getRows();
+    const onlyOne = rows.length === 1;
+    rows.forEach(row => {
+        const btn = row.querySelector('.remove-row');
+        if (!btn) return;
+        btn.classList.toggle('d-none', onlyOne);
+        btn.disabled = onlyOne;
+    });
+    }
 
-  // Clear inputs; keep serial; set totals to 0.00
-  $$('input', clone).forEach(inp=>{
-    if(inp.classList.contains('serial')) return;
-    if(inp.classList.contains('js-mat-total') ||
-       inp.classList.contains('js-lab-total') ||
-       inp.classList.contains('js-grand-total')) {
-      inp.value = '0.00';
+  // ====== Add row ======
+  function addRow(){
+    let newRow;
+
+    if (rowTemplate) {
+      // Edit page: create from template
+      const nextIndex = getRows().length;
+      const ser = nextIndex + 1;
+      const html = rowTemplate.innerHTML
+        .replaceAll('__INDEX__', nextIndex)
+        .replaceAll('__SER__', ser);
+      const wrap = document.createElement('div');
+      wrap.innerHTML = html.trim();
+      newRow = wrap.firstElementChild;
     } else {
-      inp.value = '';
+      // Create page: clone first row structure
+      const first = $('.item-row', rowsContainer);
+      if (!first) return;
+      newRow = first.cloneNode(true);
+
+      // Clear inputs except serial & readonly totals (reset totals to 0.00)
+      $$('input', newRow).forEach(inp => {
+        if (inp.classList.contains('serial')) return;
+        if (inp.classList.contains('js-mat-total') ||
+            inp.classList.contains('js-lab-total') ||
+            inp.classList.contains('js-grand-total')) {
+          inp.value = '0.00';
+        } else if (inp.type === 'hidden' && inp.classList.contains('js-delete-flag')) {
+          inp.value = '0';
+        } else {
+          inp.value = '';
+        }
+      });
+      // Make sure it's not visually deleted
+      newRow.classList.remove('row-deleted');
     }
-  });
 
-  const del = $('.remove-row', clone);
-  if(del) del.removeAttribute('disabled');
+    rowsContainer.appendChild(newRow);
+    reindexRows();
+  }
+  window.addRow = addRow; // optional global
 
-  container.appendChild(clone);
-  renumberRows();
-}
-window.addRow = addRow;
+  // ====== Remove / Soft-delete (delegated) ======
+    // put this near the top with other refs
+const deletedBin = document.getElementById('deleted-bin');
 
-// ===== Boot (events) =====
-document.addEventListener('DOMContentLoaded', () => {
-  const container = $('#rows-container');
-  $('#add-row-btn')?.addEventListener('click', addRow);
+// ====== Remove / Delete (delegated) ======
+document.addEventListener('click', function (e) {
+  const btn = e.target.closest('.remove-row');
+  if (!btn) return;
+  const row = btn.closest('.item-row');
+  if (!row || !rowsContainer.contains(row)) return;
 
-  // Recalc when key fields change
-  container?.addEventListener('input', e=>{
-    if(e.target.matches('input[name*="[amount]"], input[name*="[mc_price]"], input[name*="[lc_price]"]')){
-      const row = e.target.closest('.item-row');
-      if(row){ calcRow(row); recalcSummary(); }
-    }
-  });
-
-  // Remove row (keep at least one)
-  container?.addEventListener('click', e=>{
-    const btn = e.target.closest('.remove-row'); if(!btn) return;
-    const all = $$('#rows-container .item-row');
-    if(all.length <= 1){ alert('ต้องมีอย่างน้อย 1 แถว'); return; }
-    const row = btn.closest('.item-row'); row?.remove(); renumberRows();
-  });
-
-  // Initial
-  renumberRows();
-
-  // ===== Number formatting (like your original code) =====
-function formatNumberInput(input) {
-  // strip commas
-  let value = input.value.replace(/,/g, '');
-  if (value === '' || isNaN(value)) {
-    input.value = '';
+  // keep at least one visible row
+  const visibleCount = getRows().length;
+  if (visibleCount <= 1) {
+    alert('ต้องมีอย่างน้อย 1 แถว'); // At least one row required
     return;
   }
 
-  // split integer/decimal
-  let parts = value.split('.');
-  let intPart = parts[0];
-  let decPart = parts[1] ? parts[1].slice(0, 3) : '';
+  // existing DB row?
+  const idInput = row.querySelector('input[name*="[id]"]');
+  const existingId = idInput && idInput.value;
 
-  intPart = parseInt(intPart, 10).toLocaleString('en-US');
-
-  if (decPart.length > 0) {
-    input.value = intPart + '.' + decPart;
-  } else {
-    input.value = intPart;
+  if (existingId && deletedBin) {
+    // add a hidden field to request
+    const h = document.createElement('input');
+    h.type  = 'hidden';
+    h.name  = 'deleted_detail_ids[]';
+    h.value = existingId;
+    deletedBin.appendChild(h);
   }
-}
 
-// Global event delegation for all .number-input
+  // remove visually
+  row.remove();
+
+  // reindex and recompute
+  reindexRows();
+});
+
+  // ====== Totals recalc on inputs ======
+  rowsContainer.addEventListener('input', function (e) {
+    if (e.target.matches('input[name*="[amount]"], input[name*="[mc_price]"], input[name*="[lc_price]"]')) {
+      const row = e.target.closest('.item-row');
+      if (row) { calcRow(row); recalcSummary(); }
+    }
+  });
+
+  // ====== Observe DOM changes (rows injected elsewhere) ======
+  const mo = new MutationObserver(() => {
+    reindexRows();
+  });
+  mo.observe(rowsContainer, { childList: true });
+
+  // ====== Number formatting (.number-input) ======
+  function formatNumberInput(input) {
+    let value = input.value.replace(/,/g, '');
+    if (value === '' || isNaN(value)) { input.value = ''; return; }
+    let parts = value.split('.');
+    let intPart = parts[0];
+    let decPart = parts[1] ? parts[1].slice(0, 3) : '';
+    intPart = parseInt(intPart, 10).toLocaleString('en-US');
+    input.value = decPart.length > 0 ? (intPart + '.' + decPart) : intPart;
+  }
   document.addEventListener('input', function(e){
     if(e.target.classList.contains('number-input')){
       formatNumberInput(e.target);
@@ -185,4 +273,39 @@ function formatNumberInput(input) {
     }
   }, true);
 
-});
+  // ====== Preview button (Edit page) – submit as POST to preview ======
+  if (previewBtn) {
+    previewBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const form = this.form;
+      if (!form) return;
+
+      const spoof = form.querySelector('input[name="_method"]');
+      let spoofWasDisabled = false;
+      if (spoof) { spoof.disabled = true; spoofWasDisabled = true; }
+
+      const originalAction = form.getAttribute('action');
+      const originalMethod = form.getAttribute('method');
+
+      form.setAttribute('action', form.dataset.previewAction || form.getAttribute('data-preview-action') || form.dataset.preview || (typeof HOME_PREVIEW_URL !== 'undefined' ? HOME_PREVIEW_URL : ''));
+      if (!form.getAttribute('action')) {
+        // fallback for Blade: set data attr in template (see instructions)
+        console.warn('Preview action missing: set data-preview-action on the form.');
+      }
+      form.setAttribute('method', 'POST');
+      form.submit();
+
+      // Restore
+      form.setAttribute('action', originalAction);
+      form.setAttribute('method', originalMethod || 'POST');
+      if (spoof && spoofWasDisabled) spoof.disabled = false;
+    });
+  }
+
+  // ====== Add buttons ======
+  addBtns.forEach(btn => btn.addEventListener('click', addRow));
+
+  // ====== Initial ======
+  // compute any prefilled rows (Edit), lock delete if only one active, update summary
+  reindexRows();
+})();

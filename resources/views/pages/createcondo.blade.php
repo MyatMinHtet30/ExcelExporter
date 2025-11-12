@@ -290,7 +290,7 @@
                 <div class="col-md-8 col-5">
                   <div class="card-body">
                     <div class="form-group">
-                      <button type="button" class="btn btn-primary" id="add-row-btn">{{ __('+ Add Row') }}</button>
+                      <button type="button" class="btn btn-primary pl-2 pr-3 pt-md-2" id="add-row-btn"><span aria-hidden="true">+</span> {{ __('Add Row') }}</button>
                     </div>
 
                    <div class="form-group d-flex flex-column flex-sm-row pt-1 pt-md-5">
@@ -298,6 +298,10 @@
                     <a href="{{ route('condo') }}" class="btn btn-secondary mb-2 mb-sm-0">
                       {{ __('Cancel') }}
                     </a>
+
+                    <button type="submit" class="btn btn-primary mb-2 mb-sm-0 ml-sm-2" formaction="{{ route('condo.preview') }}">
+                      {{ __('Preview') }}
+                    </button>
 
                     {{-- Generate submit --}}
                     <button type="submit" class="btn btn-success ml-sm-2" id="generate-btn">
@@ -309,7 +313,7 @@
 
                 <div class="col-md3 col-4">
                   <div class="text-end" style="min-width: 200px; margin-left: auto">
-                    <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
+                    <div class="d-flex justify-content-between border p-2 mb-2 bg-light ">
                       <strong>{{ __('Total') }}:</strong>
                       <span class="ms-2" id="totalDisplay">0.00</span>
                     </div>

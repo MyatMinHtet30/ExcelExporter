@@ -345,13 +345,16 @@
                 <div class="col-md-8 col-5">
                   <div class="card-body">
                     <div class="form-group">
-                      <button type="button" class="btn btn-primary" id="add-row-btn">{{ __('+ Add Row') }}</button>
+                      <button type="button" class="btn btn-primary pl-2 pr-3 pt-md-2" id="add-row-btn"><span aria-hidden="true">+</span> {{ __('Add Row') }}</button>
                     </div>
 
                     <div class="form-group d-flex flex-column flex-sm-row pt-1 pt-md-5">
                       <a href="{{ route('condo') }}" class="btn btn-secondary mb-2 mb-sm-0">
                         {{ __('Cancel') }}
                       </a>
+                        <button type="button" class="btn btn-primary mb-2 mb-sm-0 ml-sm-2" id="preview-btn">
+                          {{ __('Preview') }}
+                        </button>
                       <button type="submit" class="btn btn-success ml-sm-2" id="generate-btn">
                         {{ __('Update') }}
                       </button>
@@ -498,6 +501,36 @@
         el.dispatchEvent(new Event('input', { bubbles: true }));
       });
     }
+
+    const previewBtn = document.getElementById('preview-btn');
+    previewBtn?.addEventListener('click', () => {
+      const form = document.getElementById('condo-form');
+
+      // 1) Change action to preview route
+      form.action = "{{ route('condo.preview') }}";
+
+      // 2) Ensure it's a POST (and remove the _method=PUT spoof)
+      const spoof = form.querySelector('input[name="_method"]');
+      if (spoof) spoof.remove();
+      form.method = 'POST';
+
+      // 3) (Optional) open in a new tab like a PDF viewer
+      // form.target = '_blank';
+
+      // 4) Add the condo ID so preview knows which record (if you need it)
+      // (Only if your preview needs the ID for context)
+      let cid = form.querySelector('input[name="condo_id"]');
+      if (!cid) {
+        cid = document.createElement('input');
+        cid.type = 'hidden';
+        cid.name = 'condo_id';
+        cid.value = "{{ $condo->id }}";
+        form.appendChild(cid);
+      }
+
+      // 5) Submit
+      form.submit();
+    });
   });
 </script>
 @endpush

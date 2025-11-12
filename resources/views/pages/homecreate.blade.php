@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', __('Generate Home Excel Form'))
+@section('title', __('New Home Data Entry'))
 
 @push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -56,58 +56,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-4 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="trooper" id="trooper"
-                                            placeholder="{{ __('Enter trooper') }}" required>
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4 col-6">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Date') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <input type="date" class="form-control" name="inputDate" id="inputDate">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-4 col-md-4 col-6">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('House No') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="house_no" id="house_no"
-                                            placeholder="{{ __('Enter house no.') }}" required>
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
@@ -130,7 +78,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6 col-md-6 col-12">
+                <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <h5 class="card-title text-black">{{ __('House No') }}</h5>
@@ -151,7 +99,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6 col-md-6 col-12">
+                <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
@@ -172,6 +120,22 @@
                     </div>
                 </div>
 
+                <div class="col-lg-4 col-md-4 col-12">
+                    <div class="card m-b-20">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title text-black">{{ __('Date') }}</h5>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="input-group input-42">
+                                        <input type="date" class="form-control" name="date" id="date" value="{{ old('date') }}"  required>
+                                        @error('date') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- ---------- Dynamic item rows ---------- -->
                 <div id="rows-container" class="col-12">
                     <div class="card m-b-2 item-row">
@@ -180,27 +144,18 @@
                             <!-- Line 1 -->
                             <div class="row g-3 g-compact align-items-end">
                                 <div class="col-3 col-sm-2 col-md-1 field-col">
-                                    <label class="card-title text-black">{{ __('No') }}</label>
+                                    <label class="form-label">{{ __('No') }}</label>
                                     <div class="input-group input-42">
                                         <input type="number" class="form-control readonly-input serial" name="details[0][no]" value="1"
                                             min="1" readonly>
                                     </div>
                                 </div>
 
-                                <!-- OPTIONAL: category -->
-                                <div class="col-12 col-sm-4 col-md-3 field-col">
+                                <div class="col-12 col-sm-6 col-md-6 field-col">
                                     <label class="form-label">{{ __('Category') }}</label>
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="details[0][category_name]"
                                             placeholder="{{ __('Category A / B / ...') }}">
-                                    </div>
-                                </div>
-
-                                <div class="col-12 col-sm-8 col-md-4 field-col">
-                                    <label class="form-label">{{ __('Item Name') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="details[0][item_name]"
-                                            placeholder="{{ __('Enter item name') }}" required>
                                         <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
                                             title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
@@ -209,7 +164,7 @@
                                 </div>
 
                                 <div class="col-6 col-md-2 field-col">
-                                    <label class="card-title text-black">{{ __('Amount') }}</label>
+                                    <label class="form-label">{{ __('Amount') }}</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control" name="details[0][amount]" placeholder=".00"
                                             required>
@@ -224,7 +179,7 @@
                                         <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
                                             title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
-                                        </button> -->
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -232,7 +187,7 @@
                             <!-- Line 2 -->
                             <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
                                 <div class="col-12 col-md field-col">
-                                    <label class="card-title text-black">{{ __('Material Price / Unit') }}</label>
+                                    <label class="form-label">{{ __('Material Price / Unit') }}</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control" name="details[0][mc_price]" placeholder=".00"
                                             required>
@@ -240,14 +195,14 @@
                                 </div>
 
                                 <div class="col-12 col-md field-col">
-                                    <label class="card-title text-black">{{ __('Material Total') }}</label>
+                                    <label class="form-label">{{ __('Material Total') }}</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control readonly-input js-mat-total" placeholder="0.00" readonly>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
-                                    <label class="card-title text-black">{{ __('Labor Price / Unit') }}</label>
+                                    <label class="form-label">{{ __('Labor Price / Unit') }}</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control" name="details[0][lc_price]" placeholder=".00"
                                             required>
@@ -255,14 +210,14 @@
                                 </div>
 
                                 <div class="col-12 col-md field-col">
-                                    <label class="card-title text-black">{{ __('Labor Total') }}</label>
+                                    <label class="form-label">{{ __('Labor Total') }}</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control readonly-input js-lab-total" placeholder="0.00" readonly>
                                     </div>
                                 </div>
 
                                 <div class="col-12 col-md field-col">
-                                    <label class="card-title text-black">{{ __('Grand Total') }}</label>
+                                    <label class="form-label">{{ __('Grand Total') }}</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control readonly-input js-grand-total" placeholder="0.00" readonly>
                                     </div>
@@ -294,6 +249,9 @@
                                             <a href="{{ route('home') }}" class="btn btn-secondary">
                                                 {{ __('Cancel') }}
                                             </a>
+                                            <button type="submit" class="btn btn-primary" formaction="{{ route('home.preview') }}">
+                                                {{ __('Preview') }}
+                                            </button>
                                             <button type="submit" class="btn btn-success" id="generate-btn">
                                                 {{ __('Generate') }}
                                             </button>
@@ -312,20 +270,22 @@
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                                <span class="d-block">{{ __('Operating Profit 15%') }}:</span>
+                                                <span class="d-block">{{ __('Operating +') }}</span>
+                                                <span class="d-block">{{ __('Profit (15%)') }}</span>
                                             </strong>
                                             <span class="ms-2" id="operatingDisplay">0.00</span>
                                         </div>
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                                <span class="d-block">{{ __('Category A,B Total') }}:</span>
+                                                <span class="d-block">{{ __('Category A,B') }}</span>
+                                                <span class="d-block">{{ __('Total') }}</span>
                                             </strong>
                                             <span class="ms-2" id="abDisplay">0.00</span>
                                         </div>
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
-                                            <strong>{{ __('VAT 7%') }}</strong>
+                                            <strong>{{ __('VAT (7%)') }}</strong>
                                             <span class="ms-2" id="vatDisplay">0.00</span>
                                         </div>
 

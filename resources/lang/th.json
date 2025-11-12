@@ -14,7 +14,7 @@
 
   "Home": "บ้าน",
   "Condo": "คอนโด",
-  "Generate Home Excel Form": "สร้าง Excel สำหลับบ้าน", 
+  "Generate Home Excel Form": "สร้าง Excel สำหลับบ้าน",
   "Generate Condo Excel Form": "สร้าง Excel สำหลับคอนโด",
   "Project Name": "โครงการ",
   "Enter project name": "กรอกชื่อโครงการ",
@@ -46,7 +46,7 @@
   "Speak": "พูด",
   "Customer Name": "ขื่อลูกค้า",
   "Address":"ที่อยู่",
-  "Job Name":"ชื่องาน",
+  "Job Name":"ชื่อรายการ",
   "Quotation Number":"เลขที่ในเสนอราคา",
   "Date":"วันที่",
   "Payment Term":"เงื่อนไขการชำระเงิน",
@@ -54,14 +54,15 @@
   "Details":"รายละเอียด",
   "Material Cost":"ค่าวัสดุ",
   "Labor Cost":"ค่าแรง",
-  "Price Amount":"รวม",
+  "Price Amount":"รวมของแรง",
   "Subtotal":"จำนวนเงิน",
   "Enter Customer name":"กรอกชื่อลูกค้า",
   "Enter Address":"กรอกที่อยู่",
   "Enter QN":"กรอกเลขที่ใบเสนอราคา",
   "Enter PT":"กรอกเงื่อนไขการชำระเงิน",
   "Enter Credits":"กรอกเครดิต",
-
+  "Total price": "รอดรวมทั้งหมด",
+  "Actions": "แก้ใข/ ลบ",
 
 
   "House": "บ้าน",
@@ -74,5 +75,13 @@
   "Office": "สำนักงาน",
   "Age": "อายุ",
   "Start date": "วันที่เริ่มงาน",
-  "Salary": "เงินเดือน"
+  "Salary": "เงินเดือน",
+  "Category": "หมวดหมู่",
+  "Cancel": "ยกเลิก",
+  "Preview": "ดูตัวอย่าง",
+  "Operating +": "ค่าใช้จ่ายในการดำเนินงาน +",
+  "Profit (15%)": "กำไร (15%)",
+  "VAT (7%)": "ภาษีมูลค่าเพิ่ม (7%)",
+  "Update": "อัปเดต"
+  
 }

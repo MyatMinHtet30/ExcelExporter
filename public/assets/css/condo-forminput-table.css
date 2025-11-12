@@ -39,7 +39,7 @@
   /* slim ONLY Add Row & Generate (not mic buttons) */
   #add-row-btn,
   #generate-btn {
-    padding: .35rem .5rem;
+    padding: .5rem .18rem;
     font-size: .85rem;
     line-height: 1.2;
   }
