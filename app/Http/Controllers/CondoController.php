@@ -197,10 +197,10 @@ class CondoController extends Controller
     private function computeTotals(array $items): array
     {
         $subtotals = collect($items)->map(function ($r) {
-            $amount   = (float)($r['amount'] ?? 0);
-            $ppu      = (float)($r['price_per_unit_total'] ?? 0);
-            $material = (float)($r['material_cost'] ?? 0);
-            $labor    = (float)($r['labor_cost'] ?? 0);
+            $amount   = (float) str_replace([',',' '], '', (string)($r['amount'] ?? 0));
+            $ppu      = (float) str_replace([',',' '], '', (string)($r['price_per_unit_total'] ?? 0));
+            $material = (float) str_replace([',',' '], '', (string)($r['material_cost'] ?? 0));
+            $labor    = (float) str_replace([',',' '], '', (string)($r['labor_cost'] ?? 0));
 
             if ($amount > 0 && $ppu > 0) {
                 return round($amount * $ppu, 2);
@@ -217,4 +217,73 @@ class CondoController extends Controller
 
         return [$total, $vat, $grand];
     }
+
+    // app/Http/Controllers/CondoController.php
+
+    public function preview(Request $request)
+    {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
+        // pull inputs (no strict validation for preview)
+        $header = $request->only([
+            'customer_name',
+            'address',
+            'job_name',
+            'quotation_number',
+            'quotation_date',
+            'payment_term',
+            'credits',
+        ]);
+        $items = $request->input('items', []);
+
+        // per-row data for the table
+        $rows = [];
+        foreach ($items as $i => $r) {
+            $amount  = (float) str_replace([',',' '], '', (string)($r['amount'] ?? 0));
+            $mcPrice = (float) str_replace([',',' '], '', (string)($r['material_cost'] ?? 0));
+            $lcPrice = (float) str_replace([',',' '], '', (string)($r['labor_cost'] ?? 0)); 
+            $ppuInput = trim((string)($r['price_per_unit_total'] ?? ''));
+            $ppu      = $ppuInput !== ''
+                ? (float) str_replace([',',' '], '', $ppuInput)
+                : ($mcPrice + $lcPrice);
+
+            // use the same rule as computeTotals()
+            $subtotal = 0.0;
+            if ($amount > 0 && $ppu > 0) {
+                $subtotal = round($amount * $ppu, 2);
+            } elseif ($mcPrice > 0 || $lcPrice > 0) {
+                $subtotal = round($mcPrice + $lcPrice, 2);
+            }
+
+            // skip entirely empty lines
+            $hasAny = false;
+            foreach (['details','amount','unit','material_cost','labor_cost','price_per_unit_total'] as $k) {
+                if (isset($r[$k]) && trim((string)$r[$k]) !== '') { $hasAny = true; break; }
+            }
+            if (! $hasAny) continue;
+
+            $rows[] = [
+                'no'       => ($r['no'] ?? ($i + 1)),
+                'details'  => $r['details'] ?? '',
+                'amount'   => $amount,
+                'unit'     => $r['unit'] ?? '',
+                'mc_price' => $mcPrice,
+                'lc_price' => $lcPrice,
+                'ppu'      => $ppu,
+                'subtotal' => $subtotal,
+            ];
+        }
+
+        // totals (reuse your helper)
+        [$total, $vat, $grand] = $this->computeTotals($items);
+
+        return view('pages.condopreview', array_merge($header, [
+            'rows'  => $rows,
+            'total' => $total,
+            'vat'   => $vat,
+            'grand' => $grand,
+        ]));
+    }
+
+
 }

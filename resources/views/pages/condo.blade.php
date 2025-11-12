@@ -38,7 +38,7 @@
                                     <tr>
                                         <th data-priority="1">{{ __('No.') }}</th>
                                         <th data-priority="3">{{ __('Address') }}</th>
-                                        <th data-priority="2">{{ __('Job name') }}</th>
+                                        <th data-priority="2">{{ __('Job Name') }}</th>
                                         <th data-priority="4">{{ __('Date') }}</th>
                                         <th data-priority="2">{{ __('Total price') }}</th>
                                         <th data-priority="1" class="actions-col">{{ __('Actions') }}</th>

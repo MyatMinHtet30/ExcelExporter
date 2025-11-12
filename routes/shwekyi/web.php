@@ -39,6 +39,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/{condo}/edit',   [CondoController::class, 'edit'])->name('condo.edit');      // edit form
         Route::match(['put','patch'],'/{condo}', [CondoController::class, 'update'])->name('condo.update'); // 👈
         Route::delete('/{condo}',     [CondoController::class, 'destroy'])->name('condo.destroy');// delete
+        Route::post('/preview', [CondoController::class, 'preview'])->name('condo.preview');
+
     });
 
     // ========== Admin: Condo Details (shallow update/delete) ==========
