@@ -270,7 +270,7 @@
     {{-- SweetAlert2 delete confirmation + success --}}
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // DELETE confirmation (unchanged, just fixed selector)
+            // DELETE confirmation (unchanged)
             const deleteForms = document.querySelectorAll('.js-delete-form');
 
             deleteForms.forEach(function (form) {
@@ -293,22 +293,38 @@
                 });
             });
 
-            Swal.fire({
-                icon: 'success',
-                title: '{{ __("Home Data Created Successfully!") }}',
-                timer: 2000,
-                showConfirmButton: false
-            });
-
-            // ✅ KEEP DELETE SUCCESS POPUP AS IT IS
+            // ✅ Show big modal ONLY when there is a flash message
             @if(session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: '{{ __("Deleted!") }}',
-                    text: '{{ session('success') }}',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
+                @php $msg = session('success'); @endphp
+
+                @if($msg === __('Saved successfully.'))
+                    // Created
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("Home Data Created Successfully!") }}',
+                        text: '{{ $msg }}',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                @elseif($msg === __('Updated successfully.'))
+                    // Updated
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("Updated!") }}',
+                        text: '{{ $msg }}',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                @elseif($msg === __('Deleted successfully.'))
+                    // Deleted
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("Deleted!") }}',
+                        text: '{{ $msg }}',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                @endif
             @endif
         });
     </script>

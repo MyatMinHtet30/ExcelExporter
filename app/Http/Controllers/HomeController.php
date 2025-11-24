@@ -86,7 +86,7 @@ class HomeController extends Controller
         });
 
         return redirect()->route('home')
-            ->with('home_created', __('Home Data created successfully.'));
+            ->with('success', __('Saved successfully.'));
     }
 
     /** Edit form */
