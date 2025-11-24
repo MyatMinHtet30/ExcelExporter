@@ -253,7 +253,7 @@
                                                 {{ __('Preview') }}
                                             </button>
                                             <button type="submit" class="btn btn-success" id="generate-btn">
-                                                {{ __('Generate') }}
+                                                {{ __('Create') }}
                                             </button>
                                         </div>
                                     </div>
