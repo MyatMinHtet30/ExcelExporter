@@ -19,6 +19,8 @@
         @csrf
         @method('PUT')
 
+        <input type="hidden" name="home_id" value="{{ $home->id }}">
+
         <div id="deleted-bin"></div>
 
         <div class="xp-contentbar">
