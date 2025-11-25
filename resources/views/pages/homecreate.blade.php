@@ -185,7 +185,7 @@
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control"
                                             name="details[0][mc_price]" placeholder=".00" required
-                                            data-error-required="{{ __('Material price per unit is required') }}"
+                                            data-error-required="{{ __('Material cost or labor cost is required') }}"
                                             data-error-number="{{ __('Please enter number only') }}">
                                     </div>
                                 </div>
@@ -196,7 +196,7 @@
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control"
                                             name="details[0][lc_price]" placeholder=".00" required
-                                            data-error-required="{{ __('Labor price per unit is required') }}"
+                                            data-error-required="{{ __('Material cost or labor cost is required') }}"
                                             data-error-number="{{ __('Please enter number only') }}">
                                     </div>
                                 </div>
