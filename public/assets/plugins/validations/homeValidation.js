@@ -6,17 +6,15 @@
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  const NUM_REGEX = /^\d+(\.\d{0,2})?$/; // digits, optional .xx
+  const NUM_REGEX = /^\d+(\.\d{0,2})?$/; 
 
-  // Remove old error states/messages
   function clearErrors(form) {
     $$('.is-invalid', form).forEach(el => el.classList.remove('is-invalid'));
     $$('.js-error-msg', form).forEach(el => {
-      el.textContent = ''; // keep element, just clear text
+      el.textContent = ''; 
     });
   }
 
-  // Show one error under the input
   function showError(input, msg) {
     if (!input) return;
 
@@ -39,11 +37,10 @@
     msgEl.textContent = msg;
   }
 
-  // Check numeric (for amount, mc_price, lc_price)
   function checkNumeric(input) {
     if (!input) return;
     const v = input.value.trim();
-    if (!v) return; // empty case handled by required/pair logic
+    if (!v) return; 
     if (!NUM_REGEX.test(v)) {
       const msg =
         input.dataset.errorNumber ||
@@ -69,13 +66,10 @@
       }
     }
 
-    // Top fields
     checkRequired(form.querySelector('input[name="project_name"]'));
     checkRequired(form.querySelector('input[name="list_name"]'));
     checkRequired(form.querySelector('input[name="trooper"]'));
-    // (house_no not required in your current rule)
 
-    // Dynamic rows
     $$('#rows-container .item-row').forEach(row => {
       const cat  = row.querySelector('input[name*="[category_name]"]');
       const amt  = row.querySelector('input[name*="[amount]"]');
@@ -83,12 +77,10 @@
       const mc   = row.querySelector('input[name*="[mc_price]"]');
       const lc   = row.querySelector('input[name*="[lc_price]"]');
 
-      // normal required fields
       checkRequired(cat);
       checkRequired(amt);
       checkRequired(unit);
 
-      // --- special rule for material + labor price (at least one) ---
       const mcVal = mc && mc.value.trim();
       const lcVal = lc && lc.value.trim();
 
@@ -112,10 +104,8 @@
     return valid;
   }
 
-  // Expose global for home-form.js
   window.validateHomeForm = validateHomeForm;
 
-  // ===== Live validation while typing =====
   const form = $('#home-form');
   if (form) {
     form.addEventListener('input', function (e) {
@@ -128,7 +118,6 @@
       const isLc     = name.includes('[lc_price]');
       const isNumericField = isAmount || isMc || isLc;
 
-      // ===== numeric fields (amount, mc_price, lc_price) =====
       if (isNumericField) {
         const v = input.value.trim();
         const numOk = (v === '') || NUM_REGEX.test(v);
@@ -139,7 +128,6 @@
             'Please enter a valid number';
           showError(input, msg);
         } else {
-          // clear own error
           let group =
             input.closest('.form-group') ||
             input.closest('.field-col') ||
@@ -149,7 +137,6 @@
           input.classList.remove('is-invalid');
         }
 
-        // extra: for mc/lc pair – if one valid & not empty, clear pair "required" errors
         if (isMc || isLc) {
           const row = input.closest('.item-row');
           if (row) {
@@ -175,10 +162,9 @@
           }
         }
 
-        return; // don't run generic logic below
+        return; 
       }
 
-      // ===== Generic case: any other input – if has value, clear its error =====
       if (input.value.trim()) {
         const group =
           input.closest('.form-group') ||
