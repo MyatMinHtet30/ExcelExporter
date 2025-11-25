@@ -180,11 +180,15 @@
                                             <td class="text-center actions-col">
                                                 <div class="action-buttons">
 
-                                                    <button type="button" class="btn btn-action btn-edit btn-export">
+                                                    <button type="button"
+                                                            class="btn btn-action btn-edit btn-export"
+                                                            onclick="exportHomePdf({{ $home->id }})">
                                                         PDF
                                                     </button>
 
-                                                    <button type="button" class="btn btn-action btn-edit btn-export">
+                                                    <button type="button"
+                                                            class="btn btn-action btn-edit btn-export"
+                                                            onclick="exportHomeExcel({{ $home->id }})">
                                                         EXCEL
                                                     </button>
 
@@ -225,6 +229,17 @@
             </div>
         </div> <!-- /row -->
     </div> <!-- /xp-contentbar -->
+    <iframe id="boq-export-frame"
+        style="
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 1400px;
+            height: 2000px;
+            border: 0;
+            visibility: hidden;
+        ">
+    </iframe>
 @endsection
 
 @push('scripts')
@@ -327,5 +342,18 @@
                 @endif
             @endif
         });
+    </script>
+    <script>
+        function exportHomePdf(homeId) {
+            const iframe = document.getElementById('boq-export-frame');
+            const url = '{{ route('home.export.pdf', ':id') }}'.replace(':id', homeId);
+            iframe.src = url;
+        }
+
+        function exportHomeExcel(homeId) {
+            const iframe = document.getElementById('boq-export-frame');
+            const url = '{{ route('home.export.excel', ':id') }}'.replace(':id', homeId);
+            iframe.src = url;
+        }
     </script>
 @endpush

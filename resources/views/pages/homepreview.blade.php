@@ -592,6 +592,20 @@
         }
     </script>
 
+    @if(!empty($autoDownload))
+    <script>
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                @if($autoDownload === 'pdf')
+                    downloadBoqPdf();
+                @elseif($autoDownload === 'excel')
+                    downloadBoqExcel();
+                @endif
+            }, 300); // 0.3s delay, just to be sure layout is ready
+        });
+    </script>
+    @endif
+
 </body>
 
 </html>

@@ -34,6 +34,7 @@
 .field-col {
     display: flex;
     flex-direction: column;
+    position: relative;       /* so we can position the error text inside */
 }
 
 .field-col .input-group,
@@ -157,5 +158,27 @@
     .left-controls .form-group {
         margin-bottom: .5rem;
     }
+}
+
+/* Error message that doesn't change row height */
+.field-col .invalid-feedback {
+    position: absolute;
+    left: 0;
+    bottom: -16px;            /* show a bit under the input, but no layout change */
+    font-size: 0.75rem;
+    color: #dc3545;
+    white-space: nowrap;
+
+    display: none;            /* hidden by default */
+}
+
+/* Only show when input is invalid */
+.field-col .form-control.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* Add small space between line 1 and line 2 when there is an invalid input */
+.item-row.has-error .fields-line-2 {
+    margin-top: 10px !important;
 }
 
