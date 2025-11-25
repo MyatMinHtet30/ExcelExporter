@@ -6,12 +6,12 @@
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
-  const NUM_REGEX = /^\d+(\.\d{0,2})?$/; 
+  const NUM_REGEX = /^\d+(\.\d{0,2})?$/;
 
   function clearErrors(form) {
     $$('.is-invalid', form).forEach(el => el.classList.remove('is-invalid'));
     $$('.js-error-msg', form).forEach(el => {
-      el.textContent = ''; 
+      el.textContent = '';
     });
   }
 
@@ -40,7 +40,7 @@
   function checkNumeric(input) {
     if (!input) return;
     const v = input.value.trim();
-    if (!v) return; 
+    if (!v) return;
     if (!NUM_REGEX.test(v)) {
       const msg =
         input.dataset.errorNumber ||
@@ -162,7 +162,7 @@
           }
         }
 
-        return; 
+        return;
       }
 
       if (input.value.trim()) {
@@ -192,9 +192,9 @@
         'Home', 'End'
       ];
 
-      if (allowedKeys.includes(e.key)) return;        
-      if (e.key === '.' && !input.value.includes('.')) return; 
-      if (e.key >= '0' && e.key <= '9') return;       
+      if (allowedKeys.includes(e.key)) return;
+      if (e.key === '.' && !input.value.includes('.')) return;
+      if (e.key >= '0' && e.key <= '9') return;
 
       e.preventDefault();
 

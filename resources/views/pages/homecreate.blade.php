@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', __('New Home Data Entry'))
+@section('title', __('Generate Home Excel Form'))
 
 @push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -18,7 +18,7 @@
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Project Name') }}</h5>
+                            <h5 class="card-title text-black">{{ __('Project Name') }} *</h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -61,7 +61,7 @@
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('List Name') }}</h5>
+                            <h5 class="card-title text-black">{{ __('List Name') }} *</h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -104,7 +104,7 @@
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
+                            <h5 class="card-title text-black">{{ __('Trooper') }} *</h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -141,7 +141,7 @@
 
                                 <!-- Category -->
                                 <div class="col-12 col-sm-6 col-md-3 field-col">
-                                    <label class="form-label">{{ __('Category') }}</label>
+                                    <label class="form-label">{{ __('Category') }} *</label>
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control"
                                             name="details[0][category_name]"
@@ -156,7 +156,7 @@
 
                                 <!-- Amount -->
                                 <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Amount') }}</label>
+                                    <label class="form-label">{{ __('Amount') }} *</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control"
                                             name="details[0][amount]" placeholder=".00" required
@@ -167,7 +167,7 @@
 
                                 <!-- Unit -->
                                 <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Unit') }}</label>
+                                    <label class="form-label">{{ __('Unit') }} *</label>
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control"
                                             name="details[0][unit]" placeholder="{{ __('Unit') }}" required
@@ -181,22 +181,22 @@
 
                                 <!-- Material Price / Unit -->
                                 <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Material Price / Unit') }}</label>
+                                    <label class="form-label">{{ __('Material Price / Unit') }} *</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control"
                                             name="details[0][mc_price]" placeholder=".00" required
-                                            data-error-required="{{ __('Material price per unit is required') }}"
+                                            data-error-required="{{ __('Material cost or labor cost is required') }}"
                                             data-error-number="{{ __('Please enter number only') }}">
                                     </div>
                                 </div>
 
                                 <!-- Labor Price / Unit -->
                                 <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+                                    <label class="form-label">{{ __('Labor Price / Unit') }} *</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control"
                                             name="details[0][lc_price]" placeholder=".00" required
-                                            data-error-required="{{ __('Labor price per unit is required') }}"
+                                            data-error-required="{{ __('Material cost or labor cost is required') }}"
                                             data-error-number="{{ __('Please enter number only') }}">
                                     </div>
                                 </div>

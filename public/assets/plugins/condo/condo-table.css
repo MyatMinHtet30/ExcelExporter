@@ -19,10 +19,23 @@
     background: #fff;
   }
 
-  /* nudge "Showing X of Y" + pagination to the right a bit */
-  #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-5,
+  /* Center "Showing X to Y of Z entries" */
+  #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-5 {
+    text-align: center !important;
+    margin-left: 0 !important;
+    margin-bottom: 6px;
+  }
+
+  /* Center pagination container */
   #xp-default-datatable_wrapper .row:last-child > .col-sm-12.col-md-7 {
-    margin-left: 175px; /* adjust if you want more/less */
+    display: flex !important;
+    justify-content: center !important;
+    margin-left: 0 !important;
+  }
+
+  /* Center pagination <ul> items */
+  #xp-default-datatable_wrapper div.dataTables_paginate ul.pagination {
+    justify-content: center !important;
   }
 }
 

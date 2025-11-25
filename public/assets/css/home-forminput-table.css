@@ -5,12 +5,12 @@
         }
         /* Make senior code spacing match your original code */
         #rows-container .field-col {
-            padding-left: 18px;  
+            padding-left: 18px;
             padding-right: 18px;
         }
 
         #rows-container .field-col .input-group {
-            padding-left: 0;     
+            padding-left: 0;
             padding-right: 0;
         }
 

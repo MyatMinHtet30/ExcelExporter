@@ -30,7 +30,7 @@
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Project Name') }}</h5>
+                            <h5 class="card-title text-black">{{ __('Project Name') }} *</h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -77,7 +77,7 @@
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('List Name') }}</h5>
+                            <h5 class="card-title text-black">{{ __('List Name') }} *</h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -123,7 +123,7 @@
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
+                            <h5 class="card-title text-black">{{ __('Trooper') }} *</h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -167,7 +167,7 @@
 
             <!-- Category -->
             <div class="col-12 col-sm-6 col-md-3 field-col">
-                <label class="form-label">{{ __('Category') }}</label>
+                <label class="form-label">{{ __('Category') }} *</label>
                 <div class="input-group input-42">
                     <input type="text" class="form-control"
                            name="details[{{ $i }}][category_name]"
@@ -182,7 +182,7 @@
 
             <!-- Amount -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Amount') }}</label>
+                <label class="form-label">{{ __('Amount') }} *</label>
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-amount"
                            name="details[{{ $i }}][amount]"
@@ -193,7 +193,7 @@
 
             <!-- Unit -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Unit') }}</label>
+                <label class="form-label">{{ __('Unit') }} *</label>
                 <div class="input-group input-42">
                     <input type="text" class="form-control"
                            name="details[{{ $i }}][unit]"
@@ -208,7 +208,7 @@
 
             <!-- Material Price / Unit -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Material Price / Unit') }}</label>
+                <label class="form-label">{{ __('Material Price / Unit') }} *</label>
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-mc"
                            name="details[{{ $i }}][mc_price]"
@@ -219,7 +219,7 @@
 
             <!-- Labor Price / Unit -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+                <label class="form-label">{{ __('Labor Price / Unit') }} *</label>
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-lc"
                            name="details[{{ $i }}][lc_price]"
