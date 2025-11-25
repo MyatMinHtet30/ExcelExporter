@@ -6,149 +6,133 @@
     <title>BOQ Preview</title>
 
     <style>
-        .table th {
-            white-space: normal;
-            word-break: break-word;
-            line-height: 1.15;
-        }
+    @font-face {
+        font-family: 'AngsanaPDF';
+        src: url('{{ asset("assets/fonts/angsana-new.ttf") }}') format("truetype");
+    }
 
-        .col-no {
-            width: 120px
-        }
+    html, body {
+    margin: 0;
+    background: #fff;
+    font-family: 'Times New Roman', Times, serif;
+    color: #000;
+    }
 
-        .col-list {
-            width: auto
-        }
+    /* Make sure table also uses it */
+    table,
+    table td,
+    table th,
+    .boq-wrap,
+    .boq-wrap * {
+        font-family: 'Times New Roman', Times, serif;
+    }
 
-        .col-amt {
-            width: 90px
-        }
+    .table th {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.15;
+    }
 
-        .col-unit {
-            width: 70px
-        }
+    .col-no { width: 120px }
+    .col-list { width: auto }
+    .col-amt { width: 90px }
+    .col-unit { width: 70px }
+    .col-mc { width: 90px }
+    .col-mt { width: 110px }
+    .col-lc { width: 90px }
+    .col-lt { width: 110px }
+    .col-total { width: 120px }
 
-        .col-mc {
-            width: 90px
-        }
+    .boq-wrap {
+        max-width: 1200px;
+        margin: 20px auto;
+        background: #fff;
+        border: 2px solid #000;
+        padding: 0;
+    }
 
-        .col-mt {
-            width: 110px
-        }
+    .dyn { color: red !important; }
 
-        .col-lc {
-            width: 90px
-        }
+    .boq-meta {
+        width: 100%;
+        border-collapse: collapse;
+        border: none;
+    }
 
-        .col-lt {
-            width: 110px
-        }
+    .boq-meta td {
+        border: none !important;
+        padding: 6px;
+        font-size: 14px;
+    }
 
-        .col-total {
-            width: 120px
-        }
+    .thead th {
+        border: 1px solid #000;
+        text-align: center;
+        padding: 6px;
+        font-size: 14px;
+    }
 
-        .boq-wrap {
-            max-width: 1200px;
-            margin: 20px auto;
-            background: #fff;
-            border: 2px solid #000;
-            padding: 0;
-        }
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
 
-        .dyn {
-            color: red !important;
-        }
+    .table th,
+    .table td {
+        border: 1px solid #000;
+        padding: 6px;
+        font-size: 13px;
+    }
 
-        .boq-meta {
-            width: 100%;
-            border-collapse: collapse;
-            border: none;
-        }
+    .cat { background: #fff78a; font-weight: 700; }
+    .right { text-align: right; }
+    .center { text-align: center; }
 
-        .boq-meta td {
-            border: none !important;
-            padding: 6px;
-            font-size: 14px;
-        }
+    .badge-box {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        background: #e8f5e9;
+        border: 1px solid #81c784;
+    }
 
-        .thead th {
-            border: 1px solid #000;
-            text-align: center;
-            padding: 6px;
-            font-size: 14px
-        }
+    .boq-head {
+        width: 100%;
+        text-align: center;
+        font-weight: 700;
+        font-size: 16px;
+        padding: 6px 0;
+        border-bottom: 1px solid #000;
+    }
 
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
+    .btn-footer {
+        max-width: 1200px;
+        margin: 20px auto;
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+    }
 
-        .table th,
-        .table td {
-            border: 1px solid #000;
-            padding: 6px;
-            font-size: 13px
-        }
+    .btn-lg {
+        padding: 10px 26px;
+        font-size: 16px;
+        font-weight: 600;
+        border: 1px solid #000;
+        background: #eee;
+        cursor: pointer;
+    }
 
-        .cat {
-            background: #fff78a;
-            font-weight: 700
-        }
+    .btn-lg:hover {
+        background: #ddd;
+    }
 
-        .right {
-            text-align: right
+    @media print {
+        .no-print {
+            display: none !important;
         }
-
-        .center {
-            text-align: center
-        }
-
-        .badge-box {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 4px;
-            background: #e8f5e9;
-            border: 1px solid #81c784
-        }
-
-        .boq-head {
-            width: 100%;
-            text-align: center;
-            font-weight: 700;
-            font-size: 16px;
-            padding: 6px 0;
-            border-bottom: 1px solid #000;
-        }
-
-        .btn-footer {
-            max-width: 1200px;
-            margin: 20px auto;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-
-        .btn-lg {
-            padding: 10px 26px;
-            font-size: 16px;
-            font-weight: 600;
-            border: 1px solid #000;
-            background: #eee;
-            cursor: pointer;
-        }
-
-        .btn-lg:hover {
-            background: #ddd;
-        }
-
-        @media print {
-            .no-print {
-                display: none !important
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 
 <body>
@@ -169,13 +153,14 @@
             </tr>
             <tr>
                 <td class="meta-label">Dear :</td>
-                <td class="dyn">{{ $dear }}</td>
-                <td class="right">House No. <span class="dyn">{{ $house_no }}</span></td>
+                <td class="dyn" colspan="2">{{ $dear }}</td>
             </tr>
             <tr>
                 <td class="meta-label">Trooper :</td>
                 <td class="dyn">{{ $trooper }}</td>
-                <td class="right">&nbsp;</td>
+                <td class="right">
+                    House No. <span class="dyn">{{ $house_no }}</span>
+                </td>
             </tr>
         </table>
 
@@ -234,7 +219,8 @@
                         <tr>
                             <td class="center">{{ $n }}</td>
                             <td class="dyn">{{ $r['category_name'] }}</td>
-                            <td class="right dyn">{{ number_format((float) $r['amount'], 2) }}</td>
+                            <!-- Amount CENTER to match Excel -->
+                            <td class="center dyn">{{ number_format((float) $r['amount'], 2) }}</td>
                             <td class="center dyn">{{ $r['unit'] }}</td>
                             <td class="right dyn">{{ number_format((float) $r['mc_price'], 2) }}</td>
                             <td class="right pink dyn">{{ number_format((float) $r['mat_total'], 2) }}</td>
@@ -338,16 +324,15 @@
             r += 2;
 
             /* =======================
-            META FIELDS
+               META FIELDS
             ======================= */
 
-            // ----- Row 1: Project Name + Date (GHI merged) -----
+            // Row 1: Project Name + Date
             ws.getCell(r, 1).value = "Project Name  :";
-            ws.mergeCells(r, 2, r, 6);                        // B–F
+            ws.mergeCells(r, 2, r, 6);
             ws.getCell(r, 2).value = @json($project_name);
 
-            // Date: merge G–I and center
-            ws.mergeCells(r, 7, r, 9);                        // G–H–I
+            ws.mergeCells(r, 7, r, 9);
             ws.getCell(r, 7).value = "Date: " + @json($date);
             ws.getCell(r, 7).alignment = {
                 horizontal: "center",
@@ -357,20 +342,19 @@
             ws.getRow(r).height = FIXED_HEIGHT;
             r++;
 
-            // ----- Row 2: Dear -----
+            // Row 2: Dear
             ws.getCell(r, 1).value = "Dear  :";
-            ws.mergeCells(r, 2, r, 6);            // B–F
+            ws.mergeCells(r, 2, r, 6);
             ws.getCell(r, 2).value = @json($dear);
 
             ws.getRow(r).height = FIXED_HEIGHT;
             r++;
 
-            // ----- Row 5: Trooper + House No. -----
+            // Row 3: Trooper + House No.
             ws.getCell(r, 1).value = "Trooper  :";
-            ws.mergeCells(r, 2, r, 6);                   // B–F
+            ws.mergeCells(r, 2, r, 6);
             ws.getCell(r, 2).value = @json($trooper);
 
-            // House No. label in G–H
             ws.mergeCells(r, 7, r, 8);
             ws.getCell(r, 7).value = "House No.";
             ws.getCell(r, 7).alignment = {
@@ -378,7 +362,6 @@
                 vertical: "middle"
             };
 
-            // House No. value in I
             ws.getCell(r, 9).value = @json($house_no);
             ws.getCell(r, 9).alignment = {
                 horizontal: "center",
@@ -443,7 +426,6 @@
             ws.getCell(r, 2).font = { bold: true };
             ws.getCell(r, 2).alignment = { horizontal: "center", vertical: "middle" };
 
-            // ✅ enforce border + vertical align
             for (let c = 1; c <= 9; c++) {
                 ws.getCell(r, c).border = {
                     top: { style: 'thin' },
@@ -451,14 +433,14 @@
                     bottom: { style: 'thin' },
                     right: { style: 'thin' },
                 };
-                ws.getCell(r, c).alignment = { vertical: "middle", wrapText: true };   // ✅ enforce middle
+                ws.getCell(r, c).alignment = { vertical: "middle", wrapText: true };
             }
 
             ws.getRow(r).height = FIXED_HEIGHT;
             r++;
 
             /* =======================
-            DATA ROWS
+               DATA ROWS
             ======================= */
             let n = 1;
             const rows = @json($rows);
@@ -476,24 +458,23 @@
                 ws.getCell(r, 8).value = Number(row.lab_total) || 0;
                 ws.getCell(r, 9).value = Number(row.grand_total) || 0;
 
-                // ---- Alignment for DATA ONLY ----
-                // No. column center
+                // No. center
                 ws.getCell(r, 1).alignment = { horizontal: "center", vertical: "middle" };
 
-                // Amount column center (still with number format)
+                // Amount center with number format
                 ws.getCell(r, 3).numFmt = "#,##0.00";
                 ws.getCell(r, 3).alignment = { horizontal: "center", vertical: "middle" };
 
-                // unit column center
+                // unit center
                 ws.getCell(r, 4).alignment = { horizontal: "center", vertical: "middle" };
 
-                // Money columns right align
+                // Money columns right
                 for (let c of [5, 6, 7, 8, 9]) {
                     ws.getCell(r, c).numFmt = "#,##0.00";
                     ws.getCell(r, c).alignment = { horizontal: "right", vertical: "middle" };
                 }
 
-                // Borders + ensure vertical middle for all cells in the row
+                // Borders
                 for (let c = 1; c <= 9; c++) {
                     ws.getCell(r, c).border = {
                         top: { style: 'thin' },
@@ -559,7 +540,7 @@
                     if (!ws.getCell(rr, c).alignment) {
                         ws.getCell(rr, c).alignment = {};
                     }
-                    ws.getCell(rr, c).alignment.vertical = "middle";     // ✅ enforce vertical
+                    ws.getCell(rr, c).alignment.vertical = "middle";
                 }
 
                 ws.getRow(rr).height = FIXED_HEIGHT;
@@ -582,7 +563,7 @@
             } catch (e) { }
 
             /* =======================
-            APPLY ANGSANA NEW FONT (WORKING)
+               APPLY ANGSANA NEW FONT
             ======================= */
             ws.eachRow({ includeEmpty: true }, row => {
                 row.eachCell(cell => {
@@ -611,41 +592,43 @@
 
         async function downloadBoqPdf() {
             const { jsPDF } = window.jspdf;
-
             const boqElement = document.querySelector('.boq-wrap');
             if (!boqElement) return;
 
-            // 1. Render to canvas
+            // Use Angsana for PDF capture
+            boqElement.style.fontFamily = "'AngsanaPDF', 'Times New Roman', serif";
+
+            // Higher canvas resolution, but we will use JPEG to keep file size small
             const canvas = await html2canvas(boqElement, {
-                scale: 2,
+                scale: 3,                 // ↑ better resolution than 2
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 scrollX: 0,
                 scrollY: -window.scrollY
             });
 
-            const imgData = canvas.toDataURL('image/png');
+            // Reset font back for screen preview
+            boqElement.style.fontFamily = "'Times New Roman', serif";
 
-            // 2. Create PDF (A4 landscape)
+            // JPEG with quality instead of heavy PNG
+            const imgData = canvas.toDataURL('image/jpeg', 0.7);  // 0.7 = good quality, smaller size
+
             const pdf = new jsPDF('landscape', 'mm', 'a4');
-            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageWidth  = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
 
-            const imgWidth = canvas.width;
+            const imgWidth  = canvas.width;
             const imgHeight = canvas.height;
 
-            // ⭐ Make it a bit narrower (90% width)
-            const targetWidth = pageWidth * 0.90;
-
-            // Keep aspect ratio
-            const ratio = targetWidth / imgWidth;
+            const targetWidth  = pageWidth * 0.98;
+            const ratio        = targetWidth / imgWidth;
             const targetHeight = imgHeight * ratio;
 
-            // Center it nicely
             const x = (pageWidth - targetWidth) / 2;
-            const y = 10; // small margin top
+            const y = 10;
 
-            pdf.addImage(imgData, 'PNG', x, y, targetWidth, targetHeight);
+            // Use JPEG + FAST compression in jsPDF
+            pdf.addImage(imgData, 'JPEG', x, y, targetWidth, targetHeight, undefined, 'FAST');
 
             const project = @json($project_name) ?? '';
             pdf.save((project || 'BOQ') + ' Home.pdf');
@@ -661,7 +644,7 @@
                 @elseif($autoDownload === 'excel')
                     downloadBoqExcel();
                 @endif
-            }, 300); // 0.3s delay, just to be sure layout is ready
+            }, 300);
         });
     </script>
     @endif
