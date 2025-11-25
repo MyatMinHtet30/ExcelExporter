@@ -182,3 +182,23 @@
     margin-top: 10px !important;
 }
 
+/* iPad Air + iPad mini (tablet widths) */
+@media only screen and (min-width: 744px) and (max-width: 1180px) {
+
+    /* Make left + right exactly 12 cols (8 + 4) */
+    .card-header .row > .col-md-8.col-5 {
+        flex: 0 0 66.6667% !important;  /* 8/12 */
+        max-width: 66.6667% !important;
+    }
+
+    .card-header .row > .summary-col {
+        flex: 0 0 33.3333% !important;  /* 4/12 */
+        max-width: 33.3333% !important;
+    }
+
+    /* Let the totals block use the full width of its column */
+    .summary-col .text-end {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}

@@ -76,12 +76,16 @@
                         <!-- Start XP Col -->
                         <div class="col-3 col-md-2 col-lg-2 order-1 order-md-1 align-self-center">
                             <div class="xp-logobar">
-                                <a href="index.html" class="xp-small-logo">
-                                    <img src="{{ asset('assets/images/mobile-logo.svg') }}" class="img-fluid"
-                                        alt="logo">
+                                <a href="{{ route('dashboard') }}" class="xp-small-logo">
+                                    <img src="{{ asset('assets/images/168HomeWebLogo.png') }}" class="img-fluid"
+                                        alt="168 Home Logo"
+                                        style="height:32px; object-fit:contain; transform:scale(1.5); transform-origin:center;">
                                 </a>
-                                <a href="index.html" class="xp-main-logo">
-                                    <img src="{{ asset('assets/images/logo.svg') }}" class="img-fluid" alt="logo">
+
+                                <a href="{{ route('dashboard') }}" class="xp-main-logo">
+                                    <img src="{{ asset('assets/images/168HomeWebLogo.png') }}" class="img-fluid"
+                                        alt="168 Home Logo"
+                                        style="height:42px; object-fit:contain; transform:scale(2); transform-origin:center;">
                                 </a>
                             </div>
                         </div>
@@ -89,7 +93,7 @@
 
                         <!-- Start XP Col -->
                         <div class="col-12 col-md-5 col-lg-3 order-3 order-md-2">
-                            <div class="xp-searchbar">
+                            {{-- <div class="xp-searchbar">
                                 <form>
                                     <div class="input-group">
                                         <input type="search" class="form-control" placeholder="{{ __('Search') }}"
@@ -101,7 +105,7 @@
                                         </div>
                                     </div>
                                 </form>
-                            </div>
+                            </div> --}}
                         </div>
                         <!-- End XP Col -->
 
@@ -147,12 +151,12 @@
                                             <a class="dropdown-toggle user-profile-img" href="#" role="button"
                                                 id="xp-userprofile" data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">
-                                                <img src="{{ asset('assets/images/topbar/user.jpg') }}"
-                                                    alt="user-profile" class="rounded-circle img-fluid">
+                                                <img src="{{ asset('assets/images/topbar/Profile.webp') }}"
+                                                alt="user-profile" class="rounded-circle img-fluid">
                                                 <span class="xp-user-live"></span>
                                             </a>
 
-                                            <div class="dropdown-menu dropdown-menu-right"
+                                            {{-- <div class="dropdown-menu dropdown-menu-right"
                                                 aria-labelledby="xp-userprofile">
                                                 <a class="dropdown-item"
                                                     href="#">{{ __('Welcome, :name', ['name' => 'John Doe']) }}</a>
@@ -170,6 +174,19 @@
                                                 </a>
                                                 <form id="logout-form" action="{{ route('logout') }}" method="POST"
                                                     style="display: none;">
+                                                    @csrf
+                                                </form>
+                                            </div> --}}
+
+                                            <div class="dropdown-menu dropdown-menu-right"
+                                                aria-labelledby="xp-userprofile">
+
+                                                <a href="#" class="dropdown-item"
+                                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                                    <i class="mdi mdi-logout mr-2"></i> {{ __('Logout') }}
+                                                </a>
+
+                                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display:none;">
                                                     @csrf
                                                 </form>
                                             </div>
@@ -198,7 +215,7 @@
                 <div class="xp-breadcrumbbar text-center">
                     <h4 class="page-title">@yield('title')</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">{{ __('Booster') }}</a></li>
+                        <li class="breadcrumb-item"><a href="#">168Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">@yield('title')</li>
                     </ol>
                 </div>

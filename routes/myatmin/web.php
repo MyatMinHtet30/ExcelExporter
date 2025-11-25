@@ -18,6 +18,11 @@ Route::middleware('web')->group(function () {
 });
 
 Route::middleware(['web','auth'])->group(function () {
+    Route::get('/dashboard', function () {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
+        return view('pages.dashboard');
+    })->name('dashboard');
     Route::post('/logout', [AuthUserController::class, 'logout'])->name('logout');
 
     Route::post('homes/preview', [HomeController::class, 'preview'])

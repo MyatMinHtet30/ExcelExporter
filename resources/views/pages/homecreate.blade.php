@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', __('New Home Data Entry'))
+@section('title', __('Generate Home Excel Form'))
 
 @push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
