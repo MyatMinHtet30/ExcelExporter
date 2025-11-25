@@ -313,7 +313,7 @@
             const ws = wb.addWorksheet('BOQ');
 
             ws.columns = [
-                { header: 'No.', width: 12 },
+                { header: 'No.', width: 14 },
                 { header: 'List', width: 42 },
                 { header: 'Amount', width: 12 },
                 { header: 'unit', width: 10 },
@@ -338,25 +338,53 @@
             r += 2;
 
             /* =======================
-               META FIELDS
+            META FIELDS
             ======================= */
+
+            // ----- Row 1: Project Name + Date (GHI merged) -----
             ws.getCell(r, 1).value = "Project Name  :";
-            ws.mergeCells(r, 2, r, 7);
+            ws.mergeCells(r, 2, r, 6);                        // B–F
             ws.getCell(r, 2).value = @json($project_name);
-            ws.getCell(3, 8).value = "Date: " + @json($date);
+
+            // Date: merge G–I and center
+            ws.mergeCells(r, 7, r, 9);                        // G–H–I
+            ws.getCell(r, 7).value = "Date: " + @json($date);
+            ws.getCell(r, 7).alignment = {
+                horizontal: "center",
+                vertical: "middle"
+            };
+
             ws.getRow(r).height = FIXED_HEIGHT;
             r++;
 
+            // ----- Row 2: Dear -----
             ws.getCell(r, 1).value = "Dear  :";
-            ws.mergeCells(r, 2, r, 7);
+            ws.mergeCells(r, 2, r, 6);            // B–F
             ws.getCell(r, 2).value = @json($dear);
-            ws.getCell(4, 8).value = "House No.: " + @json($house_no);
+
             ws.getRow(r).height = FIXED_HEIGHT;
             r++;
 
+            // ----- Row 5: Trooper + House No. -----
             ws.getCell(r, 1).value = "Trooper  :";
-            ws.mergeCells(r, 2, r, 7);
+            ws.mergeCells(r, 2, r, 6);                   // B–F
             ws.getCell(r, 2).value = @json($trooper);
+
+            // House No. label in G–H
+            ws.mergeCells(r, 7, r, 8);
+            ws.getCell(r, 7).value = "House No.";
+            ws.getCell(r, 7).alignment = {
+                horizontal: "center",
+                vertical: "middle"
+            };
+
+            // House No. value in I
+            ws.getCell(r, 9).value = @json($house_no);
+            ws.getCell(r, 9).alignment = {
+                horizontal: "center",
+                vertical: "middle"
+            };
+
             ws.getRow(r).height = FIXED_HEIGHT;
             r += 2;
 
@@ -430,7 +458,7 @@
             r++;
 
             /* =======================
-               DATA ROWS
+            DATA ROWS
             ======================= */
             let n = 1;
             const rows = @json($rows);
@@ -438,27 +466,45 @@
             for (const row of rows) {
                 if (!row.category_name) continue;
 
-                ws.getCell(r, 1).value = n++;
-                ws.getCell(r, 2).value = row.category_name;
-                ws.getCell(r, 3).value = Number(row.amount) || 0;
-                ws.getCell(r, 4).value = row.unit;
+                ws.getCell(r, 1).value = n++;                      // No.
+                ws.getCell(r, 2).value = row.category_name;        // List
+                ws.getCell(r, 3).value = Number(row.amount) || 0;  // Amount
+                ws.getCell(r, 4).value = row.unit;                 // unit
                 ws.getCell(r, 5).value = Number(row.mc_price) || 0;
                 ws.getCell(r, 6).value = Number(row.mat_total) || 0;
                 ws.getCell(r, 7).value = Number(row.lc_price) || 0;
                 ws.getCell(r, 8).value = Number(row.lab_total) || 0;
                 ws.getCell(r, 9).value = Number(row.grand_total) || 0;
 
-                for (let c of [3, 5, 6, 7, 8, 9]) {
+                // ---- Alignment for DATA ONLY ----
+                // No. column center
+                ws.getCell(r, 1).alignment = { horizontal: "center", vertical: "middle" };
+
+                // Amount column center (still with number format)
+                ws.getCell(r, 3).numFmt = "#,##0.00";
+                ws.getCell(r, 3).alignment = { horizontal: "center", vertical: "middle" };
+
+                // unit column center
+                ws.getCell(r, 4).alignment = { horizontal: "center", vertical: "middle" };
+
+                // Money columns right align
+                for (let c of [5, 6, 7, 8, 9]) {
                     ws.getCell(r, c).numFmt = "#,##0.00";
                     ws.getCell(r, c).alignment = { horizontal: "right", vertical: "middle" };
                 }
 
+                // Borders + ensure vertical middle for all cells in the row
                 for (let c = 1; c <= 9; c++) {
-                    ws.getCell(r, c).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    ws.getCell(r, c).border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' }
+                    };
                     if (!ws.getCell(r, c).alignment) {
                         ws.getCell(r, c).alignment = {};
                     }
-                    ws.getCell(r, c).alignment.vertical = "middle";   // ✅ enforce middle
+                    ws.getCell(r, c).alignment.vertical = "middle";
                 }
 
                 ws.getRow(r).height = FIXED_HEIGHT;
@@ -534,6 +580,20 @@
                     editAs: "oneCell"
                 });
             } catch (e) { }
+
+            /* =======================
+            APPLY ANGSANA NEW FONT (WORKING)
+            ======================= */
+            ws.eachRow({ includeEmpty: true }, row => {
+                row.eachCell(cell => {
+                    const prev = cell.font || {};
+                    cell.font = {
+                        ...prev,
+                        name: "Angsana New",
+                        size: 16
+                    };
+                });
+            });
 
             /* =======================
                SAVE
