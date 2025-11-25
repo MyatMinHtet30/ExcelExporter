@@ -120,110 +120,125 @@
                     </div>
                 </div>
 
-                <div class="col-lg-4 col-md-4 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Date') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="date" class="form-control" name="date" id="date" value="{{ old('date') }}"  required>
-                                        @error('date') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- ---------- Dynamic item rows ---------- -->
                 <div id="rows-container" class="col-12">
                     <div class="card m-b-2 item-row">
                         <div class="card-header bg-white">
 
-                            <!-- Line 1 -->
-                            <div class="row g-3 g-compact align-items-end">
-                                <div class="col-3 col-sm-2 col-md-1 field-col">
-                                    <label class="form-label">{{ __('No') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="number" class="form-control readonly-input serial" name="details[0][no]" value="1"
-                                            min="1" readonly>
-                                    </div>
-                                </div>
+                           <!-- Line 1 -->
+<div class="row g-3 g-compact align-items-end">
 
-                                <div class="col-12 col-sm-6 col-md-6 field-col">
-                                    <label class="form-label">{{ __('Category') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="details[0][category_name]"
-                                            placeholder="{{ __('Category A / B / ...') }}">
-                                        <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
-                                            title="{{ __('Speak') }}">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
-                                    </div>
-                                </div>
+    <!-- No -->
+    <div class="col-3 col-sm-2 col-md-1 field-col">
+        <label class="form-label">{{ __('No') }}</label>
+        <div class="input-group input-42">
+            <input type="number" class="form-control readonly-input serial"
+                   name="details[0][no]" value="1" min="1" readonly>
+        </div>
+    </div>
 
-                                <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Amount') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control" name="details[0][amount]" placeholder=".00"
-                                            required>
-                                    </div>
-                                </div>
+    <!-- Category -->
+    <div class="col-12 col-sm-6 col-md-3 field-col">
+        <label class="form-label">{{ __('Category') }}</label>
+        <div class="input-group input-42">
+            <input type="text" class="form-control"
+                   name="details[0][category_name]"
+                   placeholder="{{ __('Category A / B / ...') }}">
+            <button type="button" class="btn btn-outline-secondary mic-btn"
+                    onclick="startDictation(this)">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+    </div>
 
-                                <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Unit') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="details[0][unit]" placeholder="{{ __('Unit') }}"
-                                            required>
-                                        <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
-                                            title="{{ __('Speak') }}">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+    <!-- Amount -->
+    <div class="col-6 col-md-2 field-col">
+        <label class="form-label">{{ __('Amount') }}</label>
+        <div class="input-group input-42">
+            <input type="number" step="0.01"
+                class="form-control no-negative"
+                name="details[0][amount]" placeholder=".00" required>
+            <div class="invalid-feedback">
+                {{ __('Negative values are not allowed.') }}
+            </div>
+        </div>
+    </div>
 
-                            <!-- Line 2 -->
-                            <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
-                                <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Material Price / Unit') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control" name="details[0][mc_price]" placeholder=".00"
-                                            required>
-                                    </div>
-                                </div>
+    <!-- Unit -->
+    <div class="col-6 col-md-2 field-col">
+        <label class="form-label">{{ __('Unit') }}</label>
+        <div class="input-group input-42">
+            <input type="text" class="form-control"
+                   name="details[0][unit]" placeholder="{{ __('Unit') }}" required>
+            <button type="button" class="btn btn-outline-secondary mic-btn"
+                    onclick="startDictation(this)">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+    </div>
 
-                                <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Material Total') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control readonly-input js-mat-total" placeholder="0.00" readonly>
-                                    </div>
-                                </div>
+    <!-- Material Price / Unit -->
+    <div class="col-6 col-md-2 field-col">
+        <label class="form-label">{{ __('Material Price / Unit') }}</label>
+        <div class="input-group input-42">
+            <input type="number" step="0.01"
+                class="form-control no-negative"
+                name="details[0][mc_price]" placeholder=".00" required>
+            <div class="invalid-feedback">
+                {{ __('Negative values are not allowed.') }}
+            </div>
+        </div>
+    </div>
 
-                                <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Labor Price / Unit') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control" name="details[0][lc_price]" placeholder=".00"
-                                            required>
-                                    </div>
-                                </div>
+    <!-- Labor Price / Unit -->
+    <div class="col-6 col-md-2 field-col">
+        <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+        <div class="input-group input-42">
+            <input type="number" step="0.01"
+                class="form-control no-negative"
+                name="details[0][lc_price]" placeholder=".00" required>
+            <div class="invalid-feedback">
+                {{ __('Negative values are not allowed.') }}
+            </div>
+        </div>
+    </div>
 
-                                <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Labor Total') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control readonly-input js-lab-total" placeholder="0.00" readonly>
-                                    </div>
-                                </div>
+</div>
 
-                                <div class="col-12 col-md field-col">
-                                    <label class="form-label">{{ __('Grand Total') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control readonly-input js-grand-total" placeholder="0.00" readonly>
-                                    </div>
-                                </div>
-                            </div>
+<!-- Line 2 -->
+<div class="row g-3 g-compact align-items-end pt-2 fields-line-2 justify-content-end">
 
+    <!-- Material Total -->
+    <div class="col-12 col-md-2 field-col">
+        <label class="form-label">{{ __('Material Total') }}</label>
+        <div class="input-group input-42">
+            <input type="number" step="0.01"
+                   class="form-control readonly-input js-mat-total"
+                   placeholder="0.00" readonly>
+        </div>
+    </div>
+
+    <!-- Labor Total -->
+    <div class="col-12 col-md-2 field-col">
+        <label class="form-label">{{ __('Labor Total') }}</label>
+        <div class="input-group input-42">
+            <input type="number" step="0.01"
+                   class="form-control readonly-input js-lab-total"
+                   placeholder="0.00" readonly>
+        </div>
+    </div>
+
+    <!-- Grand Total -->
+    <div class="col-12 col-md-2 field-col">
+        <label class="form-label">{{ __('Grand Total') }}</label>
+        <div class="input-group input-42">
+            <input type="number" step="0.01"
+                   class="form-control readonly-input js-grand-total"
+                   placeholder="0.00" readonly>
+        </div>
+    </div>
+
+</div>
                             <div class="row pt-2">
                                 <div class="col-12 d-flex justify-content-end">
                                     <button type="button" class="btn btn-sm btn-danger remove-row">&times;</button>
@@ -253,7 +268,7 @@
                                                 {{ __('Preview') }}
                                             </button>
                                             <button type="submit" class="btn btn-success" id="generate-btn">
-                                                {{ __('Generate') }}
+                                                {{ __('Create') }}
                                             </button>
                                         </div>
                                     </div>
@@ -270,17 +285,36 @@
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                                <span class="d-block">{{ __('Operating +') }}</span>
-                                                <span class="d-block">{{ __('Profit (15%)') }}</span>
+
+                                                {{-- Desktop / big screen: one line --}}
+                                                <span class="d-none d-md-inline">
+                                                    {{ __('Operating + Profit (15%)') }}
+                                                </span>
+
+                                                {{-- Mobile / small screen: two lines --}}
+                                                <span class="d-inline d-md-none">
+                                                    <span class="d-block">{{ __('Operating +') }}</span>
+                                                    <span class="d-block">{{ __('Profit (15%)') }}</span>
+                                                </span>
+
                                             </strong>
                                             <span class="ms-2" id="operatingDisplay">0.00</span>
                                         </div>
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
+                                            {{-- Desktop / big screen: one line --}}
+                                            <span class="d-none d-md-inline">
+                                                {{ __('Category A,B Total') }}
+                                            </span>
+
+                                            {{-- Mobile / small screen: two lines --}}
+                                            <span class="d-inline d-md-none">
                                                 <span class="d-block">{{ __('Category A,B') }}</span>
                                                 <span class="d-block">{{ __('Total') }}</span>
-                                            </strong>
+                                            </span>
+
+                                        </strong>
                                             <span class="ms-2" id="abDisplay">0.00</span>
                                         </div>
 

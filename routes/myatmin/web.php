@@ -23,6 +23,13 @@ Route::middleware(['web','auth'])->group(function () {
     Route::post('homes/preview', [HomeController::class, 'preview'])
         ->name('home.preview');
 
+    Route::get('homes/{home}/export/pdf', [HomeController::class, 'exportPdf'])
+        ->name('home.export.pdf');
+
+    Route::get('homes/{home}/export/excel', [HomeController::class, 'exportExcel'])
+        ->name('home.export.excel');
+
+
     Route::resource('homes', HomeController::class)
     ->only(['index','create','store','edit','update','destroy'])
     ->names([

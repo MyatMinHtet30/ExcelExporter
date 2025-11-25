@@ -290,8 +290,11 @@
     <div class="no-print btn-footer">
         <button type="button" onclick="window.history.back()" class="btn-lg">Cancel</button>
         <button type="button" onclick="downloadBoqExcel()" class="btn-lg">Download Excel</button>
+        <button type="button" onclick="downloadBoqPdf()" class="btn-lg">Download PDF</button>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
     <script>
         async function toBase64(url) {
@@ -545,7 +548,63 @@
             a.click();
             a.remove();
         }
+
+        async function downloadBoqPdf() {
+            const { jsPDF } = window.jspdf;
+
+            const boqElement = document.querySelector('.boq-wrap');
+            if (!boqElement) return;
+
+            // 1. Render to canvas
+            const canvas = await html2canvas(boqElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: -window.scrollY
+            });
+
+            const imgData = canvas.toDataURL('image/png');
+
+            // 2. Create PDF (A4 landscape)
+            const pdf = new jsPDF('landscape', 'mm', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+
+            // ⭐ Make it a bit narrower (90% width)
+            const targetWidth = pageWidth * 0.90;
+
+            // Keep aspect ratio
+            const ratio = targetWidth / imgWidth;
+            const targetHeight = imgHeight * ratio;
+
+            // Center it nicely
+            const x = (pageWidth - targetWidth) / 2;
+            const y = 10; // small margin top
+
+            pdf.addImage(imgData, 'PNG', x, y, targetWidth, targetHeight);
+
+            const project = @json($project_name) ?? '';
+            pdf.save((project || 'BOQ') + ' Home.pdf');
+        }
     </script>
+
+    @if(!empty($autoDownload))
+    <script>
+        window.addEventListener('load', function () {
+            setTimeout(function () {
+                @if($autoDownload === 'pdf')
+                    downloadBoqPdf();
+                @elseif($autoDownload === 'excel')
+                    downloadBoqExcel();
+                @endif
+            }, 300); // 0.3s delay, just to be sure layout is ready
+        });
+    </script>
+    @endif
 
 </body>
 
