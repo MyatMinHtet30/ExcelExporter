@@ -305,15 +305,36 @@
                                         </div>
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                                <span class="d-block">{{ __('Operating +') }}</span>
-                                                <span class="d-block">{{ __('Profit (15%)') }}</span>
+
+                                                {{-- Desktop / big screen: one line --}}
+                                                <span class="d-none d-md-inline">
+                                                    {{ __('Operating + Profit (15%)') }}
+                                                </span>
+
+                                                {{-- Mobile / small screen: two lines --}}
+                                                <span class="d-inline d-md-none">
+                                                    <span class="d-block">{{ __('Operating +') }}</span>
+                                                    <span class="d-block">{{ __('Profit (15%)') }}</span>
+                                                </span>
+
                                             </strong>
                                             <span class="ms-2" id="operatingDisplay">0.00</span>
                                         </div>
+
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                                <span class="d-block">{{ __('Category A,B') }}</span>
-                                                <span class="d-block">{{ __('Total') }}</span>
+
+                                                {{-- Desktop / big screen: one line --}}
+                                                <span class="d-none d-md-inline">
+                                                    {{ __('Category A,B Total') }}
+                                                </span>
+
+                                                {{-- Mobile / small screen: two lines --}}
+                                                <span class="d-inline d-md-none">
+                                                    <span class="d-block">{{ __('Category A,B') }}</span>
+                                                    <span class="d-block">{{ __('Total') }}</span>
+                                                </span>
+
                                             </strong>
                                             <span class="ms-2" id="abDisplay">0.00</span>
                                         </div>
