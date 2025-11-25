@@ -141,136 +141,148 @@
                 </div>
 
                 {{-- ===== Existing Details ===== --}}
-                <div id="rows-container" class="col-12">
-                    @php $i = 0; @endphp
-                    @foreach($home->details as $detail)
-                        <div class="card m-b-2 item-row" data-row-index="{{ $i }}">
-    <div class="card-header bg-white">
+<div id="rows-container" class="col-12">
+    @php $i = 0; @endphp
+    @foreach($home->details as $detail)
+        <div class="card m-b-2 item-row" data-row-index="{{ $i }}">
+            <div class="card-header bg-white">
 
-        {{-- Line 1 --}}
-        <div class="row g-3 g-compact align-items-end">
-            <input type="hidden" name="details[{{ $i }}][id]" value="{{ $detail->id }}">
-            <input type="hidden" name="details[{{ $i }}][_delete]" value="0" class="js-delete-flag">
+                {{-- Line 1 --}}
+                <div class="row g-3 g-compact align-items-end">
+                    <input type="hidden" name="details[{{ $i }}][id]" value="{{ $detail->id }}">
+                    <input type="hidden" name="details[{{ $i }}][_delete]" value="0" class="js-delete-flag">
 
-            <!-- No -->
-            <div class="col-3 col-sm-2 col-md-1 field-col">
-                <label class="form-label">{{ __('No') }}</label>
-                <div class="input-group input-42">
-                    <input type="number" class="form-control readonly-input serial"
-                           name="details[{{ $i }}][no]"
-                           value="{{ $detail->no }}" min="1" readonly>
+                    <!-- No -->
+                    <div class="col-3 col-sm-2 col-md-1 field-col">
+                        <label class="form-label">{{ __('No') }}</label>
+                        <div class="input-group input-42">
+                            <input type="number" class="form-control readonly-input serial"
+                                   name="details[{{ $i }}][no]"
+                                   value="{{ $detail->no }}" min="1" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Category -->
+                    <div class="col-12 col-sm-6 col-md-3 field-col">
+                        <label class="form-label">{{ __('Category') }}</label>
+                        <div class="input-group input-42">
+                            <input type="text" class="form-control"
+                                   name="details[{{ $i }}][category_name]"
+                                   value="{{ $detail->category_name }}">
+                            <button type="button" class="btn btn-outline-secondary mic-btn"
+                                    onclick="startDictation(this)">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Amount -->
+                    <div class="col-6 col-md-2 field-col">
+                        <label class="form-label">{{ __('Amount') }}</label>
+                        <div class="input-group input-42">
+                            <input type="number" step="0.01"
+                                   class="form-control no-negative"
+                                   name="details[{{ $i }}][amount]"
+                                   value="{{ $detail->amount }}">
+                            <div class="invalid-feedback">
+                                {{ __('Negative values are not allowed.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unit -->
+                    <div class="col-6 col-md-2 field-col">
+                        <label class="form-label">{{ __('Unit') }}</label>
+                        <div class="input-group input-42">
+                            <input type="text" class="form-control"
+                                   name="details[{{ $i }}][unit]"
+                                   value="{{ $detail->unit }}">
+                            <button type="button" class="btn btn-outline-secondary mic-btn"
+                                    onclick="startDictation(this)">
+                                <i class="fas fa-microphone"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Material Price / Unit -->
+                    <div class="col-6 col-md-2 field-col">
+                        <label class="form-label">{{ __('Material Price / Unit') }}</label>
+                        <div class="input-group input-42">
+                            <input type="number" step="0.01"
+                                   class="form-control no-negative"
+                                   name="details[{{ $i }}][mc_price]"
+                                   value="{{ $detail->mc_price }}">
+                            <div class="invalid-feedback">
+                                {{ __('Negative values are not allowed.') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Labor Price / Unit -->
+                    <div class="col-6 col-md-2 field-col">
+                        <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+                        <div class="input-group input-42">
+                            <input type="number" step="0.01"
+                                   class="form-control no-negative"
+                                   name="details[{{ $i }}][lc_price]"
+                                   value="{{ $detail->lc_price }}">
+                            <div class="invalid-feedback">
+                                {{ __('Negative values are not allowed.') }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Category -->
-            <div class="col-12 col-sm-6 col-md-3 field-col">
-                <label class="form-label">{{ __('Category') }}</label>
-                <div class="input-group input-42">
-                    <input type="text" class="form-control"
-                           name="details[{{ $i }}][category_name]"
-                           value="{{ $detail->category_name }}">
-                    <button type="button" class="btn btn-outline-secondary mic-btn"
-                            onclick="startDictation(this)">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                </div>
-            </div>
+                {{-- Line 2 (same as create) --}}
+                <div class="row g-3 g-compact align-items-end pt-2 fields-line-2 justify-content-end">
 
-            <!-- Amount -->
-            <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Amount') }}</label>
-                <div class="input-group input-42">
-                    <input type="number" step="0.01" class="form-control js-amount"
-                           name="details[{{ $i }}][amount]"
-                           value="{{ $detail->amount }}">
-                </div>
-            </div>
+                    <!-- Material Total -->
+                    <div class="col-12 col-md-2 field-col">
+                        <label class="form-label">{{ __('Material Total') }}</label>
+                        <div class="input-group input-42">
+                            <input type="number" step="0.01"
+                                   class="form-control readonly-input js-mat-total"
+                                   value="{{ number_format((float) $detail->material_total, 2, '.', '') }}"
+                                   readonly>
+                        </div>
+                    </div>
 
-            <!-- Unit -->
-            <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Unit') }}</label>
-                <div class="input-group input-42">
-                    <input type="text" class="form-control"
-                           name="details[{{ $i }}][unit]"
-                           value="{{ $detail->unit }}">
-                    <button type="button" class="btn btn-outline-secondary mic-btn"
-                            onclick="startDictation(this)">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                </div>
-            </div>
+                    <!-- Labor Total -->
+                    <div class="col-12 col-md-2 field-col">
+                        <label class="form-label">{{ __('Labor Total') }}</label>
+                        <div class="input-group input-42">
+                            <input type="number" step="0.01"
+                                   class="form-control readonly-input js-lab-total"
+                                   value="{{ number_format((float) $detail->labor_total, 2, '.', '') }}"
+                                   readonly>
+                        </div>
+                    </div>
 
-            <!-- Material Price / Unit -->
-            <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Material Price / Unit') }}</label>
-                <div class="input-group input-42">
-                    <input type="number" step="0.01" class="form-control js-mc"
-                           name="details[{{ $i }}][mc_price]"
-                           value="{{ $detail->mc_price }}">
-                </div>
-            </div>
+                    <!-- Grand Total -->
+                    <div class="col-12 col-md-2 field-col">
+                        <label class="form-label">{{ __('Grand Total') }}</label>
+                        <div class="input-group input-42">
+                            <input type="number" step="0.01"
+                                   class="form-control readonly-input js-grand-total"
+                                   value="{{ number_format((float) $detail->grand_total, 2, '.', '') }}"
+                                   readonly>
+                        </div>
+                    </div>
 
-            <!-- Labor Price / Unit -->
-            <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Labor Price / Unit') }}</label>
-                <div class="input-group input-42">
-                    <input type="number" step="0.01" class="form-control js-lc"
-                           name="details[{{ $i }}][lc_price]"
-                           value="{{ $detail->lc_price }}">
                 </div>
+
+                <div class="row pt-2">
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="button" class="btn btn-sm btn-danger remove-row"
+                                onclick="markRowDeleted(this)">&times;</button>
+                    </div>
+                </div>
+
             </div>
         </div>
-
-        {{-- Line 2 (totals, same width as create, aligned right) --}}
-        <div class="row g-3 g-compact align-items-end pt-2 fields-line-2 justify-content-end">
-
-            <!-- Material Total -->
-            <div class="col-12 col-md-2 field-col">
-                <label class="form-label">{{ __('Material Total') }}</label>
-                <div class="input-group input-42">
-                    <input type="number" step="0.01"
-                           class="form-control readonly-input js-mat-total"
-                           value="{{ number_format((float) $detail->material_total, 2, '.', '') }}"
-                           readonly>
-                </div>
-            </div>
-
-            <!-- Labor Total -->
-            <div class="col-12 col-md-2 field-col">
-                <label class="form-label">{{ __('Labor Total') }}</label>
-                <div class="input-group input-42">
-                    <input type="number" step="0.01"
-                           class="form-control readonly-input js-lab-total"
-                           value="{{ number_format((float) $detail->labor_total, 2, '.', '') }}"
-                           readonly>
-                </div>
-            </div>
-
-            <!-- Grand Total -->
-            <div class="col-12 col-md-2 field-col">
-                <label class="form-label">{{ __('Grand Total') }}</label>
-                <div class="input-group input-42">
-                    <input type="number" step="0.01"
-                           class="form-control readonly-input js-grand-total"
-                           value="{{ number_format((float) $detail->grand_total, 2, '.', '') }}"
-                           readonly>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="row pt-2">
-            <div class="col-12 d-flex justify-content-end">
-                <button type="button" class="btn btn-sm btn-danger remove-row"
-                        onclick="markRowDeleted(this)">&times;</button>
-            </div>
-        </div>
-
-    </div>
+        @php $i++; @endphp
+    @endforeach
 </div>
-                        @php $i++; @endphp
-                    @endforeach
-                </div>
 
                 {{-- ===== Actions + Summary (same block as create) ===== --}}
                 <div class="col-lg-12">
@@ -305,36 +317,15 @@
                                         </div>
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-
-                                                {{-- Desktop / big screen: one line --}}
-                                                <span class="d-none d-md-inline">
-                                                    {{ __('Operating + Profit (15%)') }}
-                                                </span>
-
-                                                {{-- Mobile / small screen: two lines --}}
-                                                <span class="d-inline d-md-none">
-                                                    <span class="d-block">{{ __('Operating +') }}</span>
-                                                    <span class="d-block">{{ __('Profit (15%)') }}</span>
-                                                </span>
-
+                                                <span class="d-block">{{ __('Operating +') }}</span>
+                                                <span class="d-block">{{ __('Profit (15%)') }}</span>
                                             </strong>
                                             <span class="ms-2" id="operatingDisplay">0.00</span>
                                         </div>
-
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-
-                                                {{-- Desktop / big screen: one line --}}
-                                                <span class="d-none d-md-inline">
-                                                    {{ __('Category A,B Total') }}
-                                                </span>
-
-                                                {{-- Mobile / small screen: two lines --}}
-                                                <span class="d-inline d-md-none">
-                                                    <span class="d-block">{{ __('Category A,B') }}</span>
-                                                    <span class="d-block">{{ __('Total') }}</span>
-                                                </span>
-
+                                                <span class="d-block">{{ __('Category A,B') }}</span>
+                                                <span class="d-block">{{ __('Total') }}</span>
                                             </strong>
                                             <span class="ms-2" id="abDisplay">0.00</span>
                                         </div>
@@ -364,96 +355,135 @@
         </div>{{-- /xp-contentbar --}}
     </form>
 
-    {{-- Template for new rows (no id) --}}
     <template id="row-template">
-        <div class="card m-b-2 item-row" data-row-index="__INDEX__">
-            <div class="card-header bg-white">
-                <div class="row g-3 g-compact align-items-end">
-                    <input type="hidden" name="details[__INDEX__][id]" value="">
-                    <input type="hidden" name="details[__INDEX__][_delete]" value="0" class="js-delete-flag">
-                    <div class="col-3 col-sm-2 col-md-1 field-col">
-                        <label class="form-label">{{ __('No') }}</label>
-                        <div class="input-group input-42">
-                            <input type="number" class="form-control readonly-input serial" name="details[__INDEX__][no]"
-                                value="__SER__" min="1" readonly>
-                        </div>
-                    </div>
-                    <div class="col-12 col-sm-6 col-md-6 field-col">
-                        <label class="form-label">{{ __('Category') }}</label>
-                        <div class="input-group input-42">
-                            <input type="text" class="form-control" name="details[__INDEX__][category_name]">
-                            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
-                                title="{{ __('Speak') }}">
-                                <i class="fas fa-microphone"></i>
-                            </button>
-                        </div>
-                    </div>
+    <div class="card m-b-2 item-row" data-row-index="__INDEX__">
+        <div class="card-header bg-white">
 
-                    <div class="col-6 col-md-2 field-col">
-                        <label class="form-label">{{ __('Amount') }}</label>
-                        <div class="input-group input-42">
-                            <input type="number" step="0.01" class="form-control js-amount"
-                                name="details[__INDEX__][amount]" placeholder=".00">
-                        </div>
+            <!-- Line 1 -->
+            <div class="row g-3 g-compact align-items-end">
+                <input type="hidden" name="details[__INDEX__][id]" value="">
+                <input type="hidden" name="details[__INDEX__][_delete]" value="0" class="js-delete-flag">
+
+                <!-- No -->
+                <div class="col-3 col-sm-2 col-md-1 field-col">
+                    <label class="form-label">{{ __('No') }}</label>
+                    <div class="input-group input-42">
+                        <input type="number" class="form-control readonly-input serial"
+                               name="details[__INDEX__][no]"
+                               value="__SER__" min="1" readonly>
                     </div>
-                    <div class="col-6 col-md-2 field-col">
-                        <label class="form-label">{{ __('Unit') }}</label>
-                        <div class="input-group input-42">
-                            <input type="text" class="form-control" name="details[__INDEX__][unit]">
-                            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)">
-                                <i class="fas fa-microphone"></i>
-                            </button>
+                </div>
+
+                <!-- Category -->
+                <div class="col-12 col-sm-6 col-md-3 field-col">
+                    <label class="form-label">{{ __('Category') }}</label>
+                    <div class="input-group input-42">
+                        <input type="text" class="form-control"
+                               name="details[__INDEX__][category_name]">
+                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                onclick="startDictation(this)" title="{{ __('Speak') }}">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div class="col-6 col-md-2 field-col">
+                    <label class="form-label">{{ __('Amount') }}</label>
+                    <div class="input-group input-42">
+                        <input type="number" step="0.01"
+                               class="form-control no-negative"
+                               name="details[__INDEX__][amount]" placeholder=".00">
+                        <div class="invalid-feedback">
+                            {{ __('Negative values are not allowed.') }}
                         </div>
                     </div>
                 </div>
 
-                <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
-                    <div class="col-12 col-md field-col">
-                        <label class="form-label">{{ __('Material Price / Unit') }}</label>
-                        <div class="input-group input-42">
-                            <input type="number" step="0.01" class="form-control js-mc" name="details[__INDEX__][mc_price]"
-                                placeholder=".00">
-                        </div>
+                <!-- Unit -->
+                <div class="col-6 col-md-2 field-col">
+                    <label class="form-label">{{ __('Unit') }}</label>
+                    <div class="input-group input-42">
+                        <input type="text" class="form-control"
+                               name="details[__INDEX__][unit]">
+                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                onclick="startDictation(this)">
+                            <i class="fas fa-microphone"></i>
+                        </button>
                     </div>
-                    <div class="col-12 col-md field-col">
-                        <label class="form-label">{{ __('Material Total') }}</label>
-                        <div class="input-group input-42">
-                            <input type="number" step="0.01" class="form-control readonly-input js-mat-total" value="0.00"
-                                readonly>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md field-col">
-                        <label class="form-label">{{ __('Labor Price / Unit') }}</label>
-                        <div class="input-group input-42">
-                            <input type="number" step="0.01" class="form-control js-lc" name="details[__INDEX__][lc_price]"
-                                placeholder=".00">
-                        </div>
-                    </div>
-                    <div class="col-12 col-md field-col">
-                        <label class="form-label">{{ __('Labor Total') }}</label>
-                        <div class="input-group input-42">
-                            <input type="number" step="0.01" class="form-control readonly-input js-lab-total" value="0.00"
-                                readonly>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md field-col">
-                        <label class="form-label">{{ __('Grand Total') }}</label>
-                        <div class="input-group input-42">
-                            <input type="number" step="0.01" class="form-control readonly-input js-grand-total" value="0.00"
-                                readonly>
+                </div>
+
+                <!-- Material Price / Unit -->
+                <div class="col-6 col-md-2 field-col">
+                    <label class="form-label">{{ __('Material Price / Unit') }}</label>
+                    <div class="input-group input-42">
+                        <input type="number" step="0.01"
+                               class="form-control no-negative"
+                               name="details[__INDEX__][mc_price]" placeholder=".00">
+                        <div class="invalid-feedback">
+                            {{ __('Negative values are not allowed.') }}
                         </div>
                     </div>
                 </div>
 
-                <div class="row pt-2">
-                    <div class="col-12 d-flex justify-content-end">
-                        <button type="button" class="btn btn-sm btn-danger remove-row"
-                            onclick="markRowDeleted(this)">&times;</button>
+                <!-- Labor Price / Unit -->
+                <div class="col-6 col-md-2 field-col">
+                    <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+                    <div class="input-group input-42">
+                        <input type="number" step="0.01"
+                               class="form-control no-negative"
+                               name="details[__INDEX__][lc_price]" placeholder=".00">
+                        <div class="invalid-feedback">
+                            {{ __('Negative values are not allowed.') }}
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Line 2 -->
+            <div class="row g-3 g-compact align-items-end pt-2 fields-line-2 justify-content-end">
+
+                <!-- Material Total -->
+                <div class="col-12 col-md-2 field-col">
+                    <label class="form-label">{{ __('Material Total') }}</label>
+                    <div class="input-group input-42">
+                        <input type="number" step="0.01"
+                               class="form-control readonly-input js-mat-total"
+                               value="0.00" readonly>
+                    </div>
+                </div>
+
+                <!-- Labor Total -->
+                <div class="col-12 col-md-2 field-col">
+                    <label class="form-label">{{ __('Labor Total') }}</label>
+                    <div class="input-group input-42">
+                        <input type="number" step="0.01"
+                               class="form-control readonly-input js-lab-total"
+                               value="0.00" readonly>
+                    </div>
+                </div>
+
+                <!-- Grand Total -->
+                <div class="col-12 col-md-2 field-col">
+                    <label class="form-label">{{ __('Grand Total') }}</label>
+                    <div class="input-group input-42">
+                        <input type="number" step="0.01"
+                               class="form-control readonly-input js-grand-total"
+                               value="0.00" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row pt-2">
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="button" class="btn btn-sm btn-danger remove-row"
+                            onclick="markRowDeleted(this)">&times;</button>
+                </div>
+            </div>
+
         </div>
-    </template>
+    </div>
+</template>
 @endsection
 
 @push('scripts')

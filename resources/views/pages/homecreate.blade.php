@@ -155,8 +155,12 @@
     <div class="col-6 col-md-2 field-col">
         <label class="form-label">{{ __('Amount') }}</label>
         <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control"
-                   name="details[0][amount]" placeholder=".00" required>
+            <input type="number" step="0.01"
+                class="form-control no-negative"
+                name="details[0][amount]" placeholder=".00" required>
+            <div class="invalid-feedback">
+                {{ __('Negative values are not allowed.') }}
+            </div>
         </div>
     </div>
 
@@ -177,8 +181,12 @@
     <div class="col-6 col-md-2 field-col">
         <label class="form-label">{{ __('Material Price / Unit') }}</label>
         <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control"
-                   name="details[0][mc_price]" placeholder=".00" required>
+            <input type="number" step="0.01"
+                class="form-control no-negative"
+                name="details[0][mc_price]" placeholder=".00" required>
+            <div class="invalid-feedback">
+                {{ __('Negative values are not allowed.') }}
+            </div>
         </div>
     </div>
 
@@ -186,8 +194,12 @@
     <div class="col-6 col-md-2 field-col">
         <label class="form-label">{{ __('Labor Price / Unit') }}</label>
         <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control"
-                   name="details[0][lc_price]" placeholder=".00" required>
+            <input type="number" step="0.01"
+                class="form-control no-negative"
+                name="details[0][lc_price]" placeholder=".00" required>
+            <div class="invalid-feedback">
+                {{ __('Negative values are not allowed.') }}
+            </div>
         </div>
     </div>
 

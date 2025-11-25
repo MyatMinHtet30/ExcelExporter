@@ -233,10 +233,35 @@ document.addEventListener('click', function (e) {
 });
 
   // ====== Totals recalc on inputs ======
+    // ====== Totals recalc on inputs + no-negative enforcement ======
   rowsContainer.addEventListener('input', function (e) {
-    if (e.target.matches('input[name*="[amount]"], input[name*="[mc_price]"], input[name*="[lc_price]"]')) {
-      const row = e.target.closest('.item-row');
-      if (row) { calcRow(row); recalcSummary(); }
+    const target = e.target;
+
+    // 1) Enforce no negative numbers
+    if (target.matches('input.no-negative')) {
+      let val = target.value || '';
+
+      // Strip any "-" that got in (paste, etc.)
+      if (val.includes('-')) {
+        val = val.replace(/-/g, '');
+        target.value = val;
+        target.classList.add('is-invalid');
+      } else if (val !== '' && parseFloat(val) < 0) {
+        target.value = Math.abs(parseFloat(val)).toString();
+        target.classList.add('is-invalid');
+      } else {
+        // OK value => clear error
+        target.classList.remove('is-invalid');
+      }
+    }
+
+    // 2) Existing totals logic
+    if (target.matches('input[name*="[amount]"], input[name*="[mc_price]"], input[name*="[lc_price]"]')) {
+      const row = target.closest('.item-row');
+      if (row) {
+        calcRow(row);
+        recalcSummary();
+      }
     }
   });
 
@@ -245,6 +270,25 @@ document.addEventListener('click', function (e) {
     reindexRows();
   });
   mo.observe(rowsContainer, { childList: true });
+
+    // ====== Block negative values on .no-negative inputs ======
+  // ====== Block negative values on .no-negative inputs ======
+document.addEventListener('keydown', function (e) {
+  const target = e.target;
+  if (!target.matches('input.no-negative')) return;
+
+  // Block "-", "+", and "e" (scientific notation)
+  if (e.key === '-' || e.key === '+' || e.key.toLowerCase() === 'e') {
+    e.preventDefault();
+    target.classList.add('is-invalid');
+
+    // 🔹 also add has-error to this row so spacing appears immediately
+    const row = target.closest('.item-row');
+    if (row) {
+      row.classList.add('has-error');
+    }
+  }
+});
 
   // ====== Number formatting (.number-input) ======
   function formatNumberInput(input) {
@@ -301,6 +345,19 @@ document.addEventListener('click', function (e) {
       if (spoof && spoofWasDisabled) spoof.disabled = false;
     });
   }
+
+  document.addEventListener('input', function (e) {
+    if (!e.target.closest('.item-row')) return;
+
+    const row = e.target.closest('.item-row');
+    const hasError = row.querySelector('.form-control.is-invalid');
+
+    if (hasError) {
+        row.classList.add('has-error');
+    } else {
+        row.classList.remove('has-error');
+    }
+});
 
   // ====== Add buttons ======
   addBtns.forEach(btn => btn.addEventListener('click', addRow));
