@@ -330,6 +330,124 @@ class HomeController extends Controller
         ]);
     }
 
+        public function exportPdf(Home $home)
+    {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
+        // Load details ordered by "no" like edit()
+        $home->load(['details' => fn ($q) => $q->orderBy('no')]);
+
+        // Build rows similar to preview(), but from DB
+        $rows = $home->details->map(function (HomeDetail $d) {
+            $amt = (float)($d->amount ?? 0);
+            $mc  = (float)($d->mc_price ?? 0);
+            $lc  = (float)($d->lc_price ?? 0);
+
+            $mat   = $d->material_total ?? round($amt * $mc, 2);
+            $lab   = $d->labor_total   ?? round($amt * $lc, 2);
+            $grand = $d->grand_total   ?? round($mat + $lab, 2);
+
+            return [
+                'no'           => $d->no,
+                'category_name'=> $d->category_name ?? '',
+                'item_name'    => $d->item_name ?? '',
+                'amount'       => $amt,
+                'unit'         => $d->unit ?? '',
+                'mc_price'     => $mc,
+                'lc_price'     => $lc,
+                'mat_total'    => $mat,
+                'lab_total'    => $lab,
+                'grand_total'  => $grand,
+            ];
+        });
+
+        // Totals – same logic as preview()
+        $misc  = $rows->sum('grand_total');
+        $op    = round($misc * 0.15, 2);
+        $ab    = round($misc + $op, 2);
+        $vat   = round($ab * 0.07, 2);
+        $final = round($ab + $vat, 2);
+
+        // Use updated_at / created_at like preview
+        $previewDate = $home->updated_at
+            ?? $home->created_at
+            ?? now();
+
+        return view('pages.homepreview', [
+            'project_name' => $home->project_name,
+            'dear'         => $home->dear,
+            'list_name'    => $home->list_name,
+            'house_no'     => $home->house_no,
+            'trooper'      => $home->trooper,
+            'rows'         => $rows,
+            'miscTotal'    => $misc,
+            'operating'    => $op,
+            'abTotal'      => $ab,
+            'vat'          => $vat,
+            'finalTotal'   => $final,
+            'date'         => $previewDate->format('d/m/Y'),
+
+            'autoDownload' => 'pdf',
+        ]);
+    }
+
+    public function exportExcel(Home $home)
+    {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
+        $home->load(['details' => fn ($q) => $q->orderBy('no')]);
+
+        $rows = $home->details->map(function (HomeDetail $d) {
+            $amt = (float)($d->amount ?? 0);
+            $mc  = (float)($d->mc_price ?? 0);
+            $lc  = (float)($d->lc_price ?? 0);
+
+            $mat   = $d->material_total ?? round($amt * $mc, 2);
+            $lab   = $d->labor_total   ?? round($amt * $lc, 2);
+            $grand = $d->grand_total   ?? round($mat + $lab, 2);
+
+            return [
+                'no'           => $d->no,
+                'category_name'=> $d->category_name ?? '',
+                'item_name'    => $d->item_name ?? '',
+                'amount'       => $amt,
+                'unit'         => $d->unit ?? '',
+                'mc_price'     => $mc,
+                'lc_price'     => $lc,
+                'mat_total'    => $mat,
+                'lab_total'    => $lab,
+                'grand_total'  => $grand,
+            ];
+        });
+
+        $misc  = $rows->sum('grand_total');
+        $op    = round($misc * 0.15, 2);
+        $ab    = round($misc + $op, 2);
+        $vat   = round($ab * 0.07, 2);
+        $final = round($ab + $vat, 2);
+
+        $previewDate = $home->updated_at
+            ?? $home->created_at
+            ?? now();
+
+        return view('pages.homepreview', [
+            'project_name' => $home->project_name,
+            'dear'         => $home->dear,
+            'list_name'    => $home->list_name,
+            'house_no'     => $home->house_no,
+            'trooper'      => $home->trooper,
+            'rows'         => $rows,
+            'miscTotal'    => $misc,
+            'operating'    => $op,
+            'abTotal'      => $ab,
+            'vat'          => $vat,
+            'finalTotal'   => $final,
+            'date'         => $previewDate->format('d/m/Y'),
+
+            'autoDownload' => 'excel',
+        ]);
+    }
+
     /** Shared validation */
     private function validated(Request $request): array
     {
