@@ -7,6 +7,7 @@ use App\Models\Home;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use Carbon\Carbon;
 
 class HomeController extends Controller
 {
@@ -85,7 +86,8 @@ class HomeController extends Controller
             }
         });
 
-        return redirect()->route('home')->with('success', __('Saved successfully.'));
+        return redirect()->route('home')
+            ->with('success', __('Saved successfully.'));
     }
 
     /** Edit form */
@@ -232,19 +234,24 @@ class HomeController extends Controller
 
     public function preview(Request $request)
     {
-        // Validate incoming fields from both Create and Edit forms
+        // If coming from edit, we'll receive home_id
+        $home = null;
+        if ($request->filled('home_id')) {
+            $home = Home::find($request->home_id);
+        }
+
+        // ✅ You don't really need 'date' from request anymore, so you can remove it
         $data = $request->validate([
             'project_name' => ['nullable','string','max:255'],
             'dear'         => ['nullable','string','max:255'],
             'list_name'    => ['nullable','string','max:255'],
             'house_no'     => ['nullable','string','max:255'],
             'trooper'      => ['nullable','string','max:255'],
-            'date'         => ['nullable','date'],
+            // 'date'      => ['nullable','date'],  // <-- can be removed
 
-            // details
             'details'                 => ['required','array','min:1'],
             'details.*.id'            => ['nullable','integer'],
-            'details.*._delete'       => ['nullable','boolean'],   // ← from Edit
+            'details.*._delete'       => ['nullable','boolean'],
             'details.*.no'            => ['nullable','integer','min:1'],
             'details.*.category_name' => ['nullable','string','max:255'],
             'details.*.item_name'     => ['nullable','string','max:255'],
@@ -254,13 +261,11 @@ class HomeController extends Controller
             'details.*.lc_price'      => ['nullable','numeric','min:0'],
         ]);
 
-        // Build rows: skip deleted and empty
+        // === your existing rows building logic ===
         $rows = collect($data['details'])
             ->filter(function ($r) {
-                // remove rows toggled for deletion in Edit
                 if (!empty($r['_delete'])) return false;
 
-                // consider empty if no name and all numbers are zero/empty
                 $hasName = trim($r['category_name'] ?? '') !== '';
                 $amt = (float)($r['amount'] ?? 0);
                 $mc  = (float)($r['mc_price'] ?? 0);
@@ -290,12 +295,23 @@ class HomeController extends Controller
                 ];
             });
 
-        // Totals
-        $misc = $rows->sum('grand_total');
-        $op   = round($misc * 0.15, 2);
-        $ab   = round($misc + $op, 2);
-        $vat  = round($ab * 0.07, 2);
-        $final= round($ab + $vat, 2);
+        // Totals (unchanged)
+        $misc  = $rows->sum('grand_total');
+        $op    = round($misc * 0.15, 2);
+        $ab    = round($misc + $op, 2);
+        $vat   = round($ab * 0.07, 2);
+        $final = round($ab + $vat, 2);
+
+        // - If editing existing home → updated_at > created_at > today
+        if ($home) {
+            // EDIT PAGE → show updated_at if exists, else created_at
+            $previewDate = $home->updated_at
+                ?? $home->created_at
+                ?? now();
+        } else {
+            // CREATE PAGE → always show today's date
+            $previewDate = now();
+        }
 
         return view('pages.homepreview', [
             'project_name' => $data['project_name'] ?? '',
@@ -309,9 +325,8 @@ class HomeController extends Controller
             'abTotal'      => $ab,
             'vat'          => $vat,
             'finalTotal'   => $final,
-            'date'         => !empty($data['date'])
-                ? \Carbon\Carbon::parse($data['date'])->format('m-d-y')
-                : '',
+
+            'date'         => $previewDate->format('d/m/Y'),
         ]);
     }
 

@@ -105,6 +105,11 @@
     }
 }
 
+/* Center the number inside the No input */
+.serial {
+    text-align: center;
+}
+
 
 /* ---------- Keep Generate bottom left ---------- */
 .left-controls {

@@ -19,6 +19,8 @@
         @csrf
         @method('PUT')
 
+        <input type="hidden" name="home_id" value="{{ $home->id }}">
+
         <div id="deleted-bin"></div>
 
         <div class="xp-contentbar">
@@ -138,126 +140,134 @@
                     </div>
                 </div>
 
-                <div class="col-lg-4 col-md-4 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Date') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="date" class="form-control" name="date" id="date"
-                                            value="{{ old('date', $home->date?->format('Y-m-d')) }}" required>
-                                        @error('date') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {{-- ===== Existing Details ===== --}}
                 <div id="rows-container" class="col-12">
                     @php $i = 0; @endphp
                     @foreach($home->details as $detail)
                         <div class="card m-b-2 item-row" data-row-index="{{ $i }}">
-                            <div class="card-header bg-white">
-                                {{-- line 1 --}}
-                                <div class="row g-3 g-compact align-items-end">
-                                    <input type="hidden" name="details[{{ $i }}][id]" value="{{ $detail->id }}">
-                                    <input type="hidden" name="details[{{ $i }}][_delete]" value="0" class="js-delete-flag">
+    <div class="card-header bg-white">
 
-                                    <div class="col-3 col-sm-2 col-md-1 field-col">
-                                        <label class="form-label">{{ __('No') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="number" class="form-control readonly-input serial"
-                                                name="details[{{ $i }}][no]" value="{{ $detail->no }}" min="1" readonly>
-                                        </div>
-                                    </div>
+        {{-- Line 1 --}}
+        <div class="row g-3 g-compact align-items-end">
+            <input type="hidden" name="details[{{ $i }}][id]" value="{{ $detail->id }}">
+            <input type="hidden" name="details[{{ $i }}][_delete]" value="0" class="js-delete-flag">
 
-                                    <div class="col-12 col-sm-6 col-md-6 field-col">
-                                        <label class="form-label">{{ __('Category') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="text" class="form-control" name="details[{{ $i }}][category_name]"
-                                                value="{{ $detail->category_name }}">
-                                            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)"
-                                                title="{{ __('Speak') }}">
-                                                <i class="fas fa-microphone"></i>
-                                            </button>
-                                        </div>
-                                    </div>
+            <!-- No -->
+            <div class="col-3 col-sm-2 col-md-1 field-col">
+                <label class="form-label">{{ __('No') }}</label>
+                <div class="input-group input-42">
+                    <input type="number" class="form-control readonly-input serial"
+                           name="details[{{ $i }}][no]"
+                           value="{{ $detail->no }}" min="1" readonly>
+                </div>
+            </div>
 
-                                    <div class="col-6 col-md-2 field-col">
-                                        <label class="form-label">{{ __('Amount') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="number" step="0.01" class="form-control js-amount"
-                                                name="details[{{ $i }}][amount]" value="{{ $detail->amount }}">
-                                        </div>
-                                    </div>
+            <!-- Category -->
+            <div class="col-12 col-sm-6 col-md-3 field-col">
+                <label class="form-label">{{ __('Category') }}</label>
+                <div class="input-group input-42">
+                    <input type="text" class="form-control"
+                           name="details[{{ $i }}][category_name]"
+                           value="{{ $detail->category_name }}">
+                    <button type="button" class="btn btn-outline-secondary mic-btn"
+                            onclick="startDictation(this)">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
 
-                                    <div class="col-6 col-md-2 field-col">
-                                        <label class="form-label">{{ __('Unit') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="text" class="form-control" name="details[{{ $i }}][unit]"
-                                                value="{{ $detail->unit }}">
-                                            <button type="button" class="btn btn-outline-secondary mic-btn"
-                                                onclick="startDictation(this)">
-                                                <i class="fas fa-microphone"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
+            <!-- Amount -->
+            <div class="col-6 col-md-2 field-col">
+                <label class="form-label">{{ __('Amount') }}</label>
+                <div class="input-group input-42">
+                    <input type="number" step="0.01" class="form-control js-amount"
+                           name="details[{{ $i }}][amount]"
+                           value="{{ $detail->amount }}">
+                </div>
+            </div>
 
-                                {{-- line 2 --}}
-                                <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
-                                    <div class="col-12 col-md field-col">
-                                        <label class="form-label">{{ __('Material Price / Unit') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="number" step="0.01" class="form-control js-mc"
-                                                name="details[{{ $i }}][mc_price]" value="{{ $detail->mc_price }}">
-                                        </div>
-                                    </div>
+            <!-- Unit -->
+            <div class="col-6 col-md-2 field-col">
+                <label class="form-label">{{ __('Unit') }}</label>
+                <div class="input-group input-42">
+                    <input type="text" class="form-control"
+                           name="details[{{ $i }}][unit]"
+                           value="{{ $detail->unit }}">
+                    <button type="button" class="btn btn-outline-secondary mic-btn"
+                            onclick="startDictation(this)">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
 
-                                    <div class="col-12 col-md field-col">
-                                        <label class="form-label">{{ __('Material Total') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="number" step="0.01" class="form-control readonly-input js-mat-total"
-                                                value="{{ number_format((float) $detail->material_total, 2, '.', '') }}"
-                                                readonly>
-                                        </div>
-                                    </div>
+            <!-- Material Price / Unit -->
+            <div class="col-6 col-md-2 field-col">
+                <label class="form-label">{{ __('Material Price / Unit') }}</label>
+                <div class="input-group input-42">
+                    <input type="number" step="0.01" class="form-control js-mc"
+                           name="details[{{ $i }}][mc_price]"
+                           value="{{ $detail->mc_price }}">
+                </div>
+            </div>
 
-                                    <div class="col-12 col-md field-col">
-                                        <label class="form-label">{{ __('Labor Price / Unit') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="number" step="0.01" class="form-control js-lc"
-                                                name="details[{{ $i }}][lc_price]" value="{{ $detail->lc_price }}">
-                                        </div>
-                                    </div>
+            <!-- Labor Price / Unit -->
+            <div class="col-6 col-md-2 field-col">
+                <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+                <div class="input-group input-42">
+                    <input type="number" step="0.01" class="form-control js-lc"
+                           name="details[{{ $i }}][lc_price]"
+                           value="{{ $detail->lc_price }}">
+                </div>
+            </div>
+        </div>
 
-                                    <div class="col-12 col-md field-col">
-                                        <label class="form-label">{{ __('Labor Total') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="number" step="0.01" class="form-control readonly-input js-lab-total"
-                                                value="{{ number_format((float) $detail->labor_total, 2, '.', '') }}" readonly>
-                                        </div>
-                                    </div>
+        {{-- Line 2 (totals, same width as create, aligned right) --}}
+        <div class="row g-3 g-compact align-items-end pt-2 fields-line-2 justify-content-end">
 
-                                    <div class="col-12 col-md field-col">
-                                        <label class="form-label">{{ __('Grand Total') }}</label>
-                                        <div class="input-group input-42">
-                                            <input type="number" step="0.01" class="form-control readonly-input js-grand-total"
-                                                value="{{ number_format((float) $detail->grand_total, 2, '.', '') }}" readonly>
-                                        </div>
-                                    </div>
-                                </div>
+            <!-- Material Total -->
+            <div class="col-12 col-md-2 field-col">
+                <label class="form-label">{{ __('Material Total') }}</label>
+                <div class="input-group input-42">
+                    <input type="number" step="0.01"
+                           class="form-control readonly-input js-mat-total"
+                           value="{{ number_format((float) $detail->material_total, 2, '.', '') }}"
+                           readonly>
+                </div>
+            </div>
 
-                                <div class="row pt-2">
-                                    <div class="col-12 d-flex justify-content-end">
-                                        <button type="button" class="btn btn-sm btn-danger remove-row">&times;</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Labor Total -->
+            <div class="col-12 col-md-2 field-col">
+                <label class="form-label">{{ __('Labor Total') }}</label>
+                <div class="input-group input-42">
+                    <input type="number" step="0.01"
+                           class="form-control readonly-input js-lab-total"
+                           value="{{ number_format((float) $detail->labor_total, 2, '.', '') }}"
+                           readonly>
+                </div>
+            </div>
+
+            <!-- Grand Total -->
+            <div class="col-12 col-md-2 field-col">
+                <label class="form-label">{{ __('Grand Total') }}</label>
+                <div class="input-group input-42">
+                    <input type="number" step="0.01"
+                           class="form-control readonly-input js-grand-total"
+                           value="{{ number_format((float) $detail->grand_total, 2, '.', '') }}"
+                           readonly>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row pt-2">
+            <div class="col-12 d-flex justify-content-end">
+                <button type="button" class="btn btn-sm btn-danger remove-row"
+                        onclick="markRowDeleted(this)">&times;</button>
+            </div>
+        </div>
+
+    </div>
+</div>
                         @php $i++; @endphp
                     @endforeach
                 </div>
