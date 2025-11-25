@@ -9,7 +9,7 @@
 @endpush
 
 @section('content')
-    <form action="{{ route('home.store') }}" method="POST">
+    <form id="home-form" action="{{ route('home.store') }}" method="POST" novalidate>
         @csrf
         <div class="xp-contentbar">
             <div class="row">
@@ -23,7 +23,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="project_name" id="project_name"
-                                            placeholder="{{ __('Enter project name') }}" value="{{ old('project_name') }}" required>
+                                            placeholder="{{ __('Enter project name') }}" value="{{ old('project_name') }}" required
+                                            data-error-required="{{ __('Project name is required') }}">
                                         @error('project_name') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
@@ -44,7 +45,7 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="dear" id="dear" placeholder="{{ __('Enter recipient name') }}"
-                                            value="{{ old('dear') }}" required>
+                                            value="{{ old('dear') }}" nullable>
                                         @error('dear') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
@@ -65,7 +66,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="list_name" id="list_name" placeholder="{{ __('Enter list name') }}"
-                                            value="{{ old('list_name') }}" required>
+                                            value="{{ old('list_name') }}" required
+                                            data-error-required="{{ __('List name is required') }}">
                                         @error('list_name') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
@@ -86,7 +88,7 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="house_no" id="house_no" placeholder="{{ __('Enter house no.') }}"
-                                            value="{{ old('house_no') }}" required>
+                                            value="{{ old('house_no') }}" nullable>
                                         @error('house_no') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
@@ -107,8 +109,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="trooper" id="trooper" placeholder="{{ __('Enter trooper') }}"
-                                            value="{{ old('trooper') }}" required>
-                                        @error('trooper') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
+                                            value="{{ old('trooper') }}" required
+                                            data-error-required="{{ __('Trooper is required') }}">
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
@@ -126,107 +128,115 @@
                         <div class="card-header bg-white">
 
                            <!-- Line 1 -->
-<div class="row g-3 g-compact align-items-end">
+                            <div class="row g-3 g-compact align-items-start">
 
-    <!-- No -->
-    <div class="col-3 col-sm-2 col-md-1 field-col">
-        <label class="form-label">{{ __('No') }}</label>
-        <div class="input-group input-42">
-            <input type="number" class="form-control readonly-input serial"
-                   name="details[0][no]" value="1" min="1" readonly>
-        </div>
-    </div>
+                                <!-- No -->
+                                <div class="col-3 col-sm-2 col-md-1 field-col">
+                                    <label class="form-label">{{ __('No') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="number" class="form-control readonly-input serial"
+                                            name="details[0][no]" value="1" min="1" readonly>
+                                    </div>
+                                </div>
 
-    <!-- Category -->
-    <div class="col-12 col-sm-6 col-md-3 field-col">
-        <label class="form-label">{{ __('Category') }}</label>
-        <div class="input-group input-42">
-            <input type="text" class="form-control"
-                   name="details[0][category_name]"
-                   placeholder="{{ __('Category A / B / ...') }}">
-            <button type="button" class="btn btn-outline-secondary mic-btn"
-                    onclick="startDictation(this)">
-                <i class="fas fa-microphone"></i>
-            </button>
-        </div>
-    </div>
+                                <!-- Category -->
+                                <div class="col-12 col-sm-6 col-md-3 field-col">
+                                    <label class="form-label">{{ __('Category') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="text" class="form-control"
+                                            name="details[0][category_name]"
+                                            placeholder="{{ __('Category A / B / ...') }}" required
+                                            data-error-required="{{ __('Category is required') }}">
+                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                                onclick="startDictation(this)">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
-    <!-- Amount -->
-    <div class="col-6 col-md-2 field-col">
-        <label class="form-label">{{ __('Amount') }}</label>
-        <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control"
-                   name="details[0][amount]" placeholder=".00" required>
-        </div>
-    </div>
+                                <!-- Amount -->
+                                <div class="col-6 col-md-2 field-col">
+                                    <label class="form-label">{{ __('Amount') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="number" step="0.01" class="form-control"
+                                            name="details[0][amount]" placeholder=".00" required
+                                            data-error-required="{{ __('Amount is required') }}"
+                                            data-error-number="{{ __('Please enter number only') }}">
+                                    </div>
+                                </div>
 
-    <!-- Unit -->
-    <div class="col-6 col-md-2 field-col">
-        <label class="form-label">{{ __('Unit') }}</label>
-        <div class="input-group input-42">
-            <input type="text" class="form-control"
-                   name="details[0][unit]" placeholder="{{ __('Unit') }}" required>
-            <button type="button" class="btn btn-outline-secondary mic-btn"
-                    onclick="startDictation(this)">
-                <i class="fas fa-microphone"></i>
-            </button>
-        </div>
-    </div>
+                                <!-- Unit -->
+                                <div class="col-6 col-md-2 field-col">
+                                    <label class="form-label">{{ __('Unit') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="text" class="form-control"
+                                            name="details[0][unit]" placeholder="{{ __('Unit') }}" required
+                                            data-error-required="{{ __('Unit is required') }}">
+                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                                onclick="startDictation(this)">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
 
-    <!-- Material Price / Unit -->
-    <div class="col-6 col-md-2 field-col">
-        <label class="form-label">{{ __('Material Price / Unit') }}</label>
-        <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control"
-                   name="details[0][mc_price]" placeholder=".00" required>
-        </div>
-    </div>
+                                <!-- Material Price / Unit -->
+                                <div class="col-6 col-md-2 field-col">
+                                    <label class="form-label">{{ __('Material Price / Unit') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="number" step="0.01" class="form-control"
+                                            name="details[0][mc_price]" placeholder=".00" required
+                                            data-error-required="{{ __('Material price per unit is required') }}"
+                                            data-error-number="{{ __('Please enter number only') }}">
+                                    </div>
+                                </div>
 
-    <!-- Labor Price / Unit -->
-    <div class="col-6 col-md-2 field-col">
-        <label class="form-label">{{ __('Labor Price / Unit') }}</label>
-        <div class="input-group input-42">
-            <input type="number" step="0.01" class="form-control"
-                   name="details[0][lc_price]" placeholder=".00" required>
-        </div>
-    </div>
+                                <!-- Labor Price / Unit -->
+                                <div class="col-6 col-md-2 field-col">
+                                    <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="number" step="0.01" class="form-control"
+                                            name="details[0][lc_price]" placeholder=".00" required
+                                            data-error-required="{{ __('Labor price per unit is required') }}"
+                                            data-error-number="{{ __('Please enter number only') }}">
+                                    </div>
+                                </div>
 
-</div>
+                            </div>
 
-<!-- Line 2 -->
-<div class="row g-3 g-compact align-items-end pt-2 fields-line-2 justify-content-end">
+                            <!-- Line 2 -->
+                            <div class="row g-3 g-compact align-items-end pt-2 fields-line-2 justify-content-end">
 
-    <!-- Material Total -->
-    <div class="col-12 col-md-2 field-col">
-        <label class="form-label">{{ __('Material Total') }}</label>
-        <div class="input-group input-42">
-            <input type="number" step="0.01"
-                   class="form-control readonly-input js-mat-total"
-                   placeholder="0.00" readonly>
-        </div>
-    </div>
+                                <!-- Material Total -->
+                                <div class="col-12 col-md-2 field-col">
+                                    <label class="form-label">{{ __('Material Total') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="number" step="0.01"
+                                            class="form-control readonly-input js-mat-total"
+                                            placeholder="0.00" readonly>
+                                    </div>
+                                </div>
 
-    <!-- Labor Total -->
-    <div class="col-12 col-md-2 field-col">
-        <label class="form-label">{{ __('Labor Total') }}</label>
-        <div class="input-group input-42">
-            <input type="number" step="0.01"
-                   class="form-control readonly-input js-lab-total"
-                   placeholder="0.00" readonly>
-        </div>
-    </div>
+                                <!-- Labor Total -->
+                                <div class="col-12 col-md-2 field-col">
+                                    <label class="form-label">{{ __('Labor Total') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="number" step="0.01"
+                                            class="form-control readonly-input js-lab-total"
+                                            placeholder="0.00" readonly>
+                                    </div>
+                                </div>
 
-    <!-- Grand Total -->
-    <div class="col-12 col-md-2 field-col">
-        <label class="form-label">{{ __('Grand Total') }}</label>
-        <div class="input-group input-42">
-            <input type="number" step="0.01"
-                   class="form-control readonly-input js-grand-total"
-                   placeholder="0.00" readonly>
-        </div>
-    </div>
+                                <!-- Grand Total -->
+                                <div class="col-12 col-md-2 field-col">
+                                    <label class="form-label">{{ __('Grand Total') }}</label>
+                                    <div class="input-group input-42">
+                                        <input type="number" step="0.01"
+                                            class="form-control readonly-input js-grand-total"
+                                            placeholder="0.00" readonly>
+                                    </div>
+                                </div>
 
-</div>
+                            </div>
                             <div class="row pt-2">
                                 <div class="col-12 d-flex justify-content-end">
                                     <button type="button" class="btn btn-sm btn-danger remove-row">&times;</button>
@@ -337,5 +347,7 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
+<script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
+<script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
+
 @endpush

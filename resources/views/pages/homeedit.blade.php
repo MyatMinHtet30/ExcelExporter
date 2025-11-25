@@ -15,7 +15,7 @@
 @endpush
 
 @section('content')
-    <form action="{{ route('home.update', $home) }}" method="POST" data-preview-action="{{ route('home.preview') }}">
+    <form id="home-form" action="{{ route('home.update', $home) }}" method="POST" data-preview-action="{{ route('home.preview') }}" novalidate>
         @csrf
         @method('PUT')
 
@@ -35,7 +35,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="project_name" id="project_name"
-                                            value="{{ old('project_name', $home->project_name) }}" required>
+                                            value="{{ old('project_name', $home->project_name) }}" required
+                                            data-error-required="{{ __('Project name is required') }}">
                                         @error('project_name')<small
                                         class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
@@ -58,7 +59,7 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="dear" id="dear"
-                                            value="{{ old('dear', $home->dear) }}" required>
+                                            value="{{ old('dear', $home->dear) }}" nullable>
                                         @error('dear')<small
                                         class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
@@ -81,7 +82,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="list_name" id="list_name"
-                                            value="{{ old('list_name', $home->list_name) }}" required>
+                                            value="{{ old('list_name', $home->list_name) }}" required
+                                            data-error-required="{{ __('List name is required') }}">
                                         @error('list_name')<small
                                         class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
@@ -104,7 +106,7 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="house_no" id="house_no"
-                                            value="{{ old('house_no', $home->house_no) }}" required>
+                                            value="{{ old('house_no', $home->house_no) }}">
                                         @error('house_no')<small
                                         class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
@@ -126,7 +128,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="trooper" id="trooper"
-                                            value="{{ old('trooper', $home->trooper) }}" required>
+                                            value="{{ old('trooper', $home->trooper) }}" required
+                                            data-error-required="{{ __('Trooper is required') }}">
                                         @error('trooper')<small
                                         class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
@@ -148,7 +151,7 @@
     <div class="card-header bg-white">
 
         {{-- Line 1 --}}
-        <div class="row g-3 g-compact align-items-end">
+        <div class="row g-3 g-compact align-items-start">
             <input type="hidden" name="details[{{ $i }}][id]" value="{{ $detail->id }}">
             <input type="hidden" name="details[{{ $i }}][_delete]" value="0" class="js-delete-flag">
 
@@ -168,7 +171,8 @@
                 <div class="input-group input-42">
                     <input type="text" class="form-control"
                            name="details[{{ $i }}][category_name]"
-                           value="{{ $detail->category_name }}">
+                           value="{{ $detail->category_name }}" required
+                           data-error-required="{{ __('Category is required') }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn"
                             onclick="startDictation(this)">
                         <i class="fas fa-microphone"></i>
@@ -182,7 +186,8 @@
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-amount"
                            name="details[{{ $i }}][amount]"
-                           value="{{ $detail->amount }}">
+                           value="{{ $detail->amount }}" required
+                           data-error-required="{{ __('Amount is required') }}">
                 </div>
             </div>
 
@@ -192,7 +197,8 @@
                 <div class="input-group input-42">
                     <input type="text" class="form-control"
                            name="details[{{ $i }}][unit]"
-                           value="{{ $detail->unit }}">
+                           value="{{ $detail->unit }}" required
+                           data-error-required="{{ __('Unit is required') }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn"
                             onclick="startDictation(this)">
                         <i class="fas fa-microphone"></i>
@@ -206,7 +212,8 @@
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-mc"
                            name="details[{{ $i }}][mc_price]"
-                           value="{{ $detail->mc_price }}">
+                           value="{{ $detail->mc_price }}"
+                           data-error-number="{{ __('Please enter number only') }}">
                 </div>
             </div>
 
@@ -216,7 +223,8 @@
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-lc"
                            name="details[{{ $i }}][lc_price]"
-                           value="{{ $detail->lc_price }}">
+                           value="{{ $detail->lc_price }}"
+                           data-error-number="{{ __('Please enter number only') }}">
                 </div>
             </div>
         </div>
@@ -436,5 +444,6 @@
 @endsection
 
 @push('scripts')
+    <script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
     <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
 @endpush

@@ -17,6 +17,17 @@
   const rowsContainer = $('#rows-container');
   if (!rowsContainer) return;
 
+  const homeForm = document.getElementById('home-form');
+  if (homeForm && typeof window.validateHomeForm === 'function') {
+    homeForm.addEventListener('submit', function (e) {
+      const ok = window.validateHomeForm(homeForm);
+      if (!ok) {
+        e.preventDefault();
+        homeForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  }
+
   const addBtns = [
     $('#add-row-btn'),       // Create page
     $('#add-row-btn-edit'),  // Edit page
@@ -277,8 +288,17 @@ document.addEventListener('click', function (e) {
   if (previewBtn) {
     previewBtn.addEventListener('click', function (e) {
       e.preventDefault();
-      const form = this.form;
+
+      const form = this.form || document.getElementById('home-form');
       if (!form) return;
+
+      if (typeof window.validateHomeForm === 'function') {
+      const ok = window.validateHomeForm(form);
+      if (!ok) {
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return; // ⬅️ stop here, do NOT preview
+      }
+    }
 
       const spoof = form.querySelector('input[name="_method"]');
       let spoofWasDisabled = false;

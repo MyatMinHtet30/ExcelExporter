@@ -82,6 +82,19 @@
   "Operating +": "ค่าใช้จ่ายในการดำเนินงาน +",
   "Profit (15%)": "กำไร (15%)",
   "VAT (7%)": "ภาษีมูลค่าเพิ่ม (7%)",
-  "Update": "อัปเดต"
-  
+  "Update": "อัปเดต",
+
+  "Project name is required": "กรุณากรอกชื่อโครงการ",
+  "Recipient name is required": "กรุณากรอกชื่อลูกค้า",
+  "List name is required": "กรุณากรอกชื่อรายการ",
+  "House number is required": "กรุณากรอกบ้านเลขที่",
+  "Trooper is required": "กรุณากรอกชื่อผู้ควบคุมงาน",
+
+  "Category is required": "กรุณากรอกหมวดงานเบ็ดเตล็ด",
+  "Amount is required": "กรุณากรอกปริมาณ",
+  "Unit is required": "กรุณากรอกหน่วย",
+  "Material price per unit is required": "กรุณากรอกค่าวัสดุ",
+  "Labor price per unit is required": "กรุณากรอกค่าค่าแรงต",
+  "At least one item row is required": "กรุณาเพิ่มอย่างน้อย 1 แถว",
+  "Please enter number only": "กรุณากรอกแค่ตัวเลข"
 }
