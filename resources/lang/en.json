@@ -43,5 +43,14 @@
   "Operating +": "Operating +",
   "Profit (15%)": "Profit (15%)",
   "VAT (7%)": "VAT (7%)",
-  "Update": "Update"
+  "Update": "Update",
+  "Home Excel Forms": "Home Excel Forms",
+    "Total home records created": "Total home records created",
+    "Create New Home": "Create New Home",
+
+    "Condo Excel Forms": "Condo Excel Forms",
+    "Total condo records created": "Total condo records created",
+    "Create New Condo": "Create New Condo",
+
+    "View List": "View List"
 }

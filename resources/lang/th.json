@@ -11,11 +11,21 @@
   "Booster": "บูสเตอร์",
   "Dashboard": "หน้าแรก",
 
-
   "Home": "บ้าน",
   "Condo": "คอนโด",
+
+  "Home Excel Forms": "แบบฟอร์ม Excel บ้าน",
+  "Total home records created": "จำนวนข้อมูลบ้านทั้งหมด",
+  "Create New Home": "สร้างข้อมูลบ้านใหม่",
+  "View List": "ดูรายการ",
+
+  "Condo Excel Forms": "แบบฟอร์ม Excel คอนโด",
+  "Total condo records created": "จำนวนข้อมูลคอนโดทั้งหมด",
+  "Create New Condo": "สร้างข้อมูลคอนโดใหม่",
+
   "Generate Home Excel Form": "สร้าง Excel สำหลับบ้าน",
   "Generate Condo Excel Form": "สร้าง Excel สำหลับคอนโด",
+
   "Project Name": "โครงการ",
   "Enter project name": "กรอกชื่อโครงการ",
   "Dear": "เรียน",
@@ -64,18 +74,11 @@
   "Total price": "รอดรวมทั้งหมด",
   "Actions": "แก้ใข/ ลบ",
 
-
   "House": "บ้าน",
   "Default Data Table": "ตารางข้อมูล",
   "With DataTables you can alter the ordering characteristics of the table at initialisation time.": "ด้วย DataTables คุณสามารถปรับลักษณะการเรียงลำดับของตารางได้ตั้งแต่เริ่มต้น",
   "+ Create Home": "+ สร้างบ้าน",
   "+ Create Condo": "+ สร้างคอนโด",
-  "Name": "ชื่อ",
-  "Position": "ตำแหน่ง",
-  "Office": "สำนักงาน",
-  "Age": "อายุ",
-  "Start date": "วันที่เริ่มงาน",
-  "Salary": "เงินเดือน",
   "Category": "หมวดหมู่",
   "Cancel": "ยกเลิก",
   "Preview": "ดูตัวอย่าง",

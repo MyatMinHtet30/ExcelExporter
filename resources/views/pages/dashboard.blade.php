@@ -76,9 +76,12 @@
                         </span>
                     </div>
 
-                    <h6 class="card-title text-black mb-1">Home Excel Forms</h6>
+                    <h6 class="card-title text-black mb-1">
+                        {{ __('Home Excel Forms') }}
+                    </h6>
+
                     <p class="text-muted mb-2" style="font-size: 13px;">
-                        Total home records created
+                        {{ __('Total home records created') }}
                     </p>
 
                     <h2 class="mb-2" style="font-size: 34px;">
@@ -86,8 +89,13 @@
                     </h2>
 
                     <div class="mt-3 btn-group-stack">
-                        <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm">View List</a>
-                        <a href="{{ route('home.create') }}" class="btn btn-primary btn-sm">Create New Home</a>
+                        <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm">
+                            {{ __('View List') }}
+                        </a>
+
+                        <a href="{{ route('home.create') }}" class="btn btn-primary btn-sm">
+                            {{ __('Create New Home') }}
+                        </a>
                     </div>
 
                 </div>
@@ -106,9 +114,12 @@
                         </span>
                     </div>
 
-                    <h6 class="card-title text-black mb-1">Condo Excel Forms</h6>
+                    <h6 class="card-title text-black mb-1">
+                        {{ __('Condo Excel Forms') }}
+                    </h6>
+
                     <p class="text-muted mb-2" style="font-size: 13px;">
-                        Total condo records created
+                        {{ __('Total condo records created') }}
                     </p>
 
                     <h2 class="mb-2" style="font-size: 34px;">
@@ -116,8 +127,13 @@
                     </h2>
 
                     <div class="mt-3 btn-group-stack">
-                        <a href="{{ route('condo') }}" class="btn btn-outline-secondary btn-sm">View List</a>
-                        <a href="{{ route('condo.create') }}" class="btn btn-primary btn-sm">Create New Condo</a>
+                        <a href="{{ route('condo') }}" class="btn btn-outline-secondary btn-sm">
+                            {{ __('View List') }}
+                        </a>
+
+                        <a href="{{ route('condo.create') }}" class="btn btn-primary btn-sm">
+                            {{ __('Create New Condo') }}
+                        </a>
                     </div>
 
                 </div>
