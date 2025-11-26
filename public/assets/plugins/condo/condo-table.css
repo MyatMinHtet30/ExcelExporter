@@ -129,6 +129,12 @@
   background: #d7e8ff;
   border-color: #083a6a;
 }
+.btn-export {
+  text-align: center !important;
+  width: 65px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
 
 .btn-delete {
   color: #8c0b0b;

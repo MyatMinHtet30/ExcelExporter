@@ -147,12 +147,12 @@
                 <col style="width:220px;">
             </colgroup>
             <tr>
-                <td class="meta-label">Project Name :</td>
+                <td class="meta-label">{{ __('Project Name') }}:</td>
                 <td class="dyn">{{ $project_name }}</td>
                 <td class="right">Date: <span class="dyn">{{ $date }}</span></td>
             </tr>
             <tr>
-                <td class="meta-label">Dear :</td>
+                <td class="meta-label">{{ __('Dear') }}:</td>
                 <td class="dyn" colspan="2">{{ $dear }}</td>
             </tr>
             <tr>
@@ -282,6 +282,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         async function toBase64(url) {
             const res = await fetch(url);
@@ -295,6 +296,13 @@
         }
 
         async function downloadBoqExcel() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Download',
+                text: 'Excel downloaded successfully.',
+                timer: 2000,
+                showConfirmButton: false
+            });
             const wb = new ExcelJS.Workbook();
             const ws = wb.addWorksheet('BOQ');
 
@@ -591,6 +599,13 @@
         }
 
         async function downloadBoqPdf() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Download',
+                text: 'PDF downloaded successfully.',
+                timer: 2000,
+                showConfirmButton: false
+            });
             const { jsPDF } = window.jspdf;
             const boqElement = document.querySelector('.boq-wrap');
             if (!boqElement) return;

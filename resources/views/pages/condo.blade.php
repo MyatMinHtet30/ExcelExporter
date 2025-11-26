@@ -62,6 +62,21 @@
 
                                             <td class="actions-col">
                                                 <div class="action-buttons">
+
+                                                    {{-- PDF --}}
+                                                    <button type="button"
+                                                            class="btn btn-action btn-edit btn-export"
+                                                            onclick="exportCondoPdf({{ $condo->id }})">
+                                                        PDF
+                                                    </button>
+
+                                                    {{-- EXCEL --}}
+                                                    <button type="button"
+                                                            class="btn btn-action btn-edit btn-export"
+                                                            onclick="exportCondoExcel({{ $condo->id }})">
+                                                        EXCEL
+                                                    </button>
+
                                                     {{-- Edit --}}
                                                     <a href="{{ route('condo.edit', $condo) }}" class="btn btn-action btn-edit" title="{{ __('Edit') }}">
                                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -70,8 +85,7 @@
                                                     </a>
 
                                                     {{-- Delete --}}
-                                                    <form action="{{ route('condo.destroy', $condo) }}" method="POST" class="d-inline"
-                                                          onsubmit="return confirm('{{ __('Delete this record? This cannot be undone.') }}')">
+                                                    <form action="{{ route('condo.destroy', $condo) }}" method="POST" class="d-inline js-delete-form">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-action btn-delete" title="{{ __('Delete') }}">
@@ -104,9 +118,22 @@
             </div>
         </div> <!-- /row -->
     </div> <!-- /xp-contentbar -->
+    <iframe id="condo-export-frame"
+        style="
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 1400px;
+            height: 2000px;
+            border: 0;
+            visibility: hidden;
+        ">
+    </iframe>
 @endsection
 
 @push('scripts')
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- DataTables JS -->
     <script src="{{ asset('assets/plugins/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables/dataTables.bootstrap4.min.js') }}"></script>
@@ -141,6 +168,94 @@
       })();
     </script>
 
-    <!-- Your init -->
+        {{-- SweetAlert2 delete confirmation + success --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // DELETE confirmation
+            const deleteForms = document.querySelectorAll('.js-delete-form');
+
+            deleteForms.forEach(function (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: '{{ __("Are you sure?") }}',
+                        text: '{{ __("Delete this record? This cannot be undone.") }}',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '{{ __("Yes, delete it!") }}'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            @if(session('success'))
+                @php $msg = session('success'); @endphp
+
+                @if($msg === __('Saved successfully.'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("Condo Data Created Successfully!") }}',
+                        text: '{{ $msg }}',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                @elseif($msg === __('Updated successfully.'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("Updated!") }}',
+                        text: '{{ $msg }}',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                @elseif($msg === __('Deleted successfully.'))
+                    Swal.fire({
+                        icon: 'success',
+                        title: '{{ __("Deleted!") }}',
+                        text: '{{ $msg }}',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                @endif
+            @endif
+        });
+    </script>
+
     <script src="{{ asset('assets/js/init/table-datatable-init.js') }}"></script>
+    <script>
+        function exportCondoPdf(condoId) {
+            const iframe = document.getElementById('condo-export-frame');
+
+            Swal.fire({
+                icon: 'success',
+                title: '{{ __("Download") }}',
+                text: '{{ __("PDF downloaded successfully.") }}',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            const url = '{{ route('condo.export.pdf', ':id') }}'.replace(':id', condoId);
+            iframe.src = url;
+        }
+
+        function exportCondoExcel(condoId) {
+            const iframe = document.getElementById('condo-export-frame');
+
+            Swal.fire({
+                icon: 'success',
+                title: '{{ __("Download") }}',
+                text: '{{ __("Excel downloaded successfully.") }}',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            const url = '{{ route('condo.export.excel', ':id') }}'.replace(':id', condoId);
+            iframe.src = url;
+        }
+    </script>
 @endpush

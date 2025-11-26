@@ -32,7 +32,7 @@
   "Enter recipient name": "กรอกชื่อลูกค้า",
   "List Name": "ชื่อรายการ",
   "Enter list name": "กรอกชื่อรายการ",
-  "House No": "บ้านเลขที่",
+  "House No": "บ้านเลขที่/ แปลงที่",
   "Enter house no.": "กรอกบ้านเลขที่",
   "Trooper": "ผู้ควบคุมงาน",
   "Enter trooper": "กรอกชื่อผู้ควบคุมงาน",
@@ -61,7 +61,7 @@
   "Date":"วันที่",
   "Payment Term":"เงื่อนไขการชำระเงิน",
   "Credits":"เครดิต",
-  "Details":"รายละเอียด",
+  "Details":"หมวดงาน",
   "Material Cost":"ค่าวัสดุ",
   "Labor Cost":"ค่าแรง",
   "Price Amount":"รวมของแรง",
@@ -99,5 +99,11 @@
   "Material price per unit is required": "กรุณากรอกค่าวัสดุ",
   "Labor price per unit is required": "กรุณากรอกค่าค่าแรงต",
   "At least one item row is required": "กรุณาเพิ่มอย่างน้อย 1 แถว",
-  "Please enter number only": "กรุณากรอกแค่ตัวเลข"
+  "Please enter number only": "กรุณากรอกแค่ตัวเลข",
+
+  "Customer name is required": "กรุณากรอกชื่อลูกค้า",
+  "Address is required": "กรุณากรอกชื่คอนโต",
+  "Job name is required": "กรุณากรอกชื่อรายการ",
+  "Details is required": "กรุณากรอกหมวดงาน",
+  "Price per unit is required": "กรุณากรอกค่าของแรง" 
 }

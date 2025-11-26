@@ -42,7 +42,7 @@ class CondoUpdateRequest extends FormRequest
                 'required','string','max:100',
                 Rule::unique('condos','quotation_number')->ignore($condoId),
             ],
-            'quotation_date'   => ['required','date'],
+            'quotation_date'   => ['nullable','date'],
             'payment_term'     => ['nullable','string','max:255'],
             'credits'          => ['nullable','string','max:255'],
             'status'           => ['nullable','boolean'],

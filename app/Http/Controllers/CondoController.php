@@ -21,7 +21,7 @@ class CondoController extends Controller
         $q = $request->get('q');
 
         $condos = Condo::query()
-            ->with(['details']) // <- important to avoid N+1
+            ->with(['details']) 
             ->when($q, fn ($qq) => $qq
                 ->where('quotation_number', 'like', "%{$q}%")
                 ->orWhere('customer_name', 'like', "%{$q}%")
@@ -38,8 +38,22 @@ class CondoController extends Controller
     {
         App::setLocale(Session::get('locale', config('app.locale')));
 
-        // Your create form: resources/views/pages/createcondo.blade.php
-        return view('pages.createcondo'); // your Blade you pasted
+        $prefix = 'K-QT6804-';
+
+        $lastCondo = Condo::where('quotation_number', 'like', $prefix.'%')
+            ->orderByDesc('id')
+            ->first();
+
+        $nextNumber = 1;
+        if ($lastCondo && $lastCondo->quotation_number) {
+            $parts    = explode('-', $lastCondo->quotation_number);
+            $lastSeq  = (int) end($parts);   
+            $nextNumber = $lastSeq + 1;
+        }
+
+        $nextQuotationNumber = $prefix.$nextNumber;
+
+        return view('pages.createcondo', compact('nextQuotationNumber')); 
     }
 
     // POST /condos (header + details in one submit)
@@ -48,16 +62,31 @@ class CondoController extends Controller
         App::setLocale(Session::get('locale', config('app.locale')));
 
         $data  = $request->validated();
-        $items = $data['items'] ?? [];   // optional details
+        $items = $data['items'] ?? [];   
+
+        $prefix = 'K-QT6804-';
+
+        $lastCondo = Condo::where('quotation_number', 'like', $prefix.'%')
+            ->orderByDesc('id')
+            ->first();
+
+        $nextNumber = 1;
+        if ($lastCondo && $lastCondo->quotation_number) {
+            $parts    = explode('-', $lastCondo->quotation_number);
+            $lastSeq  = (int) end($parts);   
+            $nextNumber = $lastSeq + 1;
+        }
+
+        $quotationNumber = $prefix.$nextNumber;
 
         $payload = [
             'customer_name'    => $data['customer_name'],
             'address'          => $data['address'] ?? null,
             'job_name'         => $data['job_name'],
-            'quotation_number' => $data['quotation_number'],
-            'quotation_date'   => $data['quotation_date'],         // map
-            'payment_term'     => $data['payment_term'] ?? null,   // map
-            'credits'           => $data['credits'] ?? null,        // map
+            'quotation_number' => $quotationNumber,  
+            'quotation_date'   => now()->toDateString(),      
+            'payment_term'     => $data['payment_term'] ?? null,   
+            'credits'           => $data['credits'] ?? null,       
             'status'           => true,
         ];
 
@@ -87,8 +116,8 @@ class CondoController extends Controller
 
         // go to edit page so user can add/adjust details
         return redirect()
-            ->route('condo', $condo)
-            ->with('success', 'Quotation created successfully.');
+            ->route('condo')
+            ->with('success', __('Saved successfully.'));
     }
 
     // GET /condos/{condo}
@@ -122,8 +151,8 @@ class CondoController extends Controller
             'customer_name'    => $data['customer_name']    ?? $condo->customer_name,
             'address'          => $data['address']          ?? $condo->address,
             'job_name'         => $data['job_name']         ?? $condo->job_name,
-            'quotation_number' => $data['quotation_number'] ?? $condo->quotation_number,
-            'quotation_date'   => $data['quotation_date']   ?? optional($condo->quotation_date)->format('Y-m-d'),
+            'quotation_number' => $condo->quotation_number,
+            'quotation_date'   => now()->toDateString(),
             'payment_term'     => $data['payment_term']     ?? $condo->payment_term,
             'credits'          => $data['credits']          ?? $condo->credits,
             'status'           => $data['status']           ?? $condo->status,
@@ -176,7 +205,8 @@ class CondoController extends Controller
             }
         });
 
-        return redirect()->route('condo')->with('success', 'Condo updated.');
+        return redirect()->route('condo')->with('success', __('Updated successfully.'));
+
     }
 
 
@@ -185,12 +215,12 @@ class CondoController extends Controller
     public function destroy(Condo $condo)
     {
         DB::transaction(function () use ($condo) {
-            // FK is cascadeOnDelete; this is just explicit if needed
             $condo->details()->delete();
             $condo->delete();
         });
 
-        return redirect()->route('condo')->with('success', 'Condo deleted.');
+        return redirect()->route('condo')->with('success', __('Deleted successfully.'));
+
     }
 
     // ---------- helper ----------
@@ -224,16 +254,31 @@ class CondoController extends Controller
     {
         App::setLocale(Session::get('locale', config('app.locale')));
 
-        // pull inputs (no strict validation for preview)
         $header = $request->only([
             'customer_name',
             'address',
             'job_name',
             'quotation_number',
-            'quotation_date',
             'payment_term',
             'credits',
         ]);
+        $condoId = $request->input('condo_id');   
+        $previewDate = null;
+
+        if ($condoId) {
+            $model = Condo::find($condoId);
+            if ($model) {
+                $previewDate = $model->updated_at ?: $model->created_at;
+            }
+        }
+
+        if (! $previewDate) {
+            // for create page (no condo yet) or if somehow not found
+            $previewDate = now();
+        }
+
+        $header['quotation_date'] = $previewDate->format('Y-m-d');
+
         $items = $request->input('items', []);
 
         // per-row data for the table
@@ -282,8 +327,159 @@ class CondoController extends Controller
             'total' => $total,
             'vat'   => $vat,
             'grand' => $grand,
+            
         ]));
     }
+
+    public function exportPdf(Condo $condo)
+    {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
+        $condo->load(['details' => fn($q) => $q->orderBy('no')]);
+
+        // header data for view
+        $header = [
+            'customer_name'   => $condo->customer_name,
+            'address'         => $condo->address,
+            'job_name'        => $condo->job_name,
+            'quotation_number'=> $condo->quotation_number,
+            'quotation_date'  => $condo->quotation_date,
+            'payment_term'    => $condo->payment_term,
+            'credits'         => $condo->credits,
+        ];
+
+        $items = $condo->details->map(function (CondoDetail $d) {
+            return [
+                'no'                   => $d->no,
+                'details'              => $d->details,
+                'amount'               => $d->amount,
+                'unit'                 => $d->unit,
+                'material_cost'        => $d->material_cost,
+                'labor_cost'           => $d->labor_cost,
+                'price_per_unit_total' => $d->price_per_unit_total,
+            ];
+        })->toArray();
+
+        $rows = [];
+        foreach ($items as $i => $r) {
+            $amount  = (float) str_replace([',',' '], '', (string)($r['amount'] ?? 0));
+            $mcPrice = (float) str_replace([',',' '], '', (string)($r['material_cost'] ?? 0));
+            $lcPrice = (float) str_replace([',',' '], '', (string)($r['labor_cost'] ?? 0));
+            $ppuInput = trim((string)($r['price_per_unit_total'] ?? ''));
+            $ppu      = $ppuInput !== ''
+                ? (float) str_replace([',',' '], '', $ppuInput)
+                : ($mcPrice + $lcPrice);
+
+            $subtotal = 0.0;
+            if ($amount > 0 && $ppu > 0) {
+                $subtotal = round($amount * $ppu, 2);
+            } elseif ($mcPrice > 0 || $lcPrice > 0) {
+                $subtotal = round($mcPrice + $lcPrice, 2);
+            }
+
+            $hasAny = false;
+            foreach (['details','amount','unit','material_cost','labor_cost','price_per_unit_total'] as $k) {
+                if (isset($r[$k]) && trim((string)$r[$k]) !== '') { $hasAny = true; break; }
+            }
+            if (! $hasAny) continue;
+
+            $rows[] = [
+                'no'       => ($r['no'] ?? ($i + 1)),
+                'details'  => $r['details'] ?? '',
+                'amount'   => $amount,
+                'unit'     => $r['unit'] ?? '',
+                'mc_price' => $mcPrice,
+                'lc_price' => $lcPrice,
+                'ppu'      => $ppu,
+                'subtotal' => $subtotal,
+            ];
+        }
+
+        [$total, $vat, $grand] = $this->computeTotals($items);
+
+        return view('pages.condopreview', array_merge($header, [
+            'rows'         => $rows,
+            'total'        => $total,
+            'vat'          => $vat,
+            'grand'        => $grand,
+            'autoDownload' => 'pdf',   
+        ]));
+    }
+
+    public function exportExcel(Condo $condo)
+    {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
+        $condo->load(['details' => fn($q) => $q->orderBy('no')]);
+
+        $header = [
+            'customer_name'   => $condo->customer_name,
+            'address'         => $condo->address,
+            'job_name'        => $condo->job_name,
+            'quotation_number'=> $condo->quotation_number,
+            'quotation_date'  => $condo->quotation_date,
+            'payment_term'    => $condo->payment_term,
+            'credits'         => $condo->credits,
+        ];
+
+        $items = $condo->details->map(function (CondoDetail $d) {
+            return [
+                'no'                   => $d->no,
+                'details'              => $d->details,
+                'amount'               => $d->amount,
+                'unit'                 => $d->unit,
+                'material_cost'        => $d->material_cost,
+                'labor_cost'           => $d->labor_cost,
+                'price_per_unit_total' => $d->price_per_unit_total,
+            ];
+        })->toArray();
+
+        $rows = [];
+        foreach ($items as $i => $r) {
+            $amount  = (float) str_replace([',',' '], '', (string)($r['amount'] ?? 0));
+            $mcPrice = (float) str_replace([',',' '], '', (string)($r['material_cost'] ?? 0));
+            $lcPrice = (float) str_replace([',',' '], '', (string)($r['labor_cost'] ?? 0));
+            $ppuInput = trim((string)($r['price_per_unit_total'] ?? ''));
+            $ppu      = $ppuInput !== ''
+                ? (float) str_replace([',',' '], '', $ppuInput)
+                : ($mcPrice + $lcPrice);
+
+            $subtotal = 0.0;
+            if ($amount > 0 && $ppu > 0) {
+                $subtotal = round($amount * $ppu, 2);
+            } elseif ($mcPrice > 0 || $lcPrice > 0) {
+                $subtotal = round($mcPrice + $lcPrice, 2);
+            }
+
+            $hasAny = false;
+            foreach (['details','amount','unit','material_cost','labor_cost','price_per_unit_total'] as $k) {
+                if (isset($r[$k]) && trim((string)$r[$k]) !== '') { $hasAny = true; break; }
+            }
+            if (! $hasAny) continue;
+
+            $rows[] = [
+                'no'       => ($r['no'] ?? ($i + 1)),
+                'details'  => $r['details'] ?? '',
+                'amount'   => $amount,
+                'unit'     => $r['unit'] ?? '',
+                'mc_price' => $mcPrice,
+                'lc_price' => $lcPrice,
+                'ppu'      => $ppu,
+                'subtotal' => $subtotal,
+            ];
+        }
+
+        [$total, $vat, $grand] = $this->computeTotals($items);
+
+        return view('pages.condopreview', array_merge($header, [
+            'rows'         => $rows,
+            'total'        => $total,
+            'vat'          => $vat,
+            'grand'        => $grand,
+            'autoDownload' => 'excel', 
+        ]));
+    }
+
 
 
 }
