@@ -16,7 +16,7 @@ class CondoStoreRequest extends FormRequest
             'address'          => ['nullable','string','max:1000'],
             'job_name'         => ['required','string','max:255'],
             'quotation_number' => ['required','string','max:100','unique:condos,quotation_number'],
-            'quotation_date'   => ['required','date'],
+            'quotation_date'   => ['nullable','date'],
             'payment_term'     => ['nullable','string','max:255'],
             'credits'          => ['nullable','string','max:255'],
 

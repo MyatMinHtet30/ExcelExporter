@@ -248,13 +248,22 @@
       <tbody>
         @php $n=1; @endphp
         @forelse($rows as $r)
+        @php
+            $mc = n($r['mc_price'] ?? 0);
+            $lc = n($r['lc_price'] ?? 0);
+            $ppu = n($r['ppu'] ?? ($mc + $lc));
+        @endphp
           <tr>
             <td class="c">{{ $r['no'] ?? $n }}</td>
             <td>{{ $r['details'] }}</td>
             <td class="c">{{ number_format(n($r['amount']),2) }}</td>
             <td class="c">{{ $r['unit'] }}</td>
-            <td class="c">{{ number_format(n($r['mc_price']),2) }}</td>
-            <td class="c">{{ number_format(n($r['lc_price']),2) }}</td>
+            @if($mc == 0 && $lc == 0)
+              <td class="c" colspan="2">เหมา</td>
+            @else
+              <td class="c">{{ number_format($mc,2) }}</td>
+              <td class="c">{{ number_format($lc,2) }}</td>
+            @endif
             <td class="c">{{ number_format(n($r['ppu'] ?? (n($r['mc_price']) + n($r['lc_price']))),2) }}</td>
             <td class="r">{{ number_format(n($r['subtotal']),2) }}</td>
           </tr>
@@ -309,12 +318,16 @@
   <div class="no-print btn-footer">
     <button type="button" onclick="window.history.back()" class="btn-lg">Cancel</button>
     <button type="button" onclick="downloadCondoExcel()" class="btn-lg">Download Excel</button>
+    <button type="button" onclick="downloadCondoPdf()" class="btn-lg">Download PDF</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 (function(){
@@ -378,6 +391,13 @@ async function toBase64(url) {
   const _num = (x) => Number(String(x ?? 0).replace(/,/g,'')) || 0;
 
 async function downloadCondoExcel() {
+  Swal.fire({
+    icon: 'success',
+    title: 'Download',
+    text: 'Excel downloaded successfully.',
+    timer: 2000,
+    showConfirmButton: false
+  })
   function bahtTextLocal(n){
     n = (typeof n === 'number') ? n : parseFloat(String(n).replace(/,/g,''));
     if (isNaN(n)) return '';
@@ -562,18 +582,39 @@ async function downloadCondoExcel() {
     M(`B${r}`,`F${r}`); ws.getCell(`B${r}`).value = it.details ?? '';
     ws.getCell(`G${r}`).value = toNum(it.amount);
     ws.getCell(`H${r}`).value = it.unit ?? '';
-    ws.getCell(`I${r}`).value = toNum(it.mc_price);
-    ws.getCell(`J${r}`).value = toNum(it.lc_price);
+
+    const mc = toNum(it.mc_price);
+    const lc = toNum(it.lc_price);
+
+    if (mc === 0 && lc === 0) {
+      // merge I + J and show "เหมา"
+      M(`I${r}`, `J${r}`);
+      ws.getCell(`I${r}`).value = 'เหมา';
+      ws.getCell(`I${r}`).alignment = { horizontal: 'center', vertical: 'middle' };
+    } else {
+      // normal numeric cells
+      ws.getCell(`I${r}`).value = mc;
+      ws.getCell(`J${r}`).value = lc;
+      ['I','J'].forEach(col => {
+        const cell = ws.getCell(`${col}${r}`);
+        cell.alignment = { horizontal:'center', vertical:'middle' };
+        cell.numFmt = '#,##0.00';
+      });
+    }
+
     ws.getCell(`K${r}`).value = toNum(it.ppu ?? (toNum(it.mc_price)+toNum(it.lc_price)));
     ws.getCell(`L${r}`).value = toNum(it.subtotal);
 
-    // fonts & alignment
-    styleRange(ws,r,1,r,12,{font:ANG16});
-    ['G','I','J','K'].forEach(col => ws.getCell(`${col}${r}`).alignment = {horizontal:'center', vertical:'middle'});
-    ws.getCell(`A${r}`).alignment = {horizontal:'center', vertical:'middle'};
-    ws.getCell(`H${r}`).alignment = {horizontal:'center', vertical:'middle'};
-    ws.getCell(`L${r}`).alignment = {horizontal:'right',  vertical:'middle'};
-    ['G','I','J','K','L'].forEach(col => ws.getCell(`${col}${r}`).numFmt = '#,##0.00');
+    styleRange(ws, r, 1, r, 12, { font: ANG16 });
+    ws.getCell(`G${r}`).alignment = { horizontal:'center', vertical:'middle' };
+    ws.getCell(`A${r}`).alignment = { horizontal:'center', vertical:'middle' };
+    ws.getCell(`H${r}`).alignment = { horizontal:'center', vertical:'middle' };
+    ws.getCell(`K${r}`).alignment = { horizontal:'center', vertical:'middle' };
+    ws.getCell(`L${r}`).alignment = { horizontal:'right',  vertical:'middle' };
+
+    ['G','K','L'].forEach(col => {
+      ws.getCell(`${col}${r}`).numFmt = '#,##0.00';
+    });
 
     setRowBorder(ws, r, 1, 12, {style:'thin'});
     ws.getRow(r).height = 22;
@@ -603,12 +644,12 @@ async function downloadCondoExcel() {
   // right block borders
   setRowBorder(ws,totalRow,10,12,{style:'thin'});
   setRowBorder(ws,vatRow,  10,12,{style:'thin'});
-  setRowBorder(ws,grandRow,1,12,{style:'thin'}); // full line for Total price
+  setRowBorder(ws,grandRow,1,12,{style:'thin'});
   ws.getCell(`L${grandRow}`).font = {...ANG16, bold:true};
 
   for (let c = 1; c <= 9; c++) {
     const b = ws.getCell(grandRow, c).border || {};
-    b.top = undefined;           // delete the line under the VAT row (left side)
+    b.top = undefined;           
     ws.getCell(grandRow, c).border = b;
   }
 
@@ -622,14 +663,12 @@ async function downloadCondoExcel() {
   ws.getCell(`A${grandRow}`).value = `ตัวอักษร ( ${bahtTextLocal(meta.grand)} )`;
   styleRange(ws,grandRow,1,grandRow,9,{font:ANG16, alignment:{vertical:'middle'}});
 
-  // ---- vertical guides for price-per-unit band (now that grandRow exists) ---
   const firstTableRow = 14;
   for (let rr = firstTableRow; rr <= grandRow; rr++) {
-    ws.getCell(rr, 9).border  = { ...(ws.getCell(rr,9).border||{}),  left:{style:'thin'} };   // I left edge
-    ws.getCell(rr,11).border  = { ...(ws.getCell(rr,11).border||{}), right:{style:'thin'} };  // K right edge
+    ws.getCell(rr, 9).border  = { ...(ws.getCell(rr,9).border||{}),  left:{style:'thin'} };   
+    ws.getCell(rr,11).border  = { ...(ws.getCell(rr,11).border||{}), right:{style:'thin'} };  
   }
 
-  // ---- outer medium frame A9..L(grandRow) -----------------------------------
   for (let c=1;c<=12;c++){
     ws.getCell(9,c).border         = { ...(ws.getCell(9,c).border||{}),         top:{style:'medium'} };
     ws.getCell(grandRow,c).border  = { ...(ws.getCell(grandRow,c).border||{}),  bottom:{style:'medium'} };
@@ -639,7 +678,6 @@ async function downloadCondoExcel() {
     ws.getCell(rr,12).border = { ...(ws.getCell(rr,12).border||{}), right:{style:'medium'} };
   }
 
-  // ---- disclaimer + signatures ---------------------------------------------
   const discRow = grandRow + 2;
   M(`A${discRow}`,`L${discRow}`);
   ws.getCell(`A${discRow}`).value =
@@ -663,7 +701,6 @@ async function downloadCondoExcel() {
   makeSig('B','D'); makeSig('F','H'); makeSig('J','L');
   styleRange(ws,sigLine,2,dateLine,12,{font:ANG16, alignment:{horizontal:'center'}});
 
-  // ---- page setup -----------------------------------------------------------
   ws.pageSetup = {
     paperSize: 9, orientation:'portrait',
     fitToPage:true, fitToWidth:1, fitToHeight:0,
@@ -683,6 +720,66 @@ async function downloadCondoExcel() {
   document.body.appendChild(a); a.click(); a.remove();
 }
 
+async function downloadCondoPdf() {
+  Swal.fire({
+    icon: 'success',
+    title: 'Download',
+    text: 'PDF downloaded successfully.',
+    timer: 2000,
+    showConfirmButton: false
+  });
+  const { jsPDF } = window.jspdf;
+
+  const pageEl = document.querySelector('.page');
+  if (!pageEl) return;
+
+  const canvas = await html2canvas(pageEl, {
+    scale: 3,
+    useCORS: true,
+    backgroundColor: '#ffffff',
+    scrollX: 0,
+    scrollY: -window.scrollY
+  });
+
+  const imgData = canvas.toDataURL('image/jpeg', 0.7); 
+
+  const pdf = new jsPDF('portrait', 'mm', 'a4');
+  const pageWidth  = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+
+  const imgWidth  = canvas.width;
+  const imgHeight = canvas.height;
+
+  const targetWidth  = pageWidth * 0.98;
+  const ratio        = targetWidth / imgWidth;
+  const targetHeight = imgHeight * ratio;
+
+  const x = (pageWidth - targetWidth) / 2;
+  const y = 5;
+
+  pdf.addImage(imgData, 'JPEG', x, y, targetWidth, targetHeight, undefined, 'FAST');
+
+  const safe = s => String(s || '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim();
+  const job  = safe(@json($job_name ?? 'Condo'));
+  const addr = safe(@json($address ?? ''));
+  const filename = addr ? `${job} (${addr}).pdf` : `${job}.pdf`;
+
+  pdf.save(filename);
+}
+
 </script>
+@if (!empty($autoDownload))
+<script>
+  window.addEventListener('load', function () {
+      setTimeout(function () {
+          @if ($autoDownload === 'pdf')
+              downloadCondoPdf();
+          @elseif ($autoDownload === 'excel')
+              downloadCondoExcel();
+          @endif
+      }, 300);
+  });
+</script>
+@endif
 </body>
 </html>

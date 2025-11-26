@@ -8,7 +8,7 @@
 @endpush
 
 @section('content')
-  <form action="{{ route('condo.store') }}" method="POST" id="condo-form">
+  <form action="{{ route('condo.store') }}" method="POST" id="condo-form" novalidate>
     @csrf
     <div class="xp-contentbar">
 
@@ -26,12 +26,13 @@
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Customer Name') }}</h5>
+              <h5 class="card-title text-black">{{ __('Customer Name') }}*</h5>
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
                     <!-- bind: customer_name -->
-                    <input type="text" class="form-control" name="customer_name" id="inputText" placeholder="{{ __('Enter Customer name') }}" value="{{ old('customer_name') }}">
+                    <input type="text" class="form-control" name="customer_name" id="inputText" placeholder="{{ __('Enter Customer name') }}" value="{{ old('customer_name') }}" required
+                    data-error-required="{{ __('Customer name is required') }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -48,12 +49,13 @@
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Address') }}</h5>
+              <h5 class="card-title text-black">{{ __('Address') }}*</h5>
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
                     <!-- bind: address -->
-                    <input type="text" class="form-control" name="address" id="inputEmail" placeholder="{{ __('Enter Address') }}" value="{{ old('address') }}">
+                    <input type="text" class="form-control" name="address" id="inputEmail" placeholder="{{ __('Enter Address') }}" value="{{ old('address') }}" required 
+                    data-error-required="{{ __('Address is required') }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -70,12 +72,13 @@
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Job Name') }}</h5>
+              <h5 class="card-title text-black">{{ __('Job Name') }}*</h5>
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
                     <!-- bind: job_name -->
-                    <input type="text" class="form-control" name="job_name" id="inputPassword" placeholder="{{ __('Job Name') }}" value="{{ old('job_name') }}">
+                    <input type="text" class="form-control" name="job_name" id="inputPassword" placeholder="{{ __('Job Name') }}" value="{{ old('job_name') }}" required 
+                    data-error-required="{{ __('Job name is required') }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -92,34 +95,18 @@
         <div class="col-lg-3 col-md-3 col-6">
           <div class="card m-b-20">
             <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Quotation Number') }}</h5>
+              <h5 class="card-title text-black">{{ __('Quotation Number') }}*</h5>
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
                     <!-- bind: quotation_number -->
-                    <input type="text" class="form-control" name="quotation_number" id="inputNumber" placeholder="{{ __('Enter QN') }}" value="{{ old('quotation_number') }}">
-                    <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
+                    <input type="text" class="form-control" name="quotation_number" id="inputNumber" value="{{ old('quotation_number', $nextQuotationNumber ?? '') }}" readonly required
+                    data-error-required="{{ __('Quotation number is required') }}">
+                    <!-- <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
-                    </button>
+                    </button> -->
                   </div>
                   @error('quotation_number')<small class="text-danger">{{ $message }}</small>@enderror
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <!-- End XP Col -->
-
-        <!-- Start XP Col -->
-        <div class="col-lg-3 col-md-3 col-6">
-          <div class="card m-b-20">
-            <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Date') }}</h5>
-              <div class="card-body">
-                <div class="form-group">
-                  <!-- bind: quotation_date -->
-                  <input type="date" class="form-control" name="quotation_date" id="inputDate" value="{{ old('quotation_date') }}">
-                  @error('quotation_date')<small class="text-danger">{{ $message }}</small>@enderror
                 </div>
               </div>
             </div>
@@ -188,7 +175,7 @@
               <div class="card-header bg-white">
                 <div class="row">
 
-                  <div class="col-lg-1 col-md-1 col-2">
+                  <div class="col-3 col-sm-2 col-md-1 field-col">
                     <h5 class="card-title text-black">{{ __('No') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
@@ -198,11 +185,12 @@
                     </div>
                   </div>
 
-                  <div class="col-lg-5 col-md-4 col-10">
-                    <h5 class="card-title text-black">{{ __('Details') }}</h5>
+                  <div class="col-12 col-sm-6 col-md-3 field-col mb-3">
+                    <h5 class="card-title text-black">{{ __('Details') }}*</h5>
                     <div class="card-body">
                       <div class="input-group">
-                        <input type="text" class="form-control detail" name="items[{{ $i }}][details]" placeholder="{{ __('Details') }}" value="{{ $row['details'] }}">
+                        <input type="text" class="form-control detail" name="items[{{ $i }}][details]" placeholder="{{ __('Details') }}" value="{{ $row['details'] }}" required 
+                        data-error-required="{{ __('Details is required') }}">
                         <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                           <i class="fas fa-microphone"></i>
                         </button>
@@ -211,55 +199,62 @@
                     </div>
                   </div>
 
-                  <div class="col-lg-1 col-md-2 col-4">
-                    <h5 class="card-title text-black">{{ __('Amount') }}</h5>
+                  <div class="col-6 col-md-2 field-col">
+                    <h5 class="card-title text-black">{{ __('Amount') }}*</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control amount" name="items[{{ $i }}][amount]" placeholder=".00" value="{{ $row['amount'] }}">
+                        <input type="text" class="form-control amount" name="items[{{ $i }}][amount]" placeholder=".00" value="{{ $row['amount'] }}" required
+                        data-error-required="{{ __('Amount is required') }}"
+                        data-error-number="{{ __('Please enter number only') }}">
                       </div>
                       @error("items.$i.amount")<small class="text-danger">{{ $message }}</small>@enderror
                     </div>
                   </div>
 
-                  <div class="col-md-1 col-4">
-                    <h5 class="card-title text-black">{{ __('Unit') }}</h5>
+                  <div class="col-6 col-md-2 field-col">
+                    <h5 class="card-title text-black">{{ __('Unit') }}*</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control units" name="items[{{ $i }}][unit]" placeholder="{{ __('Units') }}" value="{{ $row['unit'] }}">
+                        <input type="text" class="form-control units" name="items[{{ $i }}][unit]" placeholder="{{ __('Units') }}" value="{{ $row['unit'] }}" required 
+                        data-error-required="{{ __('Unit is required') }}">
                       </div>
                     </div>
                   </div>
 
-                  <div class="col-md-2 col-4">
+                  <div class="col-6 col-md-2 field-col">
                     <h5 class="card-title text-black">{{ __('Material Cost') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control material" name="items[{{ $i }}][material_cost]" placeholder=".00" value="{{ $row['material_cost'] }}">
+                        <input type="text" class="form-control material" name="items[{{ $i }}][material_cost]" placeholder=".00" value="{{ $row['material_cost'] }}" required 
+                        data-error-number="{{ __('Please enter number only') }}">
                       </div>
                     </div>
                   </div>
 
-                  <div class="col-md-2 col-4">
+                  <div class="col-6 col-md-2 field-col">
                     <h5 class="card-title text-black">{{ __('Labor Cost') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control labor" name="items[{{ $i }}][labor_cost]" placeholder=".00" value="{{ $row['labor_cost'] }}">
+                        <input type="text" class="form-control labor" name="items[{{ $i }}][labor_cost]" placeholder=".00" value="{{ $row['labor_cost'] }}"
+                        data-error-number="{{ __('Please enter number only') }}">
                       </div>
                     </div>
                   </div>
 
                   <div class="d-none d-md-block col-md-8"></div>
 
-                  <div class="col-md-2 col-4">
-                    <h5 class="card-title text-black">{{ __('Price Amount') }}</h5>
+                  <div class="col-6 col-md-2 field-col">
+                    <h5 class="card-title text-black">{{ __('Price Amount') }}*</h5>
                     <div class="card-body">
                       <div class="form-group">
-                        <input type="text" class="form-control price-per-unit" name="items[{{ $i }}][price_per_unit_total]" placeholder=".00" value="{{ $row['price_per_unit_total'] }}">
+                        <input type="text" class="form-control price-per-unit" name="items[{{ $i }}][price_per_unit_total]" placeholder=".00" value="{{ $row['price_per_unit_total'] }}" required
+                        data-error-required="{{ __('Price per unit is required') }}"
+                        data-error-number="{{ __('Please enter number only') }}">
                       </div>
                     </div>
                   </div>
 
-                  <div class="col-md-2 col-4">
+                  <div class="col-6 col-md-2 field-col">
                     <h5 class="card-title text-black">{{ __('Subtotal') }}</h5>
                     <div class="card-body">
                       <div class="form-group">
@@ -345,7 +340,7 @@
           <div class="card-header bg-white">
             <div class="row">
 
-              <div class="col-lg-1 col-md-1 col-2">
+              <div class="col-3 col-sm-2 col-md-1 field-col">
                 <h5 class="card-title text-black">{{ __('No') }}</h5>
                 <div class="card-body">
                   <div class="form-group">
@@ -355,11 +350,12 @@
                 </div>
               </div>
 
-              <div class="col-lg-5 col-md-4 col-10">
-                <h5 class="card-title text-black">{{ __('Details') }}</h5>
+              <div class="col-12 col-sm-6 col-md-3 field-col">
+                <h5 class="card-title text-black">{{ __('Details') }}*</h5>
                 <div class="card-body">
                   <div class="input-group">
-                    <input type="text" class="form-control detail" name="items[__INDEX__][details]" placeholder="{{ __('Details') }}">
+                    <input type="text" class="form-control detail" name="items[__INDEX__][details]" placeholder="{{ __('Details') }}" required
+                     data-error-required="{{ __('Details is required') }}">
                     <button type="button" class="btn btn-outline-secondary mic-btn" title="{{ __('Speak') }}" onclick="startDictation(this)">
                       <i class="fas fa-microphone"></i>
                     </button>
@@ -367,54 +363,61 @@
                 </div>
               </div>
 
-              <div class="col-lg-1 col-md-2 col-4">
-                <h5 class="card-title text-black">{{ __('Amount') }}</h5>
+              <div class="col-6 col-md-2 field-col">
+                <h5 class="card-title text-black">{{ __('Amount') }}*</h5>
                 <div class="card-body">
                   <div class="form-group">
-                    <input type="text" class="form-control amount" name="items[__INDEX__][amount]" placeholder=".00">
+                    <input type="text" class="form-control amount" name="items[__INDEX__][amount]" placeholder=".00" required 
+                    data-error-required="{{ __('Amount is required') }}"
+                    data-error-number="{{ __('Please enter number only') }}">
                   </div>
                 </div>
               </div>
 
-              <div class="col-md-1 col-4">
-                <h5 class="card-title text-black">{{ __('Unit') }}</h5>
+              <div class="col-6 col-md-2 field-col">
+                <h5 class="card-title text-black">{{ __('Unit') }}*</h5>
                 <div class="card-body">
                   <div class="form-group">
-                    <input type="text" class="form-control units" name="items[__INDEX__][unit]" placeholder="{{ __('Units') }}">
+                    <input type="text" class="form-control units" name="items[__INDEX__][unit]" placeholder="{{ __('Units') }}" required
+                    data-error-required="{{ __('Unit is required') }}">
                   </div>
                 </div>
               </div>
 
-              <div class="col-md-2 col-4">
+              <div class="col-6 col-md-2 field-col">
                 <h5 class="card-title text-black">{{ __('Material Cost') }}</h5>
                 <div class="card-body">
                   <div class="form-group">
-                    <input type="text" class="form-control material" name="items[__INDEX__][material_cost]" placeholder=".00">
+                    <input type="text" class="form-control material" name="items[__INDEX__][material_cost]" placeholder=".00" required
+                    data-error-number="{{ __('Please enter number only') }}">
                   </div>
                 </div>
               </div>
 
-              <div class="col-md-2 col-4">
+              <div class="col-6 col-md-2 field-col">
                 <h5 class="card-title text-black">{{ __('Labor Cost') }}</h5>
                 <div class="card-body">
                   <div class="form-group">
-                    <input type="text" class="form-control labor" name="items[__INDEX__][labor_cost]" placeholder=".00">
+                    <input type="text" class="form-control labor" name="items[__INDEX__][labor_cost]" placeholder=".00" required 
+                    data-error-number="{{ __('Please enter number only') }}">
                   </div>
                 </div>
               </div>
 
               <div class="d-none d-md-block col-md-8"></div>
 
-              <div class="col-md-2 col-4">
-                <h5 class="card-title text-black">{{ __('Price Amount') }}</h5>
+              <div class="col-6 col-md-2 field-col">
+                <h5 class="card-title text-black">{{ __('Price Amount') }}*</h5>
                 <div class="card-body">
                   <div class="form-group">
-                    <input type="text" class="form-control price-per-unit" name="items[__INDEX__][price_per_unit_total]" placeholder=".00">
+                    <input type="text" class="form-control price-per-unit" name="items[__INDEX__][price_per_unit_total]" placeholder=".00" required
+                    data-error-required="{{ __('Price per unit is required') }}"
+                    data-error-number="{{ __('Please enter number only') }}">
                   </div>
                 </div>
               </div>
 
-              <div class="col-md-2 col-4">
+              <div class="col-6 col-md-2 field-col">
                 <h5 class="card-title text-black">{{ __('Subtotal') }}</h5>
                 <div class="card-body">
                   <div class="form-group">
@@ -439,5 +442,6 @@
 @endsection
 
 @push('scripts')
+<script src="{{ asset('assets/plugins/validations/condoValidation.js') }}"></script>
 <script src="{{ asset('assets/plugins/condo/condo-form.js') }}"></script>
 @endpush

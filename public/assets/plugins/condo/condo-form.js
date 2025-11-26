@@ -54,57 +54,17 @@
 
     const tplHtml = tplEl.innerHTML;
 
-    // ---------- Validation (moved from Blade) ----------
-    const cleanNumber = v => (v || '').toString().replace(/,/g, '').trim();
-    const rowIsEmpty = row => {
-      const f = ['.detail', '.amount', '.units', '.material', '.labor', '.price-per-unit'];
-      return f.every(sel => !(row.querySelector(sel)?.value || '').trim());
-    };
-
-    function valHeader() {
-      let ok = true;
-      const must = [
-        ['[name="customer_name"]', 'Customer Name is required'],
-        ['[name="job_name"]', 'Job Name is required'],
-        ['[name="quotation_number"]', 'Quotation Number is required'],
-        ['[name="quotation_date"]', 'Date is required'],
-      ];
-      must.forEach(([sel, msg]) => {
-        const el = form.querySelector(sel);
-        if (!el || !el.value.trim()) { ok = false; showError(el, msg); }
-      });
-      return ok;
-    }
-
-    function valRows() {
-      let ok = true;
-      const rows = rowsContainer.querySelectorAll('.item-row');
-      rows.forEach((row, i) => {
-        if (rowIsEmpty(row)) return;
-        const detail = row.querySelector('.detail');
-        const amount = row.querySelector('.amount');
-        if (!detail?.value.trim()) { ok = false; showError(detail, 'Details is required'); }
-        if (!amount?.value.trim()) { ok = false; showError(amount, 'Amount is required'); }
-        else if (isNaN(parseFloat(cleanNumber(amount.value)))) {
-          ok = false; showError(amount, 'Amount must be a number');
-        }
-      });
-      return ok;
-    }
 
     // ---------- Reindex + protections ----------
-    function enforceFirstRowProtection() {
+    function updateRemoveButtons() {
       const rows = rowsContainer.querySelectorAll('.item-row');
-      rows.forEach((row, i) => {
+      const onlyOne = rows.length <= 1;
+      rows.forEach(row => {
         const btn = row.querySelector('.remove-row');
         if (!btn) return;
-        if (i === 0) {
-          btn.disabled = true;
-          btn.title = 'First row cannot be removed';
-        } else {
-          btn.disabled = false;
-          btn.removeAttribute('title');
-        }
+        btn.disabled = onlyOne;
+        btn.classList.toggle('d-none', onlyOne); // hide when only one
+        btn.removeAttribute('title');
       });
     }
 
@@ -138,7 +98,7 @@
           if (el) el.name = `items[${idx}][${field}]`;
         });
       });
-      enforceFirstRowProtection();
+      updateRemoveButtons();
     }
 
     // ---------- Calculations ----------
@@ -246,15 +206,15 @@
 
     // Submit: validate header + rows (moved from Blade)
     form.addEventListener('submit', function (e) {
-      clearInlineErrors(form);
-      const okHeader = valHeader();
-      const okRows   = valRows();
-      if (!okHeader || !okRows) {
-        e.preventDefault();
-        const banner = form.querySelector('.alert.alert-danger');
-        if (banner) banner.style.display = 'block';
-        const first = form.querySelector('.is-invalid');
-        if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (typeof window.validateCondoForm === 'function') {
+        const ok = window.validateCondoForm(form);
+        if (!ok) {
+          e.preventDefault();
+          const banner = form.querySelector('.alert.alert-danger');
+          if (banner) banner.style.display = 'block';
+          const first = form.querySelector('.is-invalid');
+          if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       }
     });
 
@@ -262,8 +222,7 @@
     reindexRows();
     recalcAll();
 
-    // Keep first-row protection in sync on DOM mutations
-    const mo = new MutationObserver(() => enforceFirstRowProtection());
+    const mo = new MutationObserver(() => updateRemoveButtons());
     mo.observe(rowsContainer, { childList: true, subtree: true });
   });
 

@@ -119,7 +119,7 @@ class HomeController extends Controller
     $v = $request->validate([
         'details'                   => ['nullable','array'],
         'details.*.id'              => ['nullable','integer','exists:home_details,id'],
-        'details.*._delete'         => ['nullable','boolean'],   // still supported
+        'details.*._delete'         => ['nullable','boolean'],   
         'details.*.status'          => ['nullable','boolean'],
         'details.*.no'              => ['nullable','integer','min:1'],
         'details.*.category_name'   => ['nullable','string','max:255'],

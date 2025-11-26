@@ -348,12 +348,29 @@
             const iframe = document.getElementById('boq-export-frame');
             const url = '{{ route('home.export.pdf', ':id') }}'.replace(':id', homeId);
             iframe.src = url;
+
+            Swal.fire({
+                icon: 'success',
+                title: '{{ __("Download") }}',
+                text: '{{ __("PDF downloaded successfully.") }}',
+                timer: 2000,
+                showConfirmButton: false
+            });
         }
 
         function exportHomeExcel(homeId) {
             const iframe = document.getElementById('boq-export-frame');
             const url = '{{ route('home.export.excel', ':id') }}'.replace(':id', homeId);
             iframe.src = url;
+
+            Swal.fire({
+                icon: 'success',
+                title: '{{ __("Download") }}',
+                text: '{{ __("Excel downloaded successfully.") }}',
+                timer: 2000,
+                showConfirmButton: false
+            });
         }
     </script>
+
 @endpush
