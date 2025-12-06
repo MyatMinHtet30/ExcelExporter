@@ -72,7 +72,7 @@ class HomeController extends Controller
                     'category_name'  => $r['category_name'] ?? null,
                     'item_name'      => $r['item_name'] ?? null,
                     'amount'         => $amount ?: null,
-                    'unit'           => $r['unit'] ?? null,
+                    'unit'           => $this->normalizeUnitToKey($r['unit'] ?? null),
                     'mc_price'       => $mc ?: null,
                     'lc_price'       => $lc ?: null,
                     'material_total' => $amount ? $mat : null,
@@ -94,7 +94,10 @@ class HomeController extends Controller
     public function edit(Home $home)
     {
         App::setLocale(Session::get('locale', config('app.locale')));
-        $home->load(['details' => fn ($q) => $q->orderBy('no')]);   // important
+        $home->load(['details' => fn ($q) => $q->orderBy('no')]);
+        foreach ($home->details as $detail) {
+            $detail->unit = $this->normalizeUnitToKey($detail->unit);
+        }   
         return view('pages.homeedit', compact('home'));
     }
 
@@ -179,7 +182,7 @@ class HomeController extends Controller
                 'category_name'  => $r['category_name'] ?? $detail->category_name,
                 'item_name'      => $r['item_name'] ?? $detail->item_name,
                 'amount'         => $r['amount'] ?? $detail->amount,
-                'unit'           => $r['unit'] ?? $detail->unit,
+                'unit'           => $this->normalizeUnitToKey($r['unit'] ?? $detail->unit),
                 'mc_price'       => $r['mc_price'] ?? $detail->mc_price,
                 'lc_price'       => $r['lc_price'] ?? $detail->lc_price,
                 'material_total' => $amount ? round($mat, 2) : null,
@@ -204,7 +207,7 @@ class HomeController extends Controller
                     'no'             => $r['no'] ?? ($i + 1),
                     'category_name'  => $r['category_name'] ?? null,
                     'amount'         => $amount ?: null,
-                    'unit'           => $r['unit'] ?? null,
+                    'unit'           => $this->normalizeUnitToKey($r['unit'] ?? null),
                     'mc_price'       => $mc ?: null,
                     'lc_price'       => $lc ?: null,
                     'material_total' => $amount ? $mat : null,
@@ -460,5 +463,46 @@ class HomeController extends Controller
             'list_name'    => ['nullable','string','max:255'],
             'status'       => ['nullable','boolean'],
         ]);
+    }
+
+    private function normalizeUnitToKey(?string $raw): ?string
+    {
+        if ($raw === null || $raw === '') return $raw;
+
+        $unitKeys = [
+            'sq.m',
+            'm',
+            'lump sum',
+            'leaf',
+            'trip',
+            'set',
+            'sheet',
+            'unit',
+        ];
+
+        // if already a key, return it
+        if (in_array($raw, $unitKeys, true)) {
+            return $raw;
+        }
+
+        // Check current locale translation first
+        foreach ($unitKeys as $key) {
+            if ($raw === __($key)) {
+                return $key;
+            }
+        }
+
+        // Try other locales you support (example: 'th', 'en')
+        $tryLocales = ['th', 'en'];
+        foreach ($unitKeys as $key) {
+            foreach ($tryLocales as $loc) {
+                if ($raw === \Illuminate\Support\Facades\Lang::get($key, [], $loc)) {
+                    return $key;
+                }
+            }
+        }
+
+        // fallback: return original raw so nothing breaks
+        return $raw;
     }
 }

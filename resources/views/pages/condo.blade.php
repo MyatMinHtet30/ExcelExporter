@@ -105,30 +105,12 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        {{-- Laravel pagination links (optional if you keep client paging only) --}}
-                        @if(method_exists($condos, 'links'))
-                            <div class="mt-3">
-                                {{ $condos->links() }}
-                            </div>
-                        @endif
                     </div>
 
                 </div>
             </div>
         </div> <!-- /row -->
     </div> <!-- /xp-contentbar -->
-    <iframe id="condo-export-frame"
-        style="
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            width: 1400px;
-            height: 2000px;
-            border: 0;
-            visibility: hidden;
-        ">
-    </iframe>
 @endsection
 
 @push('scripts')

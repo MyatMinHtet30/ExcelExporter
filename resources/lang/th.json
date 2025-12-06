@@ -95,7 +95,7 @@
 
   "Category is required": "กรุณากรอกหมวดงานเบ็ดเตล็ด",
   "Amount is required": "กรุณากรอกปริมาณ",
-  "Unit is required": "กรุณากรอกหน่วย",
+  "Unit is required": "กรุณาเลือกหน่วย",
   "Material price per unit is required": "กรุณากรอกค่าวัสดุ",
   "Labor price per unit is required": "กรุณากรอกค่าค่าแรงต",
   "At least one item row is required": "กรุณาเพิ่มอย่างน้อย 1 แถว",
@@ -105,5 +105,15 @@
   "Address is required": "กรุณากรอกชื่คอนโต",
   "Job name is required": "กรุณากรอกชื่อรายการ",
   "Details is required": "กรุณากรอกหมวดงาน",
-  "Price per unit is required": "กรุณากรอกค่าของแรง" 
+  "Price per unit is required": "กรุณากรอกค่าของแรง", 
+  
+  "sq.m": "ตรม",
+  "m": "เมตร",
+  "lump sum": "เหมา",
+  "leaf": "บาน",
+  "trip": "เที่ยว",
+  "set": "ชุด",
+  "unit": "หลัง",
+  "sheet": "แผ่น",
+  "Select Unit": "เลือกหน่วย"
 }

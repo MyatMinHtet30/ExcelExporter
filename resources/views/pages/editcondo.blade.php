@@ -25,7 +25,7 @@
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Customer Name') }}</h5>
+              <h5 class="card-title text-black">{{ __('Customer Name') }}<span class="star" >*</span></h5>
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
@@ -51,7 +51,7 @@
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Address') }}</h5>
+              <h5 class="card-title text-black">{{ __('Address') }}<span class="star" >*</span></h5>
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
@@ -77,7 +77,7 @@
         <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Job Name') }}</h5>
+              <h5 class="card-title text-black">{{ __('Job Name') }}<span class="star" >*</span></h5>
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
@@ -100,10 +100,10 @@
         </div>
 
         <!-- Quotation Number -->
-        <div class="col-lg-3 col-md-3 col-6">
+        <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
-              <h5 class="card-title text-black">{{ __('Quotation Number') }}</h5>
+              <h5 class="card-title text-black">{{ __('Quotation Number') }}<span class="star" >*</span></h5>
               <div class="card-body">
                 <div class="form-group">
                   <div class="input-group">
@@ -125,7 +125,7 @@
         </div>
 
         <!-- Payment Term -->
-        <div class="col-lg-3 col-md-3 col-6">
+        <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
               <h5 class="card-title text-black">{{ __('Payment Term') }}</h5>
@@ -150,7 +150,7 @@
         </div>
 
         <!-- Credits -->
-        <div class="col-lg-3 col-md-3 col-6">
+        <div class="col-lg-4 col-md-4 col-12">
           <div class="card m-b-20">
             <div class="card-header bg-white">
               <h5 class="card-title text-black">{{ __('Credits') }}</h5>
@@ -215,7 +215,7 @@
                   </div>
 
                   <div class="col-12 col-sm-6 col-md-3 field-col mb-3">
-                    <h5 class="card-title text-black">{{ __('Details') }}</h5>
+                    <h5 class="card-title text-black">{{ __('Details') }}<span class="star" >*</span></h5>
                     <div class="card-body">
                       <div class="input-group">
                         <input type="text"
@@ -233,7 +233,7 @@
                   </div>
 
                   <div class="col-6 col-md-2 field-col">
-                    <h5 class="card-title text-black">{{ __('Amount') }}</h5>
+                    <h5 class="card-title text-black">{{ __('Amount') }}<span class="star" >*</span></h5>
                     <div class="card-body">
                       <div class="form-group">
                         <input type="text"
@@ -248,19 +248,28 @@
                     </div>
                   </div>
 
-                  <div class="col-6 col-md-2 field-col">
-                    <h5 class="card-title text-black">{{ __('Unit') }}</h5>
-                    <div class="card-body">
-                      <div class="form-group">
-                        <input type="text"
-                               class="form-control units"
-                               name="items[{{ $i }}][unit]"
-                               placeholder="{{ __('Units') }}"
-                               value="{{ $row['unit'] }}" required
-                               data-error-required="{{ __('Unit is required') }}">
-                      </div>
+                 <div class="col-6 col-md-2 field-col">
+                  <h5 class="card-title text-black">{{ __('Unit') }}<span class="star" >*</span></h5>
+                  <div class="card-body">
+                    <div class="form-group">
+                      @php $unitKeys = ['sq.m','m','lump sum','leaf','trip','set','sheet','unit']; @endphp
+
+                      <select class="form-control units"
+                              name="items[{{ $i }}][unit]"
+                              required
+                              data-error-required="{{ __('Unit is required') }}">
+                        <option value="">{{ __('Select Unit') }}</option>
+
+                        @foreach ($unitKeys as $key)
+                          <option value="{{ $key }}"
+                                  {{ old("items.$i.unit", $row['unit'] ?? '') === $key ? 'selected' : '' }}>
+                            {{ __($key) }}
+                          </option>
+                        @endforeach
+                      </select>
                     </div>
                   </div>
+                </div>
 
                   <div class="col-6 col-md-2 field-col">
                     <h5 class="card-title text-black">{{ __('Material Cost') }}</h5>
@@ -293,7 +302,7 @@
                   <div class="d-none d-md-block col-md-8"></div>
 
                   <div class="col-6 col-md-2 field-col">
-                    <h5 class="card-title text-black">{{ __('Price Amount') }}</h5>
+                    <h5 class="card-title text-black">{{ __('Price Amount') }}<span class="star" >*</span></h5>
                     <div class="card-body">
                       <div class="form-group">
                         <input type="text"
@@ -398,7 +407,7 @@
               </div>
 
               <div class="col-12 col-sm-6 col-md-3 field-col">
-                <h5 class="card-title text-black">{{ __('Details') }}</h5>
+                <h5 class="card-title text-black">{{ __('Details') }}<span class="star" >*</span></h5>
                 <div class="card-body">
                   <div class="input-group">
                     <input type="text" class="form-control detail" name="items[__INDEX__][details]" placeholder="{{ __('Details') }}" required
@@ -411,7 +420,7 @@
               </div>
 
               <div class="col-6 col-md-2 field-col">
-                <h5 class="card-title text-black">{{ __('Amount') }}</h5>
+                <h5 class="card-title text-black">{{ __('Amount') }}<span class="star" >*</span></h5>
                 <div class="card-body">
                   <div class="form-group">
                     <input type="text" class="form-control amount" name="items[__INDEX__][amount]" placeholder=".00" required
@@ -422,11 +431,23 @@
               </div>
 
               <div class="col-6 col-md-2 field-col">
-                <h5 class="card-title text-black">{{ __('Unit') }}</h5>
+                <h5 class="card-title text-black">{{ __('Unit') }}<span class="star" >*</span></h5>
                 <div class="card-body">
                   <div class="form-group">
-                    <input type="text" class="form-control units" name="items[__INDEX__][unit]" placeholder="{{ __('Units') }}" required
-                    data-error-required="{{ __('Unit is required') }}">
+                    <select class="form-control units"
+                          name="items[__INDEX__][unit]"
+                          required
+                          data-error-required="{{ __('Unit is required') }}">
+                    <option value="">{{ __('Select Unit') }}</option>
+                    <option value="{{ __('sq.m') }}">{{ __('sq.m') }}</option>
+                    <option value="{{ __('m') }}">{{ __('m') }}</option>
+                    <option value="{{ __('lump sum') }}">{{ __('lump sum') }}</option>
+                    <option value="{{ __('leaf') }}">{{ __('leaf') }}</option>
+                    <option value="{{ __('trip') }}">{{ __('trip') }}</option>
+                    <option value="{{ __('set') }}">{{ __('set') }}</option>
+                    <option value="{{ __('sheet') }}">{{ __('sheet') }}</option>
+                    <option value="{{ __('unit') }}">{{ __('unit') }}</option>
+                  </select>
                   </div>
                 </div>
               </div>
@@ -454,7 +475,7 @@
               <div class="d-none d-md-block col-md-8"></div>
 
               <div class="col-6 col-md-2 field-col">
-                <h5 class="card-title text-black">{{ __('Price Amount') }}</h5>
+                <h5 class="card-title text-black">{{ __('Price Amount') }}<span class="star" >*</span></h5>
                 <div class="card-body">
                   <div class="form-group">
                     <input type="text" class="form-control price-per-unit" name="items[__INDEX__][price_per_unit_total]" placeholder=".00" required

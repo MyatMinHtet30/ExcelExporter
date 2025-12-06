@@ -35,6 +35,8 @@ class AuthUserController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/')->with('status', 'Logged out.');
+
+        // use a specific key so it's only used for logout
+        return redirect('/')->with('logout_success', __('You have been logged out.'));
     }
 }
