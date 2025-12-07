@@ -202,7 +202,7 @@
                             name="details[{{ $i }}][unit]"
                             required
                             data-error-required="{{ __('Unit is required') }}">
-                    <option value="">{{ __('Select Unit') }}</option>
+                    <option value="" selected disabled>{{ __('Select Unit') }}</option>
                     @foreach ($unitKeys as $key)
                         <option value="{{ $key }}" {{ old("details.$i.unit", $detail->unit) === $key ? 'selected' : '' }}>
                         {{ __($key) }}
@@ -214,7 +214,7 @@
 
             <!-- Material Price / Unit -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Material Price / Unit') }} *</label>
+                <label class="form-label">{{ __('Material Price') }} *</label>
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-mc"
                            name="details[{{ $i }}][mc_price]"
@@ -225,7 +225,7 @@
 
             <!-- Labor Price / Unit -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Labor Price / Unit') }} *</label>
+                <label class="form-label">{{ __('Labor Price') }} *</label>
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-lc"
                            name="details[{{ $i }}][lc_price]"
@@ -386,7 +386,7 @@
                                 value="__SER__" min="1" readonly>
                         </div>
                     </div>
-                    <div class="col-12 col-sm-6 col-md-6 field-col">
+                    <div class="col-12 col-md-3 field-col">
                         <label class="form-label">{{ __('Category') }}</label>
                         <div class="input-group input-42">
                             <input type="text" class="form-control" name="details[__INDEX__][category_name]">
@@ -408,7 +408,7 @@
                         <label class="form-label">{{ __('Unit') }}</label>
                         <div class="input-group input-42">
                             <select class="form-control units" name="details[__INDEX__][unit]">
-                            <option value="">{{ __('Select Unit') }}</option>
+                            <option value="" selected disabled>{{ __('Select Unit') }}</option>
                             <option value="sq.m">sq.m</option>
                             <option value="m">m</option>
                             <option value="lump sum">lump sum</option>
@@ -418,43 +418,41 @@
                             <option value="sheet">sheet</option>
                             <option value="unit">unit</option>
                             </select>
-                            <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)">
-                            <i class="fas fa-microphone"></i>
-                            </button>
                         </div>
                     </div>
-                </div>
-
-                <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
-                    <div class="col-12 col-md field-col">
-                        <label class="form-label">{{ __('Material Price / Unit') }}</label>
+                    <div class="col-6 col-md-2 field-col">
+                        <label class="form-label">{{ __('Material Price') }}</label>
                         <div class="input-group input-42">
                             <input type="number" step="0.01" class="form-control js-mc" name="details[__INDEX__][mc_price]"
                                 placeholder=".00">
                         </div>
                     </div>
-                    <div class="col-12 col-md field-col">
+                    <div class="col-6 col-md-2 field-col">
                         <label class="form-label">{{ __('Material Total') }}</label>
                         <div class="input-group input-42">
                             <input type="number" step="0.01" class="form-control readonly-input js-mat-total" value="0.00"
                                 readonly>
                         </div>
                     </div>
-                    <div class="col-12 col-md field-col">
-                        <label class="form-label">{{ __('Labor Price / Unit') }}</label>
+                </div>
+
+                <div class="row g-3 g-compact align-items-end pt-2 fields-line-2">
+                    <div class="col-md-6"></div>
+                    <div class="col-12 col-md-2 field-col">
+                        <label class="form-label">{{ __('Labor Price') }}</label>
                         <div class="input-group input-42">
                             <input type="number" step="0.01" class="form-control js-lc" name="details[__INDEX__][lc_price]"
                                 placeholder=".00">
                         </div>
                     </div>
-                    <div class="col-12 col-md field-col">
+                    <div class="col-12 col-md-2 field-col">
                         <label class="form-label">{{ __('Labor Total') }}</label>
                         <div class="input-group input-42">
                             <input type="number" step="0.01" class="form-control readonly-input js-lab-total" value="0.00"
                                 readonly>
                         </div>
                     </div>
-                    <div class="col-12 col-md field-col">
+                    <div class="col-12 col-md-2 field-col">
                         <label class="form-label">{{ __('Grand Total') }}</label>
                         <div class="input-group input-42">
                             <input type="number" step="0.01" class="form-control readonly-input js-grand-total" value="0.00"

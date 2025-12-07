@@ -217,7 +217,7 @@
                       <div class="form-group">
                         <select class="form-control units" name="items[{{ $i }}][unit]" required
                             data-error-required="{{ __('Unit is required') }}">
-                            <option value="">{{ __('Select Unit') }}</option>
+                            <option value="" selected disabled>{{ __('Select Unit') }}</option>
                             <option value="{{ __('sq.m') }}">{{ __('sq.m') }}</option>
                             <option value="{{ __('m') }}">{{ __('m') }}</option>
                             <option value="{{ __('lump sum') }}">{{ __('lump sum') }}</option>
@@ -393,7 +393,7 @@
                   <div class="form-group">
                       <select class="form-control units" name="items[{{ $i }}][unit]" required
                           data-error-required="{{ __('Unit is required') }}">
-                          <option value="">{{ __('Select Unit') }}</option>
+                          <option value="" selected disabled>{{ __('Select Unit') }}</option>
                           <option value="{{ __('sq.m') }}">{{ __('sq.m') }}</option>
                           <option value="{{ __('m') }}">{{ __('m') }}</option>
                           <option value="{{ __('lump sum') }}">{{ __('lump sum') }}</option>
