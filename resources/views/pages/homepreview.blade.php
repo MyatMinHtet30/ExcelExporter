@@ -303,300 +303,346 @@
                 timer: 2000,
                 showConfirmButton: false
             });
-            const wb = new ExcelJS.Workbook();
-            const ws = wb.addWorksheet('BOQ');
 
+            const wb = new ExcelJS.Workbook();
+            const ws = wb.addWorksheet('BOQ', {
+            properties: { defaultRowHeight: 18.7 }
+            });
+
+            // --- columns A..I (1..9) ---
             ws.columns = [
-                { header: 'No.', width: 14 },
-                { header: 'List', width: 42 },
-                { header: 'Amount', width: 12 },
-                { header: 'unit', width: 10 },
-                { header: 'Price/Unit', width: 14 },
-                { header: 'Total Price', width: 16 },
-                { header: 'Price/Unit', width: 14 },
-                { header: 'Total Price', width: 16 },
-                { header: 'Total Amount', width: 16 },
+                { key: 'colA', width: 13 }, // col A (No / labels)
+                { key: 'colB', width: 42 }, // List / descriptions
+                { key: 'colC', width: 12 }, // Amount
+                { key: 'colD', width: 10 }, // Unit
+                { key: 'colE', width: 14 }, // Mat Price / Unit
+                { key: 'colF', width: 14 }, // Mat Total
+                { key: 'colG', width: 14 }, // Lab Price / Unit
+                { key: 'colH', width: 14 }, // Lab Total
+                { key: 'colI', width: 16 }  // Grand Total
             ];
 
-            const FIXED_HEIGHT = 30;
-            let r = 1;
+            const mediumB = { style: 'medium' };
+            const thinB = { style: 'thin' };
 
-            /* =======================
-               TITLE
-            ======================= */
-            ws.mergeCells(r, 1, r, 9);
-            ws.getCell(r, 1).value = "Bill of Quantities";
-            ws.getCell(r, 1).alignment = { horizontal: "center", vertical: "middle" };
-            ws.getCell(r, 1).font = { bold: true };
-            ws.getRow(r).height = FIXED_HEIGHT;
-            r += 2;
-
-            /* =======================
-               META FIELDS
-            ======================= */
-
-            // Row 1: Project Name + Date
-            ws.getCell(r, 1).value = "Project Name  :";
-            ws.mergeCells(r, 2, r, 6);
-            ws.getCell(r, 2).value = @json($project_name);
-
-            ws.mergeCells(r, 7, r, 9);
-            ws.getCell(r, 7).value = "Date: " + @json($date);
-            ws.getCell(r, 7).alignment = {
-                horizontal: "center",
-                vertical: "middle"
-            };
-
-            ws.getRow(r).height = FIXED_HEIGHT;
-            r++;
-
-            // Row 2: Dear
-            ws.getCell(r, 1).value = "Dear  :";
-            ws.mergeCells(r, 2, r, 6);
-            ws.getCell(r, 2).value = @json($dear);
-
-            ws.getRow(r).height = FIXED_HEIGHT;
-            r++;
-
-            // Row 3: Trooper + House No.
-            ws.getCell(r, 1).value = "Trooper  :";
-            ws.mergeCells(r, 2, r, 6);
-            ws.getCell(r, 2).value = @json($trooper);
-
-            ws.mergeCells(r, 7, r, 8);
-            ws.getCell(r, 7).value = "House No.";
-            ws.getCell(r, 7).alignment = {
-                horizontal: "center",
-                vertical: "middle"
-            };
-
-            ws.getCell(r, 9).value = @json($house_no);
-            ws.getCell(r, 9).alignment = {
-                horizontal: "center",
-                vertical: "middle"
-            };
-
-            ws.getRow(r).height = FIXED_HEIGHT;
-            r += 2;
-
-            /* =======================
-               HEADER 2-ROW
-            ======================= */
-            const hdr1 = r, hdr2 = r + 1;
-
-            ws.mergeCells(hdr1, 1, hdr2, 1);
-            ws.getCell(hdr1, 1).value = 'No.';
-
-            ws.getCell(hdr1, 2).value = 'List';
-
-            ws.mergeCells(hdr1, 3, hdr2, 3);
-            ws.getCell(hdr1, 3).value = 'Amount';
-
-            ws.mergeCells(hdr1, 4, hdr2, 4);
-            ws.getCell(hdr1, 4).value = 'unit';
-
-            ws.mergeCells(hdr1, 5, hdr1, 6);
-            ws.getCell(hdr1, 5).value = 'Material Cost';
-
-            ws.mergeCells(hdr1, 7, hdr1, 8);
-            ws.getCell(hdr1, 7).value = 'Labor Cost';
-
-            ws.mergeCells(hdr1, 9, hdr2, 9);
-            ws.getCell(hdr1, 9).value = 'Total Amount';
-
-            ws.getCell(hdr2, 2).value = @json($list_name);
-            ws.getCell(hdr2, 5).value = "Price/Unit";
-            ws.getCell(hdr2, 6).value = "Total Price";
-            ws.getCell(hdr2, 7).value = "Price/Unit";
-            ws.getCell(hdr2, 8).value = "Total Price";
-
-            for (let c = 1; c <= 9; c++) {
-                ws.getCell(hdr1, c).font = { bold: true };
-                ws.getCell(hdr2, c).font = { bold: true };
-
-                ws.getCell(hdr1, c).alignment =
-                    ws.getCell(hdr2, c).alignment =
-                    { horizontal: "center", vertical: "middle", wrapText: true };
-
-                ws.getCell(hdr1, c).border =
-                    ws.getCell(hdr2, c).border =
-                    { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-            }
-
-            ws.getRow(hdr1).height = FIXED_HEIGHT;
-            ws.getRow(hdr2).height = FIXED_HEIGHT;
-
-            /* =======================
-               CATEGORY BAND
-            ======================= */
-            r = hdr2 + 1;
-            ws.getCell(r, 2).value = "Miscellaneous work category";
-            ws.getCell(r, 2).font = { bold: true };
-            ws.getCell(r, 2).alignment = { horizontal: "center", vertical: "middle" };
-
-            for (let c = 1; c <= 9; c++) {
-                ws.getCell(r, c).border = {
-                    top: { style: 'thin' },
-                    left: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    right: { style: 'thin' },
+            // helper for borders
+            function setRowBorders(rowIndex, left=1, right=9, borderStyle=thinB) {
+            for (let c=left; c<=right; c++) {
+                ws.getCell(rowIndex, c).border = {
+                top: borderStyle, left: borderStyle, bottom: borderStyle, right: borderStyle
                 };
-                ws.getCell(r, c).alignment = { vertical: "middle", wrapText: true };
+            }
             }
 
-            ws.getRow(r).height = FIXED_HEIGHT;
-            r++;
+            // ----- Row 1: leave blank (A..I) -----
+            // row 1 empty (index 1) - keep blank
+            ws.getRow(1).height = 15;
 
-            /* =======================
-               DATA ROWS
-            ======================= */
-            let n = 1;
+            // ----- Row 2: title merged A-I, height 24 -----
+            ws.getRow(2).height = 19;
+            ws.mergeCells(2,1,2,9); // A2:I2
+            ws.getCell(2,1).value = 'Bill of Quantities';
+            ws.getCell(2,1).alignment = { horizontal: 'center', vertical: 'middle' };
+            ws.getCell(2,1).font = { bold: true };
+
+            // ----- Row 3: spacer with thick bottom border A-I, height 6.75 -----
+            ws.getRow(3).height = 5.75;
+            for (let c=1;c<=9;c++){
+            ws.getCell(3,c).border = { bottom: mediumB };
+            }
+
+            // ----- Row 4: project row, height 22.7
+            ws.getRow(4).height = 18.7;
+            ws.getCell(4,1).value = 'Project Name :';
+            ws.getCell(4,1).alignment = { horizontal: 'left', vertical: 'middle' };
+
+            ws.mergeCells(4,2,4,3); // B4:C4 for project name data
+            ws.getCell(4,2).value = @json($project_name);
+            ws.getCell(4,2).alignment = { horizontal: 'left', vertical: 'middle' };
+
+            ws.mergeCells(4,7,4,9); // G4:I4
+            ws.getCell(4,7).value = 'Date: ' + (@json($date) || '1/1/2025');
+            ws.getCell(4,7).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            // ----- Row 5: Dear row, height 22.7
+            ws.getRow(5).height = 18.7;
+            ws.getCell(5,1).value = 'Dear :';
+            ws.getCell(5,1).alignment = { horizontal: 'left', vertical: 'middle' };
+            ws.getCell(5,2).value = @json($dear);
+            ws.getCell(5,2).alignment = { horizontal: 'left', vertical: 'middle' };
+
+            // ----- Row 6: Trooper row, height 22.7, thick bottom border
+           ws.getCell(6,1).value = 'Trooper :';
+            ws.getCell(6,1).alignment = { horizontal: 'left', vertical: 'middle' };
+
+            // Do NOT merge B..F — put Trooper text in column B and center it
+            ws.getCell(6,2).value = @json($trooper);
+            ws.getCell(6,2).alignment = { horizontal: 'left', vertical: 'middle' };
+
+            ws.mergeCells(6,7,6,8); // G6:H6
+            ws.getCell(6,7).value = 'House No.';
+            ws.getCell(6,7).alignment = { horizontal: 'center', vertical: 'middle' };
+            ws.getCell(6,9).value = @json($house_no);
+            ws.getCell(6,9).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            // thick border under row 6 (bottom)
+            for (let c=1;c<=9;c++) ws.getCell(6,c).border = { bottom: mediumB };
+
+            // ----- Rows 7 & 8: double header rows -----
+            ws.mergeCells(7,1,8,1);   // A7:A8 -> No.
+            ws.getCell(7,1).value = 'No';
+            ws.getCell(7,1).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            ws.mergeCells(7,3,8,3);   // C7:C8 -> Amount
+            ws.getCell(7,3).value = 'Amount';
+            ws.getCell(7,3).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            ws.mergeCells(7,4,8,4);   // D7:D8 -> Unit
+            ws.getCell(7,4).value = 'Unit';
+            ws.getCell(7,4).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            ws.mergeCells(7,9,8,9);   // I7:I8 -> Total amount
+            ws.getCell(7,9).value = 'Total Amount';
+            ws.getCell(7,9).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            // Column B for row7-row8: top row (7) show "List" centered; row8 B will show the sub-header text
+            ws.getCell(7,2).value = 'List';
+            ws.getCell(7,2).alignment = { horizontal: 'center', vertical: 'middle' };
+            ws.getCell(8,2).value = @json($list_name) || 'List';
+            ws.getCell(8,2).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            // Merge E & F in row7 for "Material price" and set sub-headers in row8
+            ws.mergeCells(7,5,7,6); // E7:F7 Material price
+            ws.getCell(7,5).value = 'Material Cost';
+            ws.getCell(7,5).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            // Merge G & H in row7 for "Labor Cost"
+            ws.mergeCells(7,7,7,8); // G7:H7 Labor Cost
+            ws.getCell(7,7).value = 'Labor Cost';
+            ws.getCell(7,7).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            // Row 8 sub-headers for E,F,G,H
+            ws.getCell(8,5).value = 'Price/Unit';
+            ws.getCell(8,6).value = 'Total Price';
+            ws.getCell(8,7).value = 'Price/Unit';
+            ws.getCell(8,8).value = 'Total Price';
+            for (let c of [5,6,7,8]) ws.getCell(8,c).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            for (let rr of [7,8]) {
+                for (let c=1;c<=9;c++){
+                    ws.getCell(rr,c).border = {
+                    top: { style: 'thin' }, left: { style: 'thin' },
+                    bottom: { style: 'thin' }, right: { style: 'thin' }
+                    };
+                    ws.getCell(rr,c).alignment = ws.getCell(rr,c).alignment || { vertical: 'middle' };
+                }
+            }
+            // make row 8 bottom thick underline: set bottom medium border on row 8
+            for (let c=1;c<=9;c++) {
+            const existing = ws.getCell(8,c).border || {};
+            ws.getCell(8,c).border = { ...existing, bottom: mediumB };
+            }
+
+            // set header rows heights
+            ws.getRow(7).height = 18.7;
+            ws.getRow(8).height = 18.7;
+
+            // ----- Row 9: "Miscellaneous work category" in column B -----
+            ws.getRow(9).height = 18.7;
+            ws.getCell(9,2).value = 'Miscellaneous work category';
+            ws.getCell(9,2).alignment = { horizontal: 'center', vertical: 'middle' };
+            // Set border for row9 cells
+            for (let c=1;c<=9;c++) {
+            ws.getCell(9,c).border = { top: thinB, left: thinB, bottom: thinB, right: thinB };
+            ws.getCell(9,c).alignment = { vertical: 'middle' };
+            }
+
+            // ----- Data rows start at row 10 (dynamic) -----
+            let r = 10;
+            let no = 1;
             const rows = @json($rows);
 
             for (const row of rows) {
-                if (!row.category_name) continue;
+                if (!row.category_name) continue; // keep same logic as your blade template
 
-                ws.getCell(r, 1).value = n++;                      // No.
-                ws.getCell(r, 2).value = row.category_name;        // List
-                ws.getCell(r, 3).value = Number(row.amount) || 0;  // Amount
-                ws.getCell(r, 4).value = row.unit;                 // unit
-                ws.getCell(r, 5).value = Number(row.mc_price) || 0;
-                ws.getCell(r, 6).value = Number(row.mat_total) || 0;
-                ws.getCell(r, 7).value = Number(row.lc_price) || 0;
-                ws.getCell(r, 8).value = Number(row.lab_total) || 0;
-                ws.getCell(r, 9).value = Number(row.grand_total) || 0;
+                // Column A: No.
+                ws.getCell(r,1).value = no++;
+                ws.getCell(r,1).alignment = { horizontal: 'center', vertical: 'middle' };
 
-                // No. center
-                ws.getCell(r, 1).alignment = { horizontal: "center", vertical: "middle" };
+                // Column B: category_name
+                ws.getCell(r,2).value = row.category_name;
+                ws.getCell(r,2).alignment = { vertical: 'middle' };
 
-                // Amount center with number format
-                ws.getCell(r, 3).numFmt = "#,##0.00";
-                ws.getCell(r, 3).alignment = { horizontal: "center", vertical: "middle" };
+                // Column C: amount (centered)
+                ws.getCell(r,3).value = Number(row.amount) || 0;
+                ws.getCell(r,3).numFmt = '#,##0.00';
+                ws.getCell(r,3).alignment = { horizontal: 'center', vertical: 'middle' };
 
-                // unit center
-                ws.getCell(r, 4).alignment = { horizontal: "center", vertical: "middle" };
+                // Column D: unit (center)
+                ws.getCell(r,4).value = row.unit || '';
+                ws.getCell(r,4).alignment = { horizontal: 'center', vertical: 'middle' };
 
-                // Money columns right
-                for (let c of [5, 6, 7, 8, 9]) {
-                    ws.getCell(r, c).numFmt = "#,##0.00";
-                    ws.getCell(r, c).alignment = { horizontal: "right", vertical: "middle" };
+                // Column E: mc_price, Column F: mat_total
+                ws.getCell(r,5).value = Number(row.mc_price) || 0;
+                ws.getCell(r,6).value = Number(row.mat_total) || 0;
+
+                // Column G: lc_price, Column H: lab_total
+                ws.getCell(r,7).value = Number(row.lc_price) || 0;
+                ws.getCell(r,8).value = Number(row.lab_total) || 0;
+
+                // Column I: grand_total
+                ws.getCell(r,9).value = Number(row.grand_total) || 0;
+
+                // apply number formats and alignments for money cols
+                for (let col of [5,6,7,8,9]) {
+                ws.getCell(r,col).numFmt = '_-* #,##0.00_-;\\-* #,##0.00_-;_-* "-"??_-' ;
+                ws.getCell(r,col).alignment = { horizontal: 'right', vertical: 'middle' };
                 }
 
-                // Borders
-                for (let c = 1; c <= 9; c++) {
-                    ws.getCell(r, c).border = {
-                        top: { style: 'thin' },
-                        left: { style: 'thin' },
-                        bottom: { style: 'thin' },
-                        right: { style: 'thin' }
-                    };
-                    if (!ws.getCell(r, c).alignment) {
-                        ws.getCell(r, c).alignment = {};
-                    }
-                    ws.getCell(r, c).alignment.vertical = "middle";
+                // borders for the data row
+                for (let c=1;c<=9;c++){
+                ws.getCell(r,c).border = { top: thinB, left: thinB, bottom: thinB, right: thinB };
                 }
 
-                ws.getRow(r).height = FIXED_HEIGHT;
+                ws.getRow(r).height = 18.7;
                 r++;
             }
 
-            /* =======================
-               TOTALS + SEAL
-            ======================= */
-            const startTotals = r;
-            ws.mergeCells(startTotals, 2, startTotals + 4, 3);
+            // ----- After data: one empty row then totals block of 5 rows -----
+            // ensure there is an empty row
+            const emptyRow = r;
+            ws.getRow(emptyRow).height = 18.7;
+            for (let c=1;c<=9;c++){
+                ws.getCell(emptyRow, c).border = { top: thinB, left: thinB, bottom: thinB, right: thinB };
+            }
+            r = emptyRow + 1; // totals start here
 
-            const totals = {
-                miscTotal: Number(@json($miscTotal)) || 0,
-                operating: Number(@json($operating)) || 0,
-                abTotal: Number(@json($abTotal)) || 0,
-                vat: Number(@json($vat)) || 0,
-                finalTotal: Number(@json($finalTotal)) || 0,
-            };
-
-            const labels = [
-                "Total price for miscellaneous work category",
-                "Operating expenses and profit 15%",
-                "Total price of work category A,B",
-                "Value Added Tax 7%",
-                "Total price"
-            ];
-
-            const vals = [
-                totals.miscTotal,
-                totals.operating,
-                totals.abTotal,
-                totals.vat,
-                totals.finalTotal
-            ];
-
-            for (let i = 0; i < 5; i++) {
-                let rr = startTotals + i;
-
-                ws.mergeCells(rr, 4, rr, 8);
-                ws.getCell(rr, 4).value = labels[i];
-                ws.getCell(rr, 9).value = vals[i];
-                ws.getCell(rr, 9).numFmt = "#,##0.00";
-
-                ws.getCell(rr, 4).alignment = { horizontal: "right", vertical: "middle" };
-                ws.getCell(rr, 9).alignment = { horizontal: "right", vertical: "middle" };
-
-                for (let c = 1; c <= 9; c++) {
-                    ws.getCell(rr, c).border =
-                        { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-
-                    if (!ws.getCell(rr, c).alignment) {
-                        ws.getCell(rr, c).alignment = {};
-                    }
-                    ws.getCell(rr, c).alignment.vertical = "middle";
-                }
-
-                ws.getRow(rr).height = FIXED_HEIGHT;
+            const totalsStart = r; // totalsStart .. totalsStart+4 (five rows)
+            // Column A: "thick border" and display A and B on first two rows (as you requested)
+            // We'll put 'A' on first totals row and 'B' on second totals row in column A
+            ws.getCell(totalsStart, 1).value = 'A';
+            ws.getCell(totalsStart+1, 1).value = 'B';
+            // apply medium border on column A for the 5 totals rows
+            for (let rr = totalsStart; rr <= totalsStart + 4; rr++) {
+                ws.getCell(rr,1).border = { top: mediumB, left: mediumB, bottom: mediumB, right: mediumB };
+                ws.getCell(rr,1).alignment = { horizontal: 'center', vertical: 'middle' };
+                ws.getRow(rr).height = 18.7;
             }
 
-            ws.getCell(startTotals + 4, 9).font = { bold: true };
+            // Column B: big logo area with thick box border -> merge B..C rows for five rows
+            // You requested "inside the 5 row we gonna display logo photo and make itThick Box border"
+            ws.mergeCells(totalsStart,2, totalsStart+4,3); // B..C across 5 rows
+            for (let rr = totalsStart; rr <= totalsStart + 4; rr++) {
+                // set thick border on merged region cells individually
+                ws.getCell(rr,2).border = { top: mediumB, left: mediumB, bottom: mediumB, right: mediumB };
+                ws.getCell(rr,3).border = { top: mediumB, left: mediumB, bottom: mediumB, right: mediumB };
+            }
 
-            /* =======================
-               SEAL IMAGE
-            ======================= */
+            ws.getCell(totalsStart,2).alignment = { horizontal: 'center', vertical: 'middle' };
+
+            // Insert seal/logo into the merged B..C area (approx position)
             try {
                 const base64 = await toBase64(`{{ asset('assets/images/168Home.png') }}`);
                 const imgId = wb.addImage({ base64: "data:image/png;base64," + base64, extension: "png" });
-
+                // place image anchored to B cell (col index 2), row totalsStart-1 (ExcelJS uses zero-based row for ext coords)
                 ws.addImage(imgId, {
-                    tl: { col: 1.1, row: startTotals - 1 + 0.2 },
+                    tl: { col: 1.15, row: totalsStart - 1 + 0.2 },
                     ext: { width: 240, height: 140 },
-                    editAs: "oneCell"
+                    editAs: 'oneCell'
                 });
-            } catch (e) { }
+                ws.getCell(totalsStart,2).alignment = { horizontal: 'center', vertical: 'middle' };
+            } catch (e) { /* ignore image errors */ }
 
-            /* =======================
-               APPLY ANGSANA NEW FONT
-            ======================= */
-            ws.eachRow({ includeEmpty: true }, row => {
-                row.eachCell(cell => {
-                    const prev = cell.font || {};
-                    cell.font = {
-                        ...prev,
-                        name: "Angsana New",
-                        size: 16
-                    };
-                });
+            // Column C we already included in merged logo region, but you also asked "for the column C make it all thick border"
+            for (let rr = totalsStart; rr <= totalsStart + 4; rr++) {
+                ws.getCell(rr,3).border = { top: mediumB, left: mediumB, bottom: mediumB, right: mediumB };
+            }
+
+            // Columns D..G merged per row for the label text (we'll merge D..G for each totals row)
+            const labelColsLeft = 4, labelColsRight = 7; // D..G
+            for (let i=0; i<5; i++) {
+            const rr = totalsStart + i;
+            ws.mergeCells(rr, labelColsLeft, rr, labelColsRight); // D..G
+            // labels as requested:
+            const labelMap = [
+                'Total price for miscellaneous work category',
+                'Operating expenses and profit 15%',
+                'Total price of work category A,B',
+                'Value Added Tax 7%',
+                'Total price'
+            ];
+            ws.getCell(rr, labelColsLeft).value = labelMap[i];
+            ws.getCell(rr, labelColsLeft).alignment = { horizontal: 'center', vertical: 'middle' };
+            // set border on merged D..G cells
+            for (let c = labelColsLeft; c <= labelColsRight; c++) {
+                ws.getCell(rr,c).border = { top: mediumB, left: mediumB, bottom: mediumB, right: mediumB };
+            }
+            }
+
+            // Column H: make it all thick border
+            for (let rr = totalsStart; rr <= totalsStart + 4; rr++) {
+            ws.getCell(rr,8).border = { top: mediumB, left: mediumB, bottom: mediumB, right: mediumB };
+            }
+
+            // Column I: totals values with thick border and right alignment
+            // compute totals values (use your blade values)
+            const miscTotal = Number(@json($miscTotal)) || 0;
+            const operating = Number(@json($operating)) || 0;
+            const abTotal = Number(@json($abTotal)) || 0;
+            const vat = Number(@json($vat)) || 0;
+            const finalTotal = Number(@json($finalTotal)) || 0;
+
+            const vals = [ miscTotal, operating, abTotal, vat, finalTotal ];
+
+            for (let i=0;i<5;i++){
+            const rr = totalsStart + i;
+            ws.getCell(rr,9).value = vals[i];
+            ws.getCell(rr,9).numFmt = '_-* #,##0.00_-;\\-* #,##0.00_-;_-* "-"??_-' ;
+            ws.getCell(rr,9).alignment = { horizontal: 'center', vertical: 'middle' };
+            ws.getCell(rr,9).border = { top: mediumB, left: mediumB, bottom: mediumB, right: mediumB };
+            ws.getRow(rr).height = 18.7;
+            }
+            // bold the final total (last row)
+            ws.getCell(totalsStart + 4, 9);
+
+            const lastRowIndex = ws.rowCount;
+            for (let rr = 1; rr <= lastRowIndex; rr++) {
+            const cell = ws.getCell(rr, 9);
+            const prev = cell.border || null;
+            // preserve prev entirely and only replace the right side
+            cell.border = {
+                ...(prev || {}),
+                right: { style: 'medium' }
+            };
+            }
+            
+            // ----- Force Angsana New font size 16 for all cells -----
+            ws.eachRow({ includeEmpty: true }, (row) => {
+            row.eachCell((cell) => {
+                const prev = cell.font || {};
+                cell.font = { ...prev, name: 'Angsana New', size: 16 };
+            });
             });
 
-            /* =======================
-               SAVE
-            ======================= */
+            // page setup & print area (optional)
+            ws.pageSetup = {
+            paperSize: 9, orientation: 'landscape',
+            fitToPage: true, fitToWidth: 1, fitToHeight: 0,
+            margins: { left: 0.3, right: 0.3, top: 0.5, bottom: 0.5, header: 0.3, footer: 0.3 }
+            };
+
+            // Save & download
             const buf = await wb.xlsx.writeBuffer();
-            const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            const a = document.createElement("a");
+            const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            const project = @json($project_name) ?? "";
-            a.download = `${project} Home.xlsx`;
+            const safeProject = String(@json($project_name) || 'BOQ').replace(/[\\/:*?"<>|]/g, '').trim();
+            a.download = `${safeProject} Home.xlsx`;
             document.body.appendChild(a);
             a.click();
             a.remove();
         }
+
 
         async function downloadBoqPdf() {
             Swal.fire({
@@ -615,7 +661,7 @@
 
             // Higher canvas resolution, but we will use JPEG to keep file size small
             const canvas = await html2canvas(boqElement, {
-                scale: 3,                 // ↑ better resolution than 2
+                scale: 3,                 
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 scrollX: 0,
