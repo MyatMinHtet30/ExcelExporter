@@ -202,3 +202,7 @@
         min-width: 0 !important;
     }
 }
+
+.star {
+    color: #ff0000;
+}
