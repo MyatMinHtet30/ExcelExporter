@@ -30,7 +30,7 @@
                 <div class="col-lg-6 col-md-6 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Project Name') }} *</h5>
+                            <h5 class="card-title text-black">{{ __('Project Name') }} <span class="star">*</span></h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -55,7 +55,7 @@
                 <div class="col-lg-6 col-md-6 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('List Name') }} *</h5>
+                            <h5 class="card-title text-black">{{ __('List Name') }} <span class="star">*</span></h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -124,7 +124,7 @@
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Trooper') }} *</h5>
+                            <h5 class="card-title text-black">{{ __('Trooper') }} <span class="star">*</span></h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
@@ -168,7 +168,7 @@
 
             <!-- Category -->
             <div class="col-12 col-sm-6 col-md-3 field-col">
-                <label class="form-label">{{ __('Category') }} *</label>
+                <label class="form-label">{{ __('Category') }} <span class="star">*</span></label>
                 <div class="input-group input-42">
                     <input type="text" class="form-control"
                            name="details[{{ $i }}][category_name]"
@@ -183,7 +183,7 @@
 
             <!-- Amount -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Amount') }} *</label>
+                <label class="form-label">{{ __('Amount') }} <span class="star">*</span></label>
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-amount"
                            name="details[{{ $i }}][amount]"
@@ -196,7 +196,7 @@
             @php $unitKeys = ['sq.m','m','lump sum','leaf','trip','set','sheet','unit']; @endphp
 
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Unit') }} *</label>
+                <label class="form-label">{{ __('Unit') }} <span class="star">*</span></label>
                 <div class="input-group input-42">
                     <select class="form-control units"
                             name="details[{{ $i }}][unit]"
@@ -214,7 +214,7 @@
 
             <!-- Material Price / Unit -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Material Price') }} *</label>
+                <label class="form-label">{{ __('Material Price') }} <span class="star">*</span></label>
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-mc"
                            name="details[{{ $i }}][mc_price]"
@@ -225,7 +225,7 @@
 
             <!-- Labor Price / Unit -->
             <div class="col-6 col-md-2 field-col">
-                <label class="form-label">{{ __('Labor Price') }} *</label>
+                <label class="form-label">{{ __('Labor Price') }} <span class="star">*</span></label>
                 <div class="input-group input-42">
                     <input type="number" step="0.01" class="form-control js-lc"
                            name="details[{{ $i }}][lc_price]"
