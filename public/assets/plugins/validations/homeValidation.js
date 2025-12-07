@@ -73,7 +73,7 @@
     $$('#rows-container .item-row').forEach(row => {
       const cat  = row.querySelector('input[name*="[category_name]"]');
       const amt  = row.querySelector('input[name*="[amount]"]');
-      const unit = row.querySelector('input[name*="[unit]"]');
+      const unit = row.querySelector('.units');
       const mc   = row.querySelector('input[name*="[mc_price]"]');
       const lc   = row.querySelector('input[name*="[lc_price]"]');
 

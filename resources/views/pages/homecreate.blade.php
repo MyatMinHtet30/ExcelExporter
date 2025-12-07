@@ -172,7 +172,7 @@
                                     <div class="input-group input-42">
                                         <select class="form-control units" name="details[0][unit]" required
                                             data-error-required="{{ __('Unit is required') }}">
-                                            <option value="">{{ __('Select Unit') }}</option>
+                                            <option value="" selected disabled>{{ __('Select Unit') }}</option>
                                             <option value="{{ __('sq.m') }}">{{ __('sq.m') }}</option>
                                             <option value="{{ __('m') }}">{{ __('m') }}</option>
                                             <option value="{{ __('lump sum') }}">{{ __('lump sum') }}</option>
@@ -187,7 +187,7 @@
 
                                 <!-- Material Price / Unit -->
                                 <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Material Price / Unit') }} *</label>
+                                    <label class="form-label">{{ __('Material Price') }} *</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control"
                                             name="details[0][mc_price]" placeholder=".00" required
@@ -198,7 +198,7 @@
 
                                 <!-- Labor Price / Unit -->
                                 <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Labor Price / Unit') }} *</label>
+                                    <label class="form-label">{{ __('Labor Price') }} *</label>
                                     <div class="input-group input-42">
                                         <input type="number" step="0.01" class="form-control"
                                             name="details[0][lc_price]" placeholder=".00" required

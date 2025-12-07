@@ -258,7 +258,7 @@
                               name="items[{{ $i }}][unit]"
                               required
                               data-error-required="{{ __('Unit is required') }}">
-                        <option value="">{{ __('Select Unit') }}</option>
+                        <option value="" selected disabled>{{ __('Select Unit') }}</option>
 
                         @foreach ($unitKeys as $key)
                           <option value="{{ $key }}"
@@ -438,7 +438,7 @@
                           name="items[__INDEX__][unit]"
                           required
                           data-error-required="{{ __('Unit is required') }}">
-                    <option value="">{{ __('Select Unit') }}</option>
+                    <option value="" selected disabled>{{ __('Select Unit') }}</option>
                     <option value="{{ __('sq.m') }}">{{ __('sq.m') }}</option>
                     <option value="{{ __('m') }}">{{ __('m') }}</option>
                     <option value="{{ __('lump sum') }}">{{ __('lump sum') }}</option>
