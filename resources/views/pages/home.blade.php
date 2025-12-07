@@ -158,8 +158,8 @@
                                    style="width:100%">
                                 <thead>
                                     <tr>
-                                        <th data-priority="1">{{ __('Project Name') }}</th>
-                                        <th data-priority="3">{{ __('Dear') }}</th>
+                                        <th data-priority="1">{{ __('No.') }}</th>
+                                        <th data-priority="2">{{ __('Project Name') }}</th>
                                         <th data-priority="5">{{ __('Trooper') }}</th>
                                         <th data-priority="6">{{ __('House No.') }}</th>
                                         <th data-priority="4">{{ __('List Name') }}</th>
@@ -171,8 +171,8 @@
                                 <tbody>
                                     @forelse ($homes as $home)
                                         <tr>
+                                            <td>{{ method_exists($homes, 'firstItem') ? $homes->firstItem() + $loop->index : $loop->iteration }}</td>
                                             <td>{{ $home->project_name }}</td>
-                                            <td>{{ $home->dear }}</td>
                                             <td>{{ $home->trooper }}</td>
                                             <td>{{ $home->house_no }}</td>
                                             <td>{{ $home->list_name }}</td>
@@ -217,7 +217,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="text-center text-muted py-4">{{ __('No homes found.') }}</td>
+                                            <td colspan="7" class="text-center text-muted py-4">{{ __('No homes found.') }}</td>
                                         </tr>
                                     @endforelse
                                 </tbody>

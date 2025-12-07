@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Lang;
 
 class CondoController extends Controller
 {
@@ -133,6 +134,11 @@ class CondoController extends Controller
         App::setLocale(Session::get('locale', config('app.locale')));
 
         $condo->load(['details' => fn($q) => $q->orderBy('no')]);
+
+        foreach ($condo->details as $detail) {
+            $detail->unit = $this->normalizeUnitToKey($detail->unit);
+        }
+
 
         // Your edit page: resources/views/pages/condoedit.blade.php (create this)
         return view('pages.editcondo', compact('condo'));
@@ -478,6 +484,47 @@ class CondoController extends Controller
             'grand'        => $grand,
             'autoDownload' => 'excel', 
         ]));
+    }
+
+    private function normalizeUnitToKey(?string $raw): ?string
+    {
+        if ($raw === null || $raw === '') return $raw;
+
+        $unitKeys = [
+            'sq.m',
+            'm',
+            'lump sum',
+            'leaf',
+            'trip',
+            'set',
+            'sheet',
+            'unit',
+        ];
+
+        // if already a key, return it
+        if (in_array($raw, $unitKeys, true)) {
+            return $raw;
+        }
+
+        // Check current locale translation first
+        foreach ($unitKeys as $key) {
+            if ($raw === __($key)) {
+                return $key;
+            }
+        }
+
+        // Try other locales you support (e.g. 'th', 'en')
+        $tryLocales = ['th', 'en'];
+        foreach ($unitKeys as $key) {
+            foreach ($tryLocales as $loc) {
+                if ($raw === Lang::get($key, [], $loc)) {
+                    return $key;
+                }
+            }
+        }
+
+        // fallback: return original raw (so nothing breaks)
+        return $raw;
     }
 
 

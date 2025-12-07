@@ -27,7 +27,7 @@
             <div class="row">
 
                 {{-- Top info cards (same as create) --}}
-                <div class="col-lg-4 col-md-4 col-12">
+                <div class="col-lg-6 col-md-6 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <h5 class="card-title text-black">{{ __('Project Name') }} *</h5>
@@ -38,6 +38,31 @@
                                             value="{{ old('project_name', $home->project_name) }}" required
                                             data-error-required="{{ __('Project name is required') }}">
                                         @error('project_name')<small
+                                        class="text-danger d-block mt-1">{{ $message }}</small>@enderror
+                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                            onclick="startDictation(this)">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                {{-- List Name --}}
+                <div class="col-lg-6 col-md-6 col-12">
+                    <div class="card m-b-20">
+                        <div class="card-header bg-white">
+                            <h5 class="card-title text-black">{{ __('List Name') }} *</h5>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="input-group input-42">
+                                        <input type="text" class="form-control" name="list_name" id="list_name"
+                                            value="{{ old('list_name', $home->list_name) }}" required
+                                            data-error-required="{{ __('List name is required') }}">
+                                        @error('list_name')<small
                                         class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)">
@@ -61,30 +86,6 @@
                                         <input type="text" class="form-control" name="dear" id="dear"
                                             value="{{ old('dear', $home->dear) }}" nullable>
                                         @error('dear')<small
-                                        class="text-danger d-block mt-1">{{ $message }}</small>@enderror
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- List Name --}}
-                <div class="col-lg-4 col-md-4 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('List Name') }} *</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="list_name" id="list_name"
-                                            value="{{ old('list_name', $home->list_name) }}" required
-                                            data-error-required="{{ __('List name is required') }}">
-                                        @error('list_name')<small
                                         class="text-danger d-block mt-1">{{ $message }}</small>@enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)">
@@ -192,17 +193,22 @@
             </div>
 
             <!-- Unit -->
+            @php $unitKeys = ['sq.m','m','lump sum','leaf','trip','set','sheet','unit']; @endphp
+
             <div class="col-6 col-md-2 field-col">
                 <label class="form-label">{{ __('Unit') }} *</label>
                 <div class="input-group input-42">
-                    <input type="text" class="form-control"
-                           name="details[{{ $i }}][unit]"
-                           value="{{ $detail->unit }}" required
-                           data-error-required="{{ __('Unit is required') }}">
-                    <button type="button" class="btn btn-outline-secondary mic-btn"
-                            onclick="startDictation(this)">
-                        <i class="fas fa-microphone"></i>
-                    </button>
+                    <select class="form-control units"
+                            name="details[{{ $i }}][unit]"
+                            required
+                            data-error-required="{{ __('Unit is required') }}">
+                    <option value="">{{ __('Select Unit') }}</option>
+                    @foreach ($unitKeys as $key)
+                        <option value="{{ $key }}" {{ old("details.$i.unit", $detail->unit) === $key ? 'selected' : '' }}>
+                        {{ __($key) }}
+                        </option>
+                    @endforeach
+                    </select>
                 </div>
             </div>
 
@@ -401,9 +407,19 @@
                     <div class="col-6 col-md-2 field-col">
                         <label class="form-label">{{ __('Unit') }}</label>
                         <div class="input-group input-42">
-                            <input type="text" class="form-control" name="details[__INDEX__][unit]">
+                            <select class="form-control units" name="details[__INDEX__][unit]">
+                            <option value="">{{ __('Select Unit') }}</option>
+                            <option value="sq.m">sq.m</option>
+                            <option value="m">m</option>
+                            <option value="lump sum">lump sum</option>
+                            <option value="leaf">leaf</option>
+                            <option value="trip">trip</option>
+                            <option value="set">set</option>
+                            <option value="sheet">sheet</option>
+                            <option value="unit">unit</option>
+                            </select>
                             <button type="button" class="btn btn-outline-secondary mic-btn" onclick="startDictation(this)">
-                                <i class="fas fa-microphone"></i>
+                            <i class="fas fa-microphone"></i>
                             </button>
                         </div>
                     </div>

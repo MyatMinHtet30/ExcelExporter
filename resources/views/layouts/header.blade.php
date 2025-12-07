@@ -215,7 +215,7 @@
                 <div class="xp-breadcrumbbar text-center">
                     <h4 class="page-title">@yield('title')</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">168Home</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">168Home</a></li>
                         <li class="breadcrumb-item active" aria-current="page">@yield('title')</li>
                     </ol>
                 </div>
