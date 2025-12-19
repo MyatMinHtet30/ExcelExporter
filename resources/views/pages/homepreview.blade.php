@@ -307,6 +307,21 @@
             });
         }
 
+        const unitMap = {
+            'sq.m': '{{ __("sq.m") }}',
+            'm': '{{ __("m") }}',
+            'lump sum': '{{ __("lump sum") }}',
+            'leaf': '{{ __("leaf") }}',
+            'trip': '{{ __("trip") }}',
+            'set': '{{ __("set") }}',
+            'sheet': '{{ __("sheet") }}',
+            'unit': '{{ __("unit") }}',
+            'point': '{{ __("point") }}',
+            'day': '{{ __("day") }}',
+            'piece': '{{ __("piece") }}',
+            'floor': '{{ __("floor") }}',
+        };
+
         async function downloadBoqExcel() {
             Swal.fire({
                 icon: 'success',
@@ -492,7 +507,8 @@
                 ws.getCell(r,3).alignment = { horizontal: 'center', vertical: 'middle' };
 
                 // Column D: unit (center)
-                ws.getCell(r,4).value = row.unit || '';
+                const displayUnit = unitMap[row.unit] ?? row.unit ?? '';
+                ws.getCell(r,4).value = displayUnit;
                 ws.getCell(r,4).alignment = { horizontal: 'center', vertical: 'middle' };
 
                 // Column E: mc_price, Column F: mat_total
