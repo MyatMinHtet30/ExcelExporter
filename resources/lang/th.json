@@ -115,5 +115,12 @@
   "set": "ชุด",
   "unit": "หลัง",
   "sheet": "แผ่น",
-  "Select Unit": "เลือกหน่วย"
+  "point": "จุด",
+  "day": "วัน",
+  "piece": "ชิ้น",
+  "floor": "ชั้น",
+  "Select Unit": "เลือกหน่วย",
+  "Select Trooper": "เลือกผู้ควบคุมงาน",
+  "168 Home company": "บริษัท 168 Home จำกัด",
+  "Pi Kaew company": "พี่แก้ว"
 }
