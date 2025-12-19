@@ -336,6 +336,7 @@
 
             const mediumB = { style: 'medium' };
             const thinB = { style: 'thin' };
+            const logoChoice = @json($logo_choice);
 
             // helper for borders
             function setRowBorders(rowIndex, left=1, right=9, borderStyle=thinB) {
@@ -553,17 +554,19 @@
             ws.getCell(totalsStart,2).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // Insert seal/logo into the merged B..C area (approx position)
-            try {
-                const base64 = await toBase64(`{{ asset('assets/images/168Home.png') }}`);
-                const imgId = wb.addImage({ base64: "data:image/png;base64," + base64, extension: "png" });
-                // place image anchored to B cell (col index 2), row totalsStart-1 (ExcelJS uses zero-based row for ext coords)
-                ws.addImage(imgId, {
-                    tl: { col: 1.15, row: totalsStart - 1 + 0.2 },
-                    ext: { width: 240, height: 140 },
-                    editAs: 'oneCell'
-                });
-                ws.getCell(totalsStart,2).alignment = { horizontal: 'center', vertical: 'middle' };
-            } catch (e) { /* ignore image errors */ }
+            if (logoChoice === '168_home') {
+                try {
+                    const base64 = await toBase64(`{{ asset('assets/images/168Home.png') }}`);
+                    const imgId = wb.addImage({ base64: "data:image/png;base64," + base64, extension: "png" });
+                    // place image anchored to B cell (col index 2), row totalsStart-1 (ExcelJS uses zero-based row for ext coords)
+                    ws.addImage(imgId, {
+                        tl: { col: 1.15, row: totalsStart - 1 + 0.2 },
+                        ext: { width: 240, height: 140 },
+                        editAs: 'oneCell'
+                    });
+                    ws.getCell(totalsStart,2).alignment = { horizontal: 'center', vertical: 'middle' };
+                } catch (e) { /* ignore image errors */ }
+            }
 
             // Column C we already included in merged logo region, but you also asked "for the column C make it all thick border"
             for (let rr = totalsStart; rr <= totalsStart + 4; rr++) {
@@ -664,48 +667,52 @@
                 timer: 2000,
                 showConfirmButton: false
             });
+
             const { jsPDF } = window.jspdf;
             const boqElement = document.querySelector('.boq-wrap');
             if (!boqElement) return;
 
-            // Use Angsana for PDF capture
             boqElement.style.fontFamily = "'AngsanaPDF', 'Times New Roman', serif";
 
-            // Higher canvas resolution, but we will use JPEG to keep file size small
             const canvas = await html2canvas(boqElement, {
-                scale: 3,                 
+                scale: 3,
                 useCORS: true,
                 backgroundColor: '#ffffff',
                 scrollX: 0,
                 scrollY: -window.scrollY
             });
 
-            // Reset font back for screen preview
             boqElement.style.fontFamily = "'Times New Roman', serif";
 
-            // JPEG with quality instead of heavy PNG
-            const imgData = canvas.toDataURL('image/jpeg', 0.7);  // 0.7 = good quality, smaller size
+            const imgData = canvas.toDataURL('image/jpeg', 0.75);
 
             const pdf = new jsPDF('landscape', 'mm', 'a4');
+
             const pageWidth  = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
 
-            const imgWidth  = canvas.width;
-            const imgHeight = canvas.height;
+            const imgWidth  = pageWidth * 0.98;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-            const targetWidth  = pageWidth * 0.98;
-            const ratio        = targetWidth / imgWidth;
-            const targetHeight = imgHeight * ratio;
+            let heightLeft = imgHeight;
+            let position = 10;
 
-            const x = (pageWidth - targetWidth) / 2;
-            const y = 10;
+            // first page
+            pdf.addImage(imgData, 'JPEG', 5, position, imgWidth, imgHeight, undefined, 'FAST');
+            heightLeft -= pageHeight;
 
-            // Use JPEG + FAST compression in jsPDF
-            pdf.addImage(imgData, 'JPEG', x, y, targetWidth, targetHeight, undefined, 'FAST');
+            // remaining pages
+            while (heightLeft > 0) {
+                pdf.addPage();
+                position = heightLeft - imgHeight + 10;
+                pdf.addImage(imgData, 'JPEG', 5, position, imgWidth, imgHeight, undefined, 'FAST');
+                heightLeft -= pageHeight;
+            }
 
-            const project = @json($project_name) ?? '';
-            pdf.save((project || 'BOQ') + ' Home.pdf');
+            const project = @json($project_name) ?? 'BOQ';
+            pdf.save(project + ' Home.pdf');
         }
+
     </script>
 
     @if(!empty($autoDownload))

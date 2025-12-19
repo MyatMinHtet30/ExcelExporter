@@ -237,13 +237,15 @@ class HomeController extends Controller
 
     public function preview(Request $request)
     {
+        App::setLocale(Session::get('locale', config('app.locale')));
+        
         // If coming from edit, we'll receive home_id
         $home = null;
         if ($request->filled('home_id')) {
             $home = Home::find($request->home_id);
         }
 
-        // ✅ You don't really need 'date' from request anymore, so you can remove it
+        // You don't really need 'date' from request anymore, so you can remove it
         $data = $request->validate([
             'project_name' => ['nullable','string','max:255'],
             'dear'         => ['nullable','string','max:255'],
