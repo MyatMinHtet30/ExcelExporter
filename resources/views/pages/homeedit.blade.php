@@ -128,15 +128,19 @@
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="trooper" id="trooper"
-                                            value="{{ old('trooper', $home->trooper) }}" required
+                                        <select name="trooper" id="trooper" class="form-control" required
                                             data-error-required="{{ __('Trooper is required') }}">
-                                        @error('trooper')<small
-                                        class="text-danger d-block mt-1">{{ $message }}</small>@enderror
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
+
+                                            <option value="{{ __('168 Home company') }}"
+                                                {{ old('trooper', $home->trooper) === __('168 Home company') ? 'selected' : '' }}>
+                                                {{ __('168 Home company') }}
+                                            </option>
+
+                                            <option value="{{ __('Pi Kaew company') }}"
+                                                {{ old('trooper', $home->trooper) === __('Pi Kaew company') ? 'selected' : '' }}>
+                                                {{ __('Pi Kaew company') }}
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -193,7 +197,7 @@
             </div>
 
             <!-- Unit -->
-            @php $unitKeys = ['sq.m','m','lump sum','leaf','trip','set','sheet','unit']; @endphp
+            @php $unitKeys = ['sq.m','m','lump sum','leaf','trip','point','day','piece','floor','set','sheet','unit']; @endphp
 
             <div class="col-6 col-md-2 field-col">
                 <label class="form-label">{{ __('Unit') }} <span class="star">*</span></label>
@@ -414,6 +418,10 @@
                             <option value="lump sum">lump sum</option>
                             <option value="leaf">leaf</option>
                             <option value="trip">trip</option>
+                            <option value="point">point</option>
+                            <option value="day">day</option>
+                            <option value="piece">piece</option>
+                            <option value="floor">floor</option>
                             <option value="set">set</option>
                             <option value="sheet">sheet</option>
                             <option value="unit">unit</option>

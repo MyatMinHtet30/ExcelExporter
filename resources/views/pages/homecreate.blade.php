@@ -102,20 +102,26 @@
                     </div>
                 </div>
 
+                <!--  trooper -->
                 <div class="col-lg-4 col-md-4 col-12">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Trooper') }} <span class="star">*</span></h5>
+                            <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
                             <div class="card-body">
                                 <div class="form-group">
                                     <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="trooper" id="trooper" placeholder="{{ __('Enter trooper') }}"
-                                            value="{{ old('trooper') }}" required
-                                            data-error-required="{{ __('Trooper is required') }}">
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
+                                        <select name="trooper" id="trooper" class="form-control" required data-error-required="{{ __('Trooper is required') }}">
+
+                                            <option value="{{ __('168 Home company') }}"
+                                            {{ old('trooper', $home->trooper ?? '') === __('168 Home company') ? 'selected' : '' }}>
+                                            {{ __('168 Home company') }}
+                                            </option>
+
+                                            <option value="{{ __('Pi Kaew company') }}"
+                                            {{ old('trooper', $home->trooper ?? '') === __('Pi Kaew company') ? 'selected' : '' }}>
+                                            {{ __('Pi Kaew company') }}
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -178,6 +184,10 @@
                                             <option value="{{ __('lump sum') }}">{{ __('lump sum') }}</option>
                                             <option value="{{ __('leaf') }}">{{ __('leaf') }}</option>
                                             <option value="{{ __('trip') }}">{{ __('trip') }}</option>
+                                            <option value="{{ __('point') }}">{{ __('point') }}</option>
+                                            <option value="{{ __('day') }}">{{ __('day') }}</option>
+                                            <option value="{{ __('piece') }}">{{ __('piece') }}</option>
+                                            <option value="{{ __('floor') }}">{{ __('floor') }}</option>
                                             <option value="{{ __('set') }}">{{ __('set') }}</option>
                                             <option value="{{ __('sheet') }}">{{ __('sheet') }}</option>
                                             <option value="{{ __('unit') }}">{{ __('unit') }}</option>

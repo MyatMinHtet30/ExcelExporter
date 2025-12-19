@@ -221,7 +221,7 @@
                             <td class="dyn">{{ $r['category_name'] }}</td>
                             <!-- Amount CENTER to match Excel -->
                             <td class="center dyn">{{ number_format((float) $r['amount'], 2) }}</td>
-                            <td class="center dyn">{{ $r['unit'] }}</td>
+                            <td class="center dyn">{{ __($r['unit']) }}</td>
                             <td class="right dyn">{{ number_format((float) $r['mc_price'], 2) }}</td>
                             <td class="right pink dyn">{{ number_format((float) $r['mat_total'], 2) }}</td>
                             <td class="right dyn">{{ number_format((float) $r['lc_price'], 2) }}</td>
@@ -237,7 +237,19 @@
                     <td class="center">&nbsp;</td>
 
                     <td class="yellow" colspan="2" rowspan="5" style="text-align:center; vertical-align:middle;">
-                        <img src="{{ asset('assets/images/168Home.png') }}" alt="Seal" style="width:240px;height:auto;">
+                        @php
+                            $logoPath = null;
+                            if (!empty($logo_choice) && $logo_choice === '168_home') {
+                                $logoPath = asset('assets/images/168Home.png');
+                            } elseif (!empty($logo_choice) && $logo_choice === 'pi_kaew') {
+                                // currently wanted pi_kaew to hide the logo; if later you want to show its own:
+                                // $logoPath = asset('assets/images/piKaew.png'); // add this image file if you want
+                            }
+                        @endphp
+
+                        @if($logoPath)
+                            <img src="{{ $logoPath }}" alt="Seal" style="width:240px;height:auto;">
+                        @endif
                     </td>
 
                     <td class="right sum-row" colspan="5">Total price for miscellaneous work category</td>

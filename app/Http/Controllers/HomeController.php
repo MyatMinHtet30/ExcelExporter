@@ -316,6 +316,16 @@ class HomeController extends Controller
             $previewDate = now();
         }
 
+        $trooperStr = $data['trooper'] ?? ($home->trooper ?? '');
+
+        if ($trooperStr === __('168 Home company')) {
+            $logo_choice = '168_home';
+        } elseif ($trooperStr === __('Pi Kaew company')) {
+            $logo_choice = 'pi_kaew';
+        } else {
+            $logo_choice = 'none';
+        }
+
         return view('pages.homepreview', [
             'project_name' => $data['project_name'] ?? '',
             'dear'         => $data['dear'] ?? '',
@@ -328,8 +338,8 @@ class HomeController extends Controller
             'abTotal'      => $ab,
             'vat'          => $vat,
             'finalTotal'   => $final,
-
             'date'         => $previewDate->format('d/m/Y'),
+            'logo_choice'  => $logo_choice,
         ]);
     }
 
@@ -376,6 +386,16 @@ class HomeController extends Controller
             ?? $home->created_at
             ?? now();
 
+        $trooperStr = $home->trooper ?? '';
+
+        if ($trooperStr === __('168 Home company')) {
+            $logo_choice = '168_home';
+        } elseif ($trooperStr === __('Pi Kaew company')) {
+            $logo_choice = 'pi_kaew';
+        } else {
+            $logo_choice = 'none';
+        }
+
         return view('pages.homepreview', [
             'project_name' => $home->project_name,
             'dear'         => $home->dear,
@@ -389,7 +409,7 @@ class HomeController extends Controller
             'vat'          => $vat,
             'finalTotal'   => $final,
             'date'         => $previewDate->format('d/m/Y'),
-
+            'logo_choice'  => $logo_choice,
             'autoDownload' => 'pdf',
         ]);
     }
@@ -433,6 +453,16 @@ class HomeController extends Controller
             ?? $home->created_at
             ?? now();
 
+        $trooperStr = $home->trooper ?? '';
+
+        if ($trooperStr === __('168 Home company')) {
+            $logo_choice = '168_home';
+        } elseif ($trooperStr === __('Pi Kaew company')) {
+            $logo_choice = 'pi_kaew';
+        } else {
+            $logo_choice = 'none';
+        }
+
         return view('pages.homepreview', [
             'project_name' => $home->project_name,
             'dear'         => $home->dear,
@@ -446,7 +476,7 @@ class HomeController extends Controller
             'vat'          => $vat,
             'finalTotal'   => $final,
             'date'         => $previewDate->format('d/m/Y'),
-
+            'logo_choice'  => $logo_choice,
             'autoDownload' => 'excel',
         ]);
     }
@@ -476,6 +506,10 @@ class HomeController extends Controller
             'leaf',
             'trip',
             'set',
+            'point',
+            'day',
+            'piece',
+            'floor',
             'sheet',
             'unit',
         ];
