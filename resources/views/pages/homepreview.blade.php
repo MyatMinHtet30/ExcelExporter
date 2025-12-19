@@ -667,8 +667,18 @@
             const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            const safeProject = String(@json($project_name) || 'BOQ').replace(/[\\/:*?"<>|]/g, '').trim();
-            a.download = `${safeProject} Home.xlsx`;
+            const listName = String(@json($list_name) || 'BOQ').trim();
+            let houseNo  = String(@json($house_no) || '').trim();
+
+            houseNo = houseNo.replace(/\//g, '-');
+            let fileName = houseNo
+                ? `${listName} (${houseNo})`
+                : listName;
+
+            // clean illegal filename characters
+            fileName = fileName.replace(/[\\/:*?"<>|]/g, '');
+
+            a.download = `${fileName}.xlsx`;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -725,8 +735,19 @@
                 heightLeft -= pageHeight;
             }
 
-            const project = @json($project_name) ?? 'BOQ';
-            pdf.save(project + ' Home.pdf');
+            const listName = String(@json($list_name) || 'BOQ').trim();
+            let houseNo = String(@json($house_no) || '').trim();
+
+            // Convert slash to dash
+            houseNo = houseNo.replace(/\//g, '-');
+
+            let fileName = houseNo
+                ? `${listName} (${houseNo})`
+                : listName;
+
+            fileName = fileName.replace(/[\\:*?"<>|]/g, '');
+
+            pdf.save(fileName + '.pdf');
         }
 
     </script>
