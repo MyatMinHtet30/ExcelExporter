@@ -28,6 +28,9 @@ Route::middleware(['web','auth'])->group(function () {
     Route::post('homes/preview', [HomeController::class, 'preview'])
         ->name('home.preview');
 
+    Route::delete('homes/photos/{image}', [HomeController::class, 'deletePhoto'])
+        ->name('home.photo.delete');
+
     Route::get('homes/{home}/export/pdf', [HomeController::class, 'exportPdf'])
         ->name('home.export.pdf');
 

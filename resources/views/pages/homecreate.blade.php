@@ -4,12 +4,12 @@
 
 @push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<link href="{{ asset('assets/css/forminput-table.css') }}" rel="stylesheet">
-<link href="{{ asset('assets/css/home-common.css') }}" rel="stylesheet">
+<link href="{{ asset('assets/css/forminput-table.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ asset('assets/css/home-common.css') }}" rel="stylesheet" type="text/css">
 @endpush
 
 @section('content')
-    <form id="home-form" action="{{ route('home.store') }}" method="POST" novalidate>
+    <form id="home-form" action="{{ route('home.store') }}" method="POST" novalidate enctype="multipart/form-data">
         @csrf
         <div class="xp-contentbar">
             <div class="row">
@@ -23,7 +23,8 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="project_name" id="project_name"
-                                            placeholder="{{ __('Enter project name') }}" value="{{ old('project_name') }}" required
+                                            placeholder="{{ __('Enter project name') }}" 
+                                            value="{{ old('project_name', $restoredData['project_name'] ?? '') }}" required
                                             data-error-required="{{ __('Project name is required') }}">
                                         @error('project_name') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
@@ -45,7 +46,7 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="list_name" id="list_name" placeholder="{{ __('Enter list name') }}"
-                                            value="{{ old('list_name') }}" required
+                                            value="{{ old('list_name', $restoredData['list_name'] ?? '') }}" required
                                             data-error-required="{{ __('List name is required') }}">
                                         @error('list_name') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
@@ -68,7 +69,7 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="dear" id="dear" placeholder="{{ __('Enter recipient name') }}"
-                                            value="{{ old('dear') }}" nullable>
+                                            value="{{ old('dear', $restoredData['dear'] ?? '') }}" nullable>
                                         @error('dear') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
@@ -89,7 +90,7 @@
                                 <div class="form-group">
                                     <div class="input-group input-42">
                                         <input type="text" class="form-control" name="house_no" id="house_no" placeholder="{{ __('Enter house no.') }}"
-                                            value="{{ old('house_no') }}" nullable>
+                                            value="{{ old('house_no', $restoredData['house_no'] ?? '') }}" nullable>
                                         @error('house_no') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
                                         <button type="button" class="btn btn-outline-secondary mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
@@ -113,12 +114,12 @@
                                         <select name="trooper" id="trooper" class="form-control" required data-error-required="{{ __('Trooper is required') }}">
 
                                             <option value="{{ __('168 Home company') }}"
-                                            {{ old('trooper', $home->trooper ?? '') === __('168 Home company') ? 'selected' : '' }}>
+                                            {{ old('trooper', $restoredData['trooper'] ?? '') === __('168 Home company') ? 'selected' : '' }}>
                                             {{ __('168 Home company') }}
                                             </option>
 
                                             <option value="{{ __('Pi Kaew company') }}"
-                                            {{ old('trooper', $home->trooper ?? '') === __('Pi Kaew company') ? 'selected' : '' }}>
+                                            {{ old('trooper', $restoredData['trooper'] ?? '') === __('Pi Kaew company') ? 'selected' : '' }}>
                                             {{ __('Pi Kaew company') }}
                                             </option>
                                         </select>
@@ -131,7 +132,7 @@
 
                 <!-- ---------- Dynamic item rows ---------- -->
                 <div id="rows-container" class="col-12">
-                    <div class="card m-b-2 item-row">
+                    <div class="card m-b-20 item-row">
                         <div class="card-header bg-white">
 
                            <!-- Line 1 -->
@@ -262,15 +263,15 @@
                     </div>
                 </div>
 
-                <!-- ===== Actions + Summary (condo layout) ===== -->
-                <div class="col-lg-12">
+                <!-- ===== Desktop Actions + Summary (Keep as is - hidden on mobile) ===== -->
+                <div class="col-lg-12 d-none d-md-block">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <div class="row">
                                 <!-- Left: buttons -->
                                 <div class="col-md-8 col-5">
                                     <div class="card-body left-controls">
-                                        <div class="form-group">
+                                        <div class="form-group d-none d-md-block">
                                             <button type="button" class="btn btn-primary" id="add-row-btn">+
                                                 {{ __('Add Row') }}</button>
                                         </div>
@@ -291,7 +292,6 @@
                                 <!-- Right: compact totals -->
                                 <div class="col-4 col-sm-4 col-md-3 col-lg-4 ms-md-auto summary-col">
                                     <div class="text-end" style="min-width:200px">
-
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong>{{ __('Total') }}:</strong>
                                             <span class="ms-2" id="miscDisplay">0.00</span>
@@ -299,36 +299,27 @@
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-
-                                                {{-- Desktop / big screen: one line --}}
                                                 <span class="d-none d-md-inline">
                                                     {{ __('Operating + Profit (15%)') }}
                                                 </span>
-
-                                                {{-- Mobile / small screen: two lines --}}
                                                 <span class="d-inline d-md-none">
                                                     <span class="d-block">{{ __('Operating +') }}</span>
                                                     <span class="d-block">{{ __('Profit (15%)') }}</span>
                                                 </span>
-
                                             </strong>
                                             <span class="ms-2" id="operatingDisplay">0.00</span>
                                         </div>
 
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                            {{-- Desktop / big screen: one line --}}
-                                            <span class="d-none d-md-inline">
-                                                {{ __('Category A,B Total') }}
-                                            </span>
-
-                                            {{-- Mobile / small screen: two lines --}}
-                                            <span class="d-inline d-md-none">
-                                                <span class="d-block">{{ __('Category A,B') }}</span>
-                                                <span class="d-block">{{ __('Total') }}</span>
-                                            </span>
-
-                                        </strong>
+                                                <span class="d-none d-md-inline">
+                                                    {{ __('Category A,B Total') }}
+                                                </span>
+                                                <span class="d-inline d-md-none">
+                                                    <span class="d-block">{{ __('Category A,B') }}</span>
+                                                    <span class="d-block">{{ __('Total') }}</span>
+                                                </span>
+                                            </strong>
                                             <span class="ms-2" id="abDisplay">0.00</span>
                                         </div>
 
@@ -350,14 +341,131 @@
                                         <input type="hidden" id="final_total" name="final_total">
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- ===== /Actions + Summary ===== -->
+                <!-- ===== Mobile View Only (NEW - shows below rows) ===== -->
+                <div class="col-12 d-md-none">
+                    <!-- 1. Mobile Add Row Button (FIRST) -->
+                    <div class="form-section mt-3">
+                        <div class="text-center">
+                            <button type="button" class="btn btn-primary btn-lg w-100" id="add-row-btn-mobile">
+                                <i class="fas fa-plus-circle me-2"></i>{{ __('Add New Item') }}
+                            </button>
+                        </div>
+                    </div>
 
+                    <!-- 2. Mobile Calculation Summary (SECOND) -->
+                    <div class="form-section mt-3">
+                        <div class="card shadow-sm">
+                            <div class="btn_div card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>{{ __('Cost Summary') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="summary-row">
+                                    <div class="summary-label">{{ __('Total') }}:</div>
+                                    <div class="summary-value" id="miscDisplayMobile">0.00</div>
+                                </div>
+                                <div class="summary-row">
+                                    <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
+                                    <div class="summary-value" id="operatingDisplayMobile">0.00</div>
+                                </div>
+                                <div class="summary-row">
+                                    <div class="summary-label">{{ __('Category A,B Total') }}:</div>
+                                    <div class="summary-value" id="abDisplayMobile">0.00</div>
+                                </div>
+                                <div class="summary-row">
+                                    <div class="summary-label">{{ __('VAT (7%)') }}:</div>
+                                    <div class="summary-value" id="vatDisplayMobile">0.00</div>
+                                </div>
+                                <div class="summary-row total-row">
+                                    <div class="summary-label">{{ __('Total Price') }}:</div>
+                                    <div class="summary-value total-value" id="finalDisplayMobile">0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Photo Upload Section (THIRD - NEW) -->
+                    <div class="form-section mt-3">
+                        <div class="card shadow-sm">
+                            <div class="btn_div card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="photo-upload-area" id="photo-upload-area">
+                                    <div class="photo-upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <h5>{{ __('Upload Project Photos') }}</h5>
+                                    <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
+                                    <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF. Max 5MB per photo') }}</p>
+                                    
+                                    <!-- Photo counter -->
+                                    <div class="photo-counter" id="photo-counter">
+                                        <i class="fas fa-images me-1"></i>
+                                        <span id="photo-count">0</span> {{ __('photos selected') }}
+                                    </div>
+                                    
+                                    <!-- Photo list for restored/selected photos -->
+                                    <div class="photo-list" id="photo-list"></div>
+                                    
+                                    <input type="file" id="photo-input" name="photos[]" multiple accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
+                                        <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
+                                    </button>
+                                </div>
+                                
+                                <!-- Upload Progress -->
+                                <div class="upload-loading" id="upload-loading">
+                                    <div class="spinner-border text-primary" role="status">
+                                    </div>
+                                    <div class="upload-progress">
+                                        <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Mobile Action Buttons (FOURTH) -->
+                    <div class="form-section mt-3">
+                        <h5 class="btn_div form-section-title">
+                            <i class="fas fa-tasks me-2"></i>{{ __('Actions') }}
+                        </h5>
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="btn-group-vertical w-100" role="group">
+                                    <button type="submit" class="btn btn-primary btn-lg mb-3" formaction="{{ route('home.preview') }}">
+                                        <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
+                                    </button>
+                                    
+                                    <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn-mobile">
+                                        <i class="fas fa-file-excel me-2"></i>{{ __('Create') }}
+                                    </button>
+                                    
+                                    <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
+                                    </a>
+                                </div>
+                                
+                                <div class="mt-3 text-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {{ __('Click Preview to review before generating') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ===== /Mobile View Only ===== -->
             </div>
+                <div id="fab-btn" class="fab-btn">
+                    <i id="fab-icon" class="fas fa-plus"></i>
+                </div>
         </div>
     </form>
 @endsection
@@ -365,5 +473,123 @@
 @push('scripts')
 <script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
 <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
+
+@if(isset($restoredData) && $restoredData)
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Restore form details
+    const restoredDetails = @json($restoredData['details'] ?? []);
+    const restoredPhotos = @json($restoredPhotos ?? []);
+    
+    if (restoredDetails && restoredDetails.length > 0) {
+        // Clear existing rows except the first one
+        const rowsContainer = document.getElementById('rows-container');
+        const existingRows = rowsContainer.querySelectorAll('.item-row');
+        
+        // Remove all rows except the first
+        for (let i = 1; i < existingRows.length; i++) {
+            existingRows[i].remove();
+        }
+        
+        // Restore each detail row
+        restoredDetails.forEach((detail, index) => {
+            if (index > 0) {
+                // Add new row for details beyond the first
+                if (typeof window.addRow === 'function') {
+                    window.addRow();
+                }
+            }
+            
+            // Wait a bit for the row to be added, then populate it
+            setTimeout(() => {
+                const row = rowsContainer.children[index];
+                if (row) {
+                    // Populate the row with restored data
+                    const categoryInput = row.querySelector('input[name*="[category_name]"]');
+                    const amountInput = row.querySelector('input[name*="[amount]"]');
+                    const unitSelect = row.querySelector('select[name*="[unit]"]');
+                    const mcPriceInput = row.querySelector('input[name*="[mc_price]"]');
+                    const lcPriceInput = row.querySelector('input[name*="[lc_price]"]');
+                    
+                    if (categoryInput) categoryInput.value = detail.category_name || '';
+                    if (amountInput) amountInput.value = detail.amount || '';
+                    if (unitSelect) unitSelect.value = detail.unit || '';
+                    if (mcPriceInput) mcPriceInput.value = detail.mc_price || '';
+                    if (lcPriceInput) lcPriceInput.value = detail.lc_price || '';
+                    
+                    // Trigger calculation
+                    if (amountInput) amountInput.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }, index * 100); // Stagger the population
+        });
+    }
+    
+    // Restore photos
+    if (restoredPhotos && restoredPhotos.length > 0) {
+        const photoCountElement = document.getElementById('photo-count');
+        const photoList = document.getElementById('photo-list');
+        
+        if (photoCountElement) {
+            photoCountElement.textContent = restoredPhotos.length;
+        }
+        
+        // Create a list of restored photos for display
+        if (photoList) {
+            restoredPhotos.forEach((photoPath, index) => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-list-item restored-photo';
+                photoItem.dataset.photoPath = photoPath;
+                photoItem.innerHTML = `
+                    <div class="photo-name" title="Restored Photo ${index + 1}">
+                        <i class="fas fa-image me-1 text-warning"></i>
+                        Restored Photo ${index + 1}
+                    </div>
+                    <div class="photo-size">Restored</div>
+                    <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                photoList.appendChild(photoItem);
+            });
+        }
+        
+        // Create hidden inputs for restored photos
+        const form = document.getElementById('home-form');
+        if (form) {
+            restoredPhotos.forEach((photoPath, index) => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'restored_photos[]';
+                hiddenInput.value = photoPath;
+                hiddenInput.className = 'restored-photo-input';
+                form.appendChild(hiddenInput);
+            });
+        }
+    }
+    
+    // Function to remove restored photos
+    window.removeRestoredPhoto = function(button) {
+        const photoItem = button.closest('.photo-list-item');
+        const photoPath = photoItem.dataset.photoPath;
+        
+        // Remove from display
+        photoItem.remove();
+        
+        // Remove corresponding hidden input
+        const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+        if (hiddenInput) {
+            hiddenInput.remove();
+        }
+        
+        // Update counter
+        const photoCountElement = document.getElementById('photo-count');
+        if (photoCountElement) {
+            const currentCount = parseInt(photoCountElement.textContent) || 0;
+            photoCountElement.textContent = Math.max(0, currentCount - 1);
+        }
+    };
+});
+</script>
+@endif
 
 @endpush

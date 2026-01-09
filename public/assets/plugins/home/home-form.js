@@ -88,8 +88,7 @@
     set('.js-grand-total', gTotal);
   }
 
-  // ====== Summary ======
-  function recalcSummary(){
+function recalcSummary(){
     // Sum only ACTIVE (non-deleted) rows' grand totals
     const sum = getRows()
    .map(r => $('.js-grand-total', r))
@@ -100,21 +99,28 @@
     const vat       = ab * 0.07;
     const finalT    = ab + vat;
 
+    // Update DESKTOP displays
     const setTxt=id=>val=>{ const el=$('#'+id); if(el) el.textContent = to2(val); };
-    const setVal=id=>val=>{ const el=$('#'+id); if(el) el.value      = to2(val); };
-
     setTxt('miscDisplay')(sum);
     setTxt('operatingDisplay')(operating);
     setTxt('abDisplay')(ab);
     setTxt('vatDisplay')(vat);
     setTxt('finalDisplay')(finalT);
 
+    // Update MOBILE displays
+    setTxt('miscDisplayMobile')(sum);
+    setTxt('operatingDisplayMobile')(operating);
+    setTxt('abDisplayMobile')(ab);
+    setTxt('vatDisplayMobile')(vat);
+    setTxt('finalDisplayMobile')(finalT);
+
+    const setVal=id=>val=>{ const el=$('#'+id); if(el) el.value      = to2(val); };
     setVal('misc_total')(sum);
     setVal('operating_expenses')(operating);
     setVal('category_ab_total')(ab);
     setVal('vat_total')(vat);
     setVal('final_total')(finalT);
-  }
+}
   function recalcAll(){
     getRows().forEach(calcRow);
     recalcSummary();
@@ -202,6 +208,10 @@
 
     rowsContainer.appendChild(newRow);
     reindexRows();
+    // Scroll to the new row
+    setTimeout(() => {
+      newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
   }
   window.addRow = addRow; // optional global
 
@@ -344,6 +354,14 @@ document.addEventListener('keydown', function (e) {
       }
     }
 
+      // Ensure all restored photos are included in the form
+      const restoredPhotoInputs = form.querySelectorAll('input[name="restored_photos[]"]');
+      restoredPhotoInputs.forEach(input => {
+        if (!input.value) {
+          input.remove(); // Remove empty inputs
+        }
+      });
+
       const spoof = form.querySelector('input[name="_method"]');
       let spoofWasDisabled = false;
       if (spoof) { spoof.disabled = true; spoofWasDisabled = true; }
@@ -380,9 +398,366 @@ document.addEventListener('keydown', function (e) {
 });
 
   // ====== Add buttons ======
-  addBtns.forEach(btn => btn.addEventListener('click', addRow));
+  // ====== Add buttons ======
+// Handle desktop button
+const desktopAddBtn = document.getElementById('add-row-btn');
+if (desktopAddBtn) {
+    desktopAddBtn.addEventListener('click', addRow);
+}
+
+// Handle mobile button
+const mobileAddBtn = document.getElementById('add-row-btn-mobile');
+if (mobileAddBtn) {
+    mobileAddBtn.addEventListener('click', addRow);
+}
+
+// Legacy support for edit page button
+const editAddBtn = document.getElementById('add-row-btn-edit');
+if (editAddBtn) {
+    editAddBtn.addEventListener('click', addRow);
+}
+
+
+// If you still want to use forEach
+addBtns.forEach(btn => {
+    if (btn) btn.addEventListener('click', addRow);
+});
 
   // ====== Initial ======
   // compute any prefilled rows (Edit), lock delete if only one active, update summary
   reindexRows();
 })();
+
+// Mobile generate button triggers desktop button
+const mobileGenerateBtn = document.getElementById('generate-btn-mobile');
+const desktopGenerateBtn = document.getElementById('generate-btn');
+const mobilePreviewBtn = document.getElementById('preview-btn-mobile');
+const desktopPreviewBtn = document.getElementById('preview-btn');
+
+if (mobileGenerateBtn && desktopGenerateBtn) {
+    mobileGenerateBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        desktopGenerateBtn.click();
+    });
+}
+
+if (mobilePreviewBtn && desktopPreviewBtn) {
+    mobilePreviewBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        desktopPreviewBtn.click();
+    });
+}
+
+// Photo Upload Functionality for Mobile
+document.addEventListener('DOMContentLoaded', function() {
+    const photoInput = document.getElementById('photo-input');
+    const uploadArea = document.getElementById('photo-upload-area');
+    const photoList = document.getElementById('photo-list');
+    const photoCountElement = document.getElementById('photo-count');
+    const uploadLoading = document.getElementById('upload-loading');
+    const progressBar = document.getElementById('upload-progress-bar');
+    let uploadedPhotos = [];
+    
+    // Only initialize for mobile
+    if (window.innerWidth <= 768) {
+        // Drag and drop functionality
+        if (uploadArea) {
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+            
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handlePhotos(files);
+            });
+        }
+        
+        // File input change
+        if (photoInput) {
+            photoInput.addEventListener('change', (e) => {
+                handlePhotos(e.target.files);
+            });
+        }
+        
+        function handlePhotos(files) {
+            const validFiles = Array.from(files).filter(file => {
+                const isValidType = file.type.startsWith('image/');
+                const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
+                return isValidType && isValidSize;
+            });
+            
+            if (validFiles.length === 0) {
+                alert('Please select valid image files (max 5MB each)');
+                return;
+            }
+            
+            // Show loading
+            if (uploadLoading) {
+                uploadLoading.classList.add('active');
+                progressBar.style.width = '0%';
+            }
+            
+            // Simulate upload progress
+            let loaded = 0;
+            const total = validFiles.length;
+            const progressInterval = setInterval(() => {
+                loaded++;
+                if (progressBar) progressBar.style.width = `${(loaded / total) * 100}%`;
+                
+                if (loaded >= total) {
+                    clearInterval(progressInterval);
+                    setTimeout(() => {
+                        if (uploadLoading) uploadLoading.classList.remove('active');
+                        processPhotos(validFiles);
+                    }, 500);
+                }
+            }, 200);
+        }
+        
+        function processPhotos(files) {
+            files.forEach((file, index) => {
+                const photoData = {
+                    id: 'photo-' + Date.now() + '-' + index,
+                    name: file.name,
+                    size: (file.size / (1024*1024)).toFixed(2) + ' MB',
+                    file: file
+                };
+                
+                uploadedPhotos.push(photoData);
+                renderPhotoItem(photoData);
+            });
+            
+            // Update photo counter
+            updatePhotoCounter();
+            
+            // Update hidden field
+            updatePhotosInput();
+        }
+        
+        function renderPhotoItem(photo) {
+            const photoItem = document.createElement('div');
+            photoItem.className = 'photo-list-item';
+            photoItem.dataset.id = photo.id;
+            
+            photoItem.innerHTML = `
+                <div class="photo-name" title="${photo.name}">
+                    <i class="fas fa-image me-1 text-primary"></i>
+                    ${truncateFileName(photo.name)}
+                </div>
+                <div class="photo-size">${photo.size}</div>
+                <button type="button" class="photo-remove" onclick="removePhoto('${photo.id}')">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            if (photoList) photoList.appendChild(photoItem);
+        }
+        
+        function truncateFileName(name) {
+            if (name.length > 30) {
+                return name.substring(0, 27) + '...';
+            }
+            return name;
+        }
+        
+        window.removePhoto = function(photoId) {
+            // Remove from array
+            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
+            
+            // Remove from DOM
+            const photoElement = document.querySelector(`[data-id="${photoId}"]`);
+            if (photoElement) {
+                photoElement.remove();
+            }
+            
+            // Update photo counter
+            updatePhotoCounter();
+            
+            // Update hidden field
+            updatePhotosInput();
+        };
+        
+        function updatePhotoCounter() {
+            if (photoCountElement) {
+                // Count existing photos that haven't been removed
+                const existingPhotosCount = document.querySelectorAll('.existing-photo').length;
+                // Count restored photos that haven't been removed
+                const restoredPhotosCount = document.querySelectorAll('.restored-photo').length;
+                // Count new uploaded photos
+                const newPhotosCount = uploadedPhotos.length;
+                // Total count
+                const totalCount = existingPhotosCount + restoredPhotosCount + newPhotosCount;
+                
+                photoCountElement.textContent = totalCount;
+            }
+        }
+
+        // Global function to remove existing photos
+        window.removeExistingPhoto = function(photoId) {
+            const photoElement = document.querySelector(`[data-photo-id="${photoId}"]`);
+            if (photoElement) {
+                // Add animation
+                photoElement.style.transition = 'opacity 0.3s, transform 0.3s';
+                photoElement.style.opacity = '0';
+                photoElement.style.transform = 'scale(0.8)';
+                
+                setTimeout(() => {
+                    photoElement.remove();
+                    updatePhotoCounter();
+                    
+                    // Add hidden input to mark for deletion
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'delete_photos[]';
+                    hiddenInput.value = photoId;
+                    document.getElementById('home-form').appendChild(hiddenInput);
+                }, 300);
+            }
+        };
+        
+        function updatePhotosInput() {
+            // Clear existing file input
+            if (photoInput) photoInput.value = '';
+            
+            // Create new DataTransfer object
+            const dataTransfer = new DataTransfer();
+            
+            // Add all photos as files
+            uploadedPhotos.forEach(photo => {
+                if (photo.file) {
+                    dataTransfer.items.add(photo.file);
+                }
+            });
+            
+            // Update file input
+            if (photoInput) photoInput.files = dataTransfer.files;
+            
+            // Ensure restored photos are still in the form
+            const form = document.getElementById('home-form');
+            if (form) {
+                // Remove any existing restored photo inputs that might be duplicated
+                const existingRestoredInputs = form.querySelectorAll('input[name="restored_photos[]"]');
+                const restoredPhotoPaths = Array.from(document.querySelectorAll('.restored-photo')).map(el => el.dataset.photoPath);
+                
+                existingRestoredInputs.forEach(input => {
+                    if (!restoredPhotoPaths.includes(input.value)) {
+                        input.remove();
+                    }
+                });
+                
+                // Add any missing restored photo inputs
+                restoredPhotoPaths.forEach(photoPath => {
+                    const existingInput = form.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+                    if (!existingInput) {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'restored_photos[]';
+                        hiddenInput.value = photoPath;
+                        hiddenInput.className = 'restored-photo-input';
+                        form.appendChild(hiddenInput);
+                    }
+                });
+            }
+        }
+    }
+    
+        // ====== Floating Action Button (Scroll Up/Down) ======
+    const fabBtn = document.getElementById('fab-btn');
+    const fabIcon = document.getElementById('fab-icon');
+    
+    if (fabBtn && fabIcon) {
+        let lastScrollTop = 0;
+        let isScrolling;
+        
+        // Show FAB only on mobile
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            fabBtn.classList.add('show');
+        }
+        
+        // Function to check scroll position
+        function checkScrollPosition() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = document.documentElement.clientHeight;
+            
+            // Clear our timeout throughout the scroll
+            window.clearTimeout(isScrolling);
+            
+            // Determine scroll direction
+            const scrollingDown = scrollTop > lastScrollTop;
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+            
+            // Check if at top (within 50px from top)
+            const atTop = scrollTop < 50;
+            
+            // Check if at bottom (within 50px from bottom)
+            const atBottom = scrollHeight - (scrollTop + clientHeight) < 50;
+            
+            // Set a timeout to run after scrolling ends
+            isScrolling = setTimeout(function() {
+                if (atTop) {
+                    // At top, show down arrow (go to bottom)
+                    fabIcon.className = 'fas fa-arrow-down';
+                } else if (atBottom) {
+                    // At bottom, show up arrow (go to top)
+                    fabIcon.className = 'fas fa-arrow-up';
+                } else {
+                    // In middle, show arrow based on scroll direction
+                    fabIcon.className = scrollingDown ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
+                }
+            }, 66); // Run every 66ms for smooth transition
+        }
+        
+        // FAB click handler
+        fabBtn.addEventListener('click', function() {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = document.documentElement.clientHeight;
+            
+            // Check current icon
+            const isUpArrow = fabIcon.classList.contains('fa-arrow-up');
+            
+            if (isUpArrow) {
+                // Currently showing up arrow, scroll to top
+                window.scrollTo({ 
+                    top: 0, 
+                    behavior: 'smooth' 
+                });
+            } else {
+                // Currently showing down arrow, scroll to bottom
+                window.scrollTo({ 
+                    top: scrollHeight,
+                    behavior: 'smooth' 
+                });
+            }
+        });
+        
+        // Listen for scroll events
+        window.addEventListener('scroll', checkScrollPosition);
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const isMobileNow = window.innerWidth <= 768;
+            if (isMobileNow) {
+                fabBtn.classList.add('show');
+            } else {
+                fabBtn.classList.remove('show');
+            }
+            checkScrollPosition(); // Re-check on resize
+        });
+        
+        // Initial check
+        checkScrollPosition();
+        
+        // Add a small delay to ensure DOM is fully loaded
+        setTimeout(checkScrollPosition, 500);
+    }
+});

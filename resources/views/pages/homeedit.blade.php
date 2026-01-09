@@ -15,7 +15,7 @@
 @endpush
 
 @section('content')
-    <form id="home-form" action="{{ route('home.update', $home) }}" method="POST" data-preview-action="{{ route('home.preview') }}" novalidate>
+    <form id="home-form" action="{{ route('home.update', $home) }}" method="POST" data-preview-action="{{ route('home.preview') }}" novalidate enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -290,17 +290,17 @@
                     @endforeach
                 </div>
 
-                {{-- ===== Actions + Summary (same block as create) ===== --}}
-                <div class="col-lg-12">
+                <!-- ===== Desktop Actions + Summary (Keep as is - hidden on mobile) ===== -->
+                <div class="col-lg-12 d-none d-md-block">
                     <div class="card m-b-20">
                         <div class="card-header bg-white">
                             <div class="row">
+                                <!-- Left: buttons -->
                                 <div class="col-md-8 col-5">
                                     <div class="card-body left-controls">
-                                        <div class="form-group">
-                                            <button type="button" class="btn btn-primary" id="add-row-btn-edit">
-                                                + {{ __('Add Row') }}
-                                            </button>
+                                        <div class="form-group d-none d-md-block">
+                                            <button type="button" class="btn btn-primary" id="add-row-btn">+
+                                                {{ __('Add Row') }}</button>
                                         </div>
                                         <div class="form-group btn-generate d-flex flex-wrap gap-2">
                                             <a href="{{ route('home') }}" class="btn btn-secondary">
@@ -315,20 +315,20 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Right: compact totals -->
                                 <div class="col-4 col-sm-4 col-md-3 col-lg-4 ms-md-auto summary-col">
-                                    <div class="text-end" style="min-width:200px;margin-left:auto">
+                                    <div class="text-end" style="min-width:200px">
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong>{{ __('Total') }}:</strong>
                                             <span class="ms-2" id="miscDisplay">0.00</span>
                                         </div>
+
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
-                                                {{-- Desktop / big screen: one line --}}
                                                 <span class="d-none d-md-inline">
                                                     {{ __('Operating + Profit (15%)') }}
                                                 </span>
-
-                                                {{-- Mobile / small screen: two lines --}}
                                                 <span class="d-inline d-md-none">
                                                     <span class="d-block">{{ __('Operating +') }}</span>
                                                     <span class="d-block">{{ __('Profit (15%)') }}</span>
@@ -336,30 +336,31 @@
                                             </strong>
                                             <span class="ms-2" id="operatingDisplay">0.00</span>
                                         </div>
+
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong class="text-start">
                                                 <span class="d-none d-md-inline">
-                                                {{ __('Category A,B Total') }}
-                                            </span>
-
-                                            {{-- Mobile / small screen: two lines --}}
-                                            <span class="d-inline d-md-none">
-                                                <span class="d-block">{{ __('Category A,B') }}</span>
-                                                <span class="d-block">{{ __('Total') }}</span>
-                                            </span>
+                                                    {{ __('Category A,B Total') }}
+                                                </span>
+                                                <span class="d-inline d-md-none">
+                                                    <span class="d-block">{{ __('Category A,B') }}</span>
+                                                    <span class="d-block">{{ __('Total') }}</span>
+                                                </span>
                                             </strong>
                                             <span class="ms-2" id="abDisplay">0.00</span>
                                         </div>
+
                                         <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
                                             <strong>{{ __('VAT (7%)') }}</strong>
                                             <span class="ms-2" id="vatDisplay">0.00</span>
                                         </div>
+
                                         <div class="d-flex justify-content-between border p-2 bg-light">
                                             <strong>{{ __('Total Price') }}:</strong>
                                             <span class="ms-2" id="finalDisplay">0.00</span>
                                         </div>
 
-                                        {{-- Hidden senders for summary if you need them --}}
+                                        <!-- Hidden inputs for backend -->
                                         <input type="hidden" id="misc_total" name="misc_total">
                                         <input type="hidden" id="operating_expenses" name="operating_expenses">
                                         <input type="hidden" id="category_ab_total" name="category_ab_total">
@@ -371,8 +372,146 @@
                         </div>
                     </div>
                 </div>
+                <!-- ===== Mobile View Only (NEW - shows below rows) ===== -->
+                <div class="col-12 d-md-none">
+                    <!-- 1. Mobile Add Row Button (FIRST) -->
+                    <div class="form-section mt-3">
+                        <div class="text-center">
+                            <button type="button" class="btn btn-primary btn-lg w-100" id="add-row-btn-mobile">
+                                <i class="fas fa-plus-circle me-2"></i>{{ __('Add New Item') }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2. Mobile Calculation Summary (SECOND) -->
+                    <div class="form-section mt-3">
+                        <div class="card shadow-sm">
+                            <div class="btn_div card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>{{ __('Cost Summary') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="summary-row">
+                                    <div class="summary-label">{{ __('Total') }}:</div>
+                                    <div class="summary-value" id="miscDisplayMobile">0.00</div>
+                                </div>
+                                <div class="summary-row">
+                                    <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
+                                    <div class="summary-value" id="operatingDisplayMobile">0.00</div>
+                                </div>
+                                <div class="summary-row">
+                                    <div class="summary-label">{{ __('Category A,B Total') }}:</div>
+                                    <div class="summary-value" id="abDisplayMobile">0.00</div>
+                                </div>
+                                <div class="summary-row">
+                                    <div class="summary-label">{{ __('VAT (7%)') }}:</div>
+                                    <div class="summary-value" id="vatDisplayMobile">0.00</div>
+                                </div>
+                                <div class="summary-row total-row">
+                                    <div class="summary-label">{{ __('Total Price') }}:</div>
+                                    <div class="summary-value total-value" id="finalDisplayMobile">0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Photo Upload Section (THIRD - NEW) -->
+                    <div class="form-section mt-3">
+                        <div class="card shadow-sm">
+                            <div class="btn_div card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Existing Photos List -->
+                                @if($home->images->count() > 0)
+                                    <div class="existing-photos-list mb-3" id="existing-photos-list">
+                                        @foreach($home->images as $image)
+                                            <div class="photo-list-item existing-photo" data-photo-id="{{ $image->id }}">
+                                                <div class="photo-name" title="{{ basename($image->image_path) }}">
+                                                    <i class="fas fa-image me-1 text-success"></i>
+                                                    {{ basename($image->image_path) }}
+                                                </div>
+                                                <div class="photo-size">Existing</div>
+                                                <button type="button" class="photo-remove" onclick="removeExistingPhoto({{ $image->id }})">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <div class="photo-upload-area" id="photo-upload-area">
+                                    <div class="photo-upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                    </div>
+                                    <h5>{{ __('Upload Project Photos') }}</h5>
+                                    <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
+                                    <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF. Max 5MB per photo') }}</p>
+                                    
+                                    <!-- Photo counter -->
+                                    <div class="photo-counter" id="photo-counter">
+                                        <i class="fas fa-images me-1"></i>
+                                        <span id="photo-count">{{ $home->images->count() }}</span> {{ __('photos selected') }}
+                                    </div>
+                                    
+                                    <!-- New photos list -->
+                                    <div class="photo-list" id="photo-list"></div>
+                                    
+                                    <input type="file" id="photo-input" name="photos[]" multiple accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
+                                        <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
+                                    </button>
+                                </div>
+                                
+                                <!-- Upload Progress -->
+                                <div class="upload-loading" id="upload-loading">
+                                    <div class="spinner-border text-primary" role="status">
+                                    </div>
+                                    <div class="upload-progress">
+                                        <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. Mobile Action Buttons (FOURTH) -->
+                    <div class="form-section mt-3">
+                        <h5 class="btn_div form-section-title">
+                            <i class="fas fa-tasks me-2"></i>{{ __('Actions') }}
+                        </h5>
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <div class="btn-group-vertical w-100" role="group">
+                                    <button type="button" class="btn btn-primary btn-lg mb-3" id="preview-btn-mobile">
+                                        <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
+                                    </button>
+                                    
+                                    <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn-mobile">
+                                        <i class="fas fa-save me-2"></i>{{ __('Update') }}
+                                    </button>
+                                    
+                                    <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
+                                    </a>
+                                </div>
+                                
+                                <div class="mt-3 text-center">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {{ __('Click Preview to review before updating') }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ===== /Mobile View Only ===== -->
 
             </div>{{-- /row --}}
+            <div id="fab-btn" class="fab-btn">
+                <i id="fab-icon" class="fas fa-plus"></i>
+            </div>
         </div>{{-- /xp-contentbar --}}
     </form>
 
@@ -483,4 +622,120 @@
 @push('scripts')
     <script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
     <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
+    <script>
+        // Restore form data when coming back from preview
+        document.addEventListener('DOMContentLoaded', function() {
+            // Restore form details
+            const restoredData = @json($restoredData ?? null);
+            const restoredPhotos = @json($restoredPhotos ?? []);
+            
+            if (restoredData && restoredData.details) {
+                // Restore form field values
+                Object.keys(restoredData).forEach(key => {
+                    if (key !== 'details') {
+                        const input = document.querySelector(`[name="${key}"]`);
+                        if (input && restoredData[key]) {
+                            input.value = restoredData[key];
+                        }
+                    }
+                });
+                
+                // Restore details rows
+                const details = restoredData.details || [];
+                details.forEach((detail, index) => {
+                    setTimeout(() => {
+                        // Find or create row
+                        let row = document.querySelector(`[data-row-index="${index}"]`);
+                        if (!row && typeof window.addRow === 'function') {
+                            window.addRow();
+                            row = document.querySelector(`[data-row-index="${index}"]`);
+                        }
+                        
+                        if (row) {
+                            // Populate row fields
+                            Object.keys(detail).forEach(fieldName => {
+                                if (fieldName !== '_delete' && fieldName !== 'id') {
+                                    const input = row.querySelector(`[name*="[${fieldName}]"]`);
+                                    if (input && detail[fieldName] !== null && detail[fieldName] !== undefined) {
+                                        input.value = detail[fieldName];
+                                    }
+                                }
+                            });
+                            
+                            // Trigger calculation
+                            const amountInput = row.querySelector('input[name*="[amount]"]');
+                            if (amountInput) amountInput.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    }, index * 100); // Stagger the population
+                });
+            }
+            
+            // Restore photos
+            if (restoredPhotos && restoredPhotos.length > 0) {
+                const photoCountElement = document.getElementById('photo-count');
+                const photoList = document.getElementById('photo-list');
+                
+                if (photoCountElement) {
+                    // Count existing photos + restored photos
+                    const existingCount = document.querySelectorAll('.existing-photo').length;
+                    photoCountElement.textContent = existingCount + restoredPhotos.length;
+                }
+                
+                // Create a list of restored photos for display
+                if (photoList) {
+                    restoredPhotos.forEach((photoPath, index) => {
+                        const photoItem = document.createElement('div');
+                        photoItem.className = 'photo-list-item restored-photo';
+                        photoItem.dataset.photoPath = photoPath;
+                        photoItem.innerHTML = `
+                            <div class="photo-name" title="Restored Photo ${index + 1}">
+                                <i class="fas fa-image me-1 text-warning"></i>
+                                Restored Photo ${index + 1}
+                            </div>
+                            <div class="photo-size">Restored</div>
+                            <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        photoList.appendChild(photoItem);
+                    });
+                }
+                
+                // Create hidden inputs for restored photos
+                const form = document.getElementById('home-form');
+                if (form) {
+                    restoredPhotos.forEach((photoPath, index) => {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'restored_photos[]';
+                        hiddenInput.value = photoPath;
+                        hiddenInput.className = 'restored-photo-input';
+                        form.appendChild(hiddenInput);
+                    });
+                }
+            }
+            
+            // Function to remove restored photos
+            window.removeRestoredPhoto = function(button) {
+                const photoItem = button.closest('.photo-list-item');
+                const photoPath = photoItem.dataset.photoPath;
+                
+                // Remove from display
+                photoItem.remove();
+                
+                // Remove corresponding hidden input
+                const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+                if (hiddenInput) {
+                    hiddenInput.remove();
+                }
+                
+                // Update counter
+                const photoCountElement = document.getElementById('photo-count');
+                if (photoCountElement) {
+                    const currentCount = parseInt(photoCountElement.textContent) || 0;
+                    photoCountElement.textContent = Math.max(0, currentCount - 1);
+                }
+            };
+        });
+    </script>
 @endpush

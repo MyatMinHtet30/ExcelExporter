@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 use App\Models\HomeDetail;
 use Illuminate\Support\Facades\DB;
 use App\Models\Home;
+use App\Models\Image;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class HomeController extends Controller
@@ -20,10 +22,25 @@ class HomeController extends Controller
     }
 
     /** Create form */
-    public function create()
+    public function create(Request $request)
     {
         App::setLocale(Session::get('locale', config('app.locale')));
-        return view('pages.homecreate');
+        
+        // Check if we need to restore form data from preview
+        $restoredData = null;
+        $restoredPhotos = [];
+        if ($request->get('restore') && session()->has('preview_form_data')) {
+            $sessionData = session()->get('preview_form_data');
+            $restoredData = $sessionData['form_data'] ?? null;
+            $restoredPhotos = $sessionData['temp_photos'] ?? [];
+            
+            // Don't clear session data yet - keep it for multiple preview attempts
+        } else {
+            // Clear any old preview session data and temp photos when starting fresh
+            $this->clearTempPhotosAndSession();
+        }
+        
+        return view('pages.homecreate', compact('restoredData', 'restoredPhotos'));
     }
 
     /** Store */
@@ -48,7 +65,15 @@ class HomeController extends Controller
             'final_total' => ['nullable','numeric','min:0'],
         ]);
 
-        DB::transaction(function () use ($parent, $v, $totals) {
+        // Validate photos and restored photos
+        $photos = $request->validate([
+            'photos' => ['nullable', 'array'],
+            'photos.*' => ['image', 'mimes:jpeg,png,jpg,gif', 'max:5120'], // 5MB max per photo
+            'restored_photos' => ['nullable', 'array'],
+            'restored_photos.*' => ['string'], // Paths to temporary photos
+        ]);
+
+        DB::transaction(function () use ($parent, $v, $totals, $photos, $request) {
             $home = Home::create($parent + [
                 'date'        => $parent['date'] ?? null,
                 'status'      => $parent['status'] ?? true,
@@ -84,21 +109,68 @@ class HomeController extends Controller
             if (!empty($rows)) {
                 $home->details()->createMany($rows);
             }
+
+            // Handle photo uploads
+            if (!empty($photos['photos'])) {
+                foreach ($photos['photos'] as $photo) {
+                    $path = $photo->store('home_photos', 'public');
+                    $home->images()->create([
+                        'image_path' => $path,
+                        'status' => true,
+                    ]);
+                }
+            }
+
+            // Handle restored photos (move from temp to permanent)
+            if (!empty($photos['restored_photos'])) {
+                foreach ($photos['restored_photos'] as $tempPath) {
+                    if (\Storage::disk('public')->exists($tempPath)) {
+                        // Move from temp to permanent location
+                        $filename = basename($tempPath);
+                        $permanentPath = 'home_photos/' . $filename;
+                        
+                        if (\Storage::disk('public')->move($tempPath, $permanentPath)) {
+                            $home->images()->create([
+                                'image_path' => $permanentPath,
+                                'status' => true,
+                            ]);
+                        }
+                    }
+                }
+            }
         });
+
+        // Clear preview session data after successful save
+        session()->forget('preview_form_data');
 
         return redirect()->route('home')
             ->with('success', __('Saved successfully.'));
     }
 
     /** Edit form */
-    public function edit(Home $home)
+    public function edit(Home $home, Request $request)
     {
         App::setLocale(Session::get('locale', config('app.locale')));
         $home->load(['details' => fn ($q) => $q->orderBy('no')]);
         foreach ($home->details as $detail) {
             $detail->unit = $this->normalizeUnitToKey($detail->unit);
         }   
-        return view('pages.homeedit', compact('home'));
+        
+        // Check if we need to restore form data from preview
+        $restoredData = null;
+        $restoredPhotos = [];
+        if ($request->get('restore') && session()->has('preview_form_data')) {
+            $sessionData = session()->get('preview_form_data');
+            $restoredData = $sessionData['form_data'] ?? null;
+            $restoredPhotos = $sessionData['temp_photos'] ?? [];
+            
+            // Don't clear session data yet - keep it for multiple preview attempts
+        } else {
+            // Clear any old preview session data and temp photos when starting fresh edit
+            $this->clearTempPhotosAndSession();
+        }
+        
+        return view('pages.homeedit', compact('home', 'restoredData', 'restoredPhotos'));
     }
 
     /** Update */
@@ -119,6 +191,14 @@ class HomeController extends Controller
         'deleted_detail_ids.*' => ['integer','exists:home_details,id'],
     ]);
 
+    // Validate photos and photo deletions
+    $photos = $request->validate([
+        'photos' => ['nullable', 'array'],
+        'photos.*' => ['image', 'mimes:jpeg,png,jpg,gif', 'max:5120'], // 5MB max per photo
+        'delete_photos' => ['nullable', 'array'],
+        'delete_photos.*' => ['integer', 'exists:images,id'],
+    ]);
+
     $v = $request->validate([
         'details'                   => ['nullable','array'],
         'details.*.id'              => ['nullable','integer','exists:home_details,id'],
@@ -132,7 +212,7 @@ class HomeController extends Controller
         'details.*.lc_price'        => ['nullable','numeric','min:0'],
     ]);
 
-    DB::transaction(function () use ($home, $parent, $v, $totals, $deleteBag) {
+    DB::transaction(function () use ($home, $parent, $v, $totals, $deleteBag, $photos, $request) {
         // 1) Update parent
         $home->update($parent + [
             'date'        => $parent['date'] ?? $home->date,
@@ -219,7 +299,35 @@ class HomeController extends Controller
         if (!empty($newRows)) {
             $home->details()->createMany($newRows);
         }
+
+        // 7) Handle photo deletions
+        if (!empty($photos['delete_photos'])) {
+            $photosToDelete = Image::whereIn('id', $photos['delete_photos'])
+                ->where('home_id', $home->id)
+                ->get();
+            
+            foreach ($photosToDelete as $photo) {
+                if ($photo->image_path && \Storage::disk('public')->exists($photo->image_path)) {
+                    \Storage::disk('public')->delete($photo->image_path);
+                }
+                $photo->delete();
+            }
+        }
+
+        // 8) Handle new photo uploads
+        if (!empty($photos['photos'])) {
+            foreach ($photos['photos'] as $photo) {
+                $path = $photo->store('home_photos', 'public');
+                $home->images()->create([
+                    'image_path' => $path,
+                    'status' => true,
+                ]);
+            }
+        }
     });
+
+    // Clear preview session data after successful update
+    session()->forget('preview_form_data');
 
     return redirect()->route('home')->with('success', __('Updated successfully.'));
 }
@@ -265,6 +373,42 @@ class HomeController extends Controller
             'details.*.mc_price'      => ['nullable','numeric','min:0'],
             'details.*.lc_price'      => ['nullable','numeric','min:0'],
         ]);
+
+        // Handle photos from form - SIMPLIFIED LOGIC
+        $uploadedPhotos = [];
+        $allTempPhotos = [];
+        
+        // Handle new photo uploads
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                // Store temporarily for preview
+                $tempPath = $photo->store('temp_photos', 'public');
+                $allTempPhotos[] = $tempPath;
+                $uploadedPhotos[] = (object)[
+                    'image_path' => $tempPath,
+                    'temp' => true
+                ];
+            }
+        }
+        
+        // Handle restored photos from form (explicitly sent from form)
+        if ($request->has('restored_photos') && is_array($request->input('restored_photos'))) {
+            foreach ($request->input('restored_photos') as $tempPath) {
+                if ($tempPath && \Storage::disk('public')->exists($tempPath)) {
+                    // Only add if not already in our new uploads
+                    if (!in_array($tempPath, $allTempPhotos)) {
+                        $allTempPhotos[] = $tempPath;
+                        $uploadedPhotos[] = (object)[
+                            'image_path' => $tempPath,
+                            'temp' => true
+                        ];
+                    }
+                }
+            }
+        }
+
+        // Clean up old temp photos (older than 1 hour)
+        $this->cleanupTempPhotos();
 
         // === your existing rows building logic ===
         $rows = collect($data['details'])
@@ -313,9 +457,14 @@ class HomeController extends Controller
             $previewDate = $home->updated_at
                 ?? $home->created_at
                 ?? now();
+            
+            // Combine existing photos with uploaded photos
+            $existingPhotos = $home->images()->where('status', true)->get();
+            $allPhotos = $existingPhotos->merge(collect($uploadedPhotos));
         } else {
             // CREATE PAGE → always show today's date
             $previewDate = now();
+            $allPhotos = collect($uploadedPhotos);
         }
 
         $trooperStr = $data['trooper'] ?? ($home->trooper ?? '');
@@ -327,6 +476,13 @@ class HomeController extends Controller
         } else {
             $logo_choice = 'none';
         }
+
+        // Store form data in session for back navigation
+        session()->put('preview_form_data', [
+            'form_data' => $data,
+            'temp_photos' => $allTempPhotos, // Use the deduplicated list
+            'home_id' => $home ? $home->id : null,
+        ]);
 
         return view('pages.homepreview', [
             'project_name' => $data['project_name'] ?? '',
@@ -342,6 +498,8 @@ class HomeController extends Controller
             'finalTotal'   => $final,
             'date'         => $previewDate->format('d/m/Y'),
             'logo_choice'  => $logo_choice,
+            'photos'       => $allPhotos,
+            'is_preview'   => true,
         ]);
     }
 
@@ -413,6 +571,7 @@ class HomeController extends Controller
             'date'         => $previewDate->format('d/m/Y'),
             'logo_choice'  => $logo_choice,
             'autoDownload' => 'pdf',
+            'photos'       => $home->images()->where('status', true)->get(),
         ]);
     }
 
@@ -480,6 +639,7 @@ class HomeController extends Controller
             'date'         => $previewDate->format('d/m/Y'),
             'logo_choice'  => $logo_choice,
             'autoDownload' => 'excel',
+            'photos'       => $home->images()->where('status', true)->get(),
         ]);
     }
 
@@ -540,5 +700,56 @@ class HomeController extends Controller
 
         // fallback: return original raw so nothing breaks
         return $raw;
+    }
+
+    /** Delete Photo */
+    public function deletePhoto(Image $image)
+    {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
+        // Delete the file from storage
+        if ($image->image_path && \Storage::disk('public')->exists($image->image_path)) {
+            \Storage::disk('public')->delete($image->image_path);
+        }
+
+        // Delete the database record
+        $image->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    /** Clean up temporary photos */
+    private function cleanupTempPhotos()
+    {
+        $tempDir = storage_path('app/public/temp_photos');
+        if (is_dir($tempDir)) {
+            $files = glob($tempDir . '/*');
+            $oneHourAgo = time() - 3600; // 1 hour ago
+            
+            foreach ($files as $file) {
+                if (is_file($file) && filemtime($file) < $oneHourAgo) {
+                    unlink($file);
+                }
+            }
+        }
+    }
+
+    /** Clear all temporary photos and session data */
+    private function clearTempPhotosAndSession()
+    {
+        // Clear session data
+        session()->forget('preview_form_data');
+        
+        // Clean up ALL temp photos when starting fresh (not just old ones)
+        $tempDir = storage_path('app/public/temp_photos');
+        if (is_dir($tempDir)) {
+            $files = glob($tempDir . '/*');
+            
+            foreach ($files as $file) {
+                if (is_file($file)) {
+                    unlink($file);
+                }
+            }
+        }
     }
 }
