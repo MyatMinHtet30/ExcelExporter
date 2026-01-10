@@ -46,6 +46,9 @@ class HomeController extends Controller
     /** Store */
     public function store(Request $request)
     {
+        \Log::info('HomeController@store called');
+        \Log::info('Request data:', $request->all());
+        
         App::setLocale(Session::get('locale', config('app.locale')));
 
         $parent = $this->validated($request);
@@ -68,7 +71,7 @@ class HomeController extends Controller
         // Validate photos and restored photos
         $photos = $request->validate([
             'photos' => ['nullable', 'array'],
-            'photos.*' => ['image', 'mimes:jpeg,png,jpg,gif', 'max:5120'], // 5MB max per photo
+            'photos.*' => ['file', 'mimes:jpeg,jpg,png,gif,bmp,tiff,tif,webp,svg,heic,heif,avif,ico,raw,cr2,nef,arw,dng', 'max:51200'], // 50MB max per photo
             'restored_photos' => ['nullable', 'array'],
             'restored_photos.*' => ['string'], // Paths to temporary photos
         ]);
@@ -194,7 +197,7 @@ class HomeController extends Controller
     // Validate photos and photo deletions
     $photos = $request->validate([
         'photos' => ['nullable', 'array'],
-        'photos.*' => ['image', 'mimes:jpeg,png,jpg,gif', 'max:5120'], // 5MB max per photo
+        'photos.*' => ['file', 'mimes:jpeg,jpg,png,gif,bmp,tiff,tif,webp,svg,heic,heif,avif,ico,raw,cr2,nef,arw,dng', 'max:51200'], // 50MB max per photo
         'delete_photos' => ['nullable', 'array'],
         'delete_photos.*' => ['integer', 'exists:images,id'],
     ]);
@@ -375,33 +378,45 @@ class HomeController extends Controller
         ]);
 
         // Handle photos from form - SIMPLIFIED LOGIC
-        $uploadedPhotos = [];
+        $uploadedPhotos = collect();
         $allTempPhotos = [];
         
-        // Handle new photo uploads
+        // Handle new photo uploads (direct file uploads)
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $photo) {
                 // Store temporarily for preview
                 $tempPath = $photo->store('temp_photos', 'public');
                 $allTempPhotos[] = $tempPath;
-                $uploadedPhotos[] = (object)[
+                
+                // Create a temporary Image model instance (not saved to DB)
+                $tempImage = new Image([
                     'image_path' => $tempPath,
-                    'temp' => true
-                ];
+                    'status' => true,
+                ]);
+                // Set a temporary ID to avoid issues with JSON serialization
+                $tempImage->id = 'temp_' . uniqid();
+                $tempImage->temp = true; // Add a temporary flag
+                $uploadedPhotos->push($tempImage);
             }
         }
         
-        // Handle restored photos from form (explicitly sent from form)
+        // Handle restored photos from form (from chunked upload or previous preview)
         if ($request->has('restored_photos') && is_array($request->input('restored_photos'))) {
             foreach ($request->input('restored_photos') as $tempPath) {
                 if ($tempPath && \Storage::disk('public')->exists($tempPath)) {
                     // Only add if not already in our new uploads
                     if (!in_array($tempPath, $allTempPhotos)) {
                         $allTempPhotos[] = $tempPath;
-                        $uploadedPhotos[] = (object)[
+                        
+                        // Create a temporary Image model instance (not saved to DB)
+                        $tempImage = new Image([
                             'image_path' => $tempPath,
-                            'temp' => true
-                        ];
+                            'status' => true,
+                        ]);
+                        // Set a temporary ID to avoid issues with JSON serialization
+                        $tempImage->id = 'temp_' . uniqid();
+                        $tempImage->temp = true; // Add a temporary flag
+                        $uploadedPhotos->push($tempImage);
                     }
                 }
             }
@@ -460,11 +475,11 @@ class HomeController extends Controller
             
             // Combine existing photos with uploaded photos
             $existingPhotos = $home->images()->where('status', true)->get();
-            $allPhotos = $existingPhotos->merge(collect($uploadedPhotos));
+            $allPhotos = $existingPhotos->merge($uploadedPhotos);
         } else {
             // CREATE PAGE → always show today's date
             $previewDate = now();
-            $allPhotos = collect($uploadedPhotos);
+            $allPhotos = $uploadedPhotos;
         }
 
         $trooperStr = $data['trooper'] ?? ($home->trooper ?? '');
@@ -498,7 +513,7 @@ class HomeController extends Controller
             'finalTotal'   => $final,
             'date'         => $previewDate->format('d/m/Y'),
             'logo_choice'  => $logo_choice,
-            'photos'       => $allPhotos,
+            'photos'       => $allPhotos instanceof \Illuminate\Support\Collection ? $allPhotos : collect($allPhotos),
             'is_preview'   => true,
         ]);
     }
@@ -732,6 +747,142 @@ class HomeController extends Controller
                 }
             }
         }
+    }
+
+    /** Upload photo chunk for better handling of many photos */
+    public function uploadPhotoChunk(Request $request)
+    {
+        App::setLocale(Session::get('locale', config('app.locale')));
+
+        $request->validate([
+            'photo' => ['required', 'file', 'mimes:jpeg,jpg,png,gif,bmp,tiff,tif,webp,svg,heic,heif,avif,ico,raw,cr2,nef,arw,dng', 'max:51200'], // 50MB max per photo
+        ]);
+
+        try {
+            // Store photo temporarily
+            $photo = $request->file('photo');
+            
+            // Handle special formats that might need conversion
+            $processedPhoto = $this->processPhotoUpload($photo);
+            
+            $tempPath = $processedPhoto->store('temp_photos', 'public');
+            
+            return response()->json([
+                'success' => true,
+                'temp_path' => $tempPath,
+                'filename' => $photo->getClientOriginalName(),
+                'size' => $photo->getSize(),
+                'original_format' => $photo->getClientOriginalExtension(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Upload failed: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Process uploaded photo to handle special formats
+     */
+    private function processPhotoUpload($photo)
+    {
+        $extension = strtolower($photo->getClientOriginalExtension());
+        
+        // List of formats that might need special handling
+        $specialFormats = ['heic', 'heif', 'avif', 'cr2', 'nef', 'arw', 'dng', 'raw'];
+        
+        if (in_array($extension, $specialFormats)) {
+            // For HEIC/HEIF files, try to convert to JPEG for better web compatibility
+            if (in_array($extension, ['heic', 'heif'])) {
+                return $this->convertHeicToJpeg($photo);
+            }
+            
+            // Log the special format for monitoring
+            \Log::info("Uploaded special format: {$extension}", [
+                'filename' => $photo->getClientOriginalName(),
+                'size' => $photo->getSize()
+            ]);
+        }
+        
+        return $photo;
+    }
+
+    /**
+     * Convert HEIC/HEIF to JPEG for better web compatibility
+     */
+    private function convertHeicToJpeg($photo)
+    {
+        try {
+            // Check if ImageMagick is available
+            if (extension_loaded('imagick')) {
+                $imagick = new \Imagick();
+                $imagick->readImageBlob(file_get_contents($photo->getRealPath()));
+                $imagick->setImageFormat('jpeg');
+                $imagick->setImageCompressionQuality(85);
+                
+                // Create a temporary file for the converted image
+                $tempPath = tempnam(sys_get_temp_dir(), 'heic_converted_') . '.jpg';
+                $imagick->writeImage($tempPath);
+                $imagick->clear();
+                
+                // Create a new UploadedFile object from the converted image
+                $convertedPhoto = new \Illuminate\Http\UploadedFile(
+                    $tempPath,
+                    pathinfo($photo->getClientOriginalName(), PATHINFO_FILENAME) . '.jpg',
+                    'image/jpeg',
+                    null,
+                    true
+                );
+                
+                return $convertedPhoto;
+            }
+            
+            // If ImageMagick is not available, try GD (limited HEIC support)
+            // For now, just return the original file
+            \Log::warning('HEIC conversion not available - ImageMagick not installed');
+            return $photo;
+            
+        } catch (\Exception $e) {
+            \Log::error('HEIC conversion failed: ' . $e->getMessage());
+            return $photo;
+        }
+    }
+
+    /** Check PHP configuration for upload limits */
+    public function checkUploadConfig()
+    {
+        $config = [
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+            'post_max_size' => ini_get('post_max_size'),
+            'max_file_uploads' => ini_get('max_file_uploads'),
+            'max_execution_time' => ini_get('max_execution_time'),
+            'memory_limit' => ini_get('memory_limit'),
+            'max_input_vars' => ini_get('max_input_vars'),
+        ];
+
+        return response()->json([
+            'config' => $config,
+            'recommendations' => [
+                'upload_max_filesize' => '50M',
+                'post_max_size' => '500M',
+                'max_file_uploads' => '200',
+                'max_execution_time' => '600',
+                'memory_limit' => '512M',
+                'max_input_vars' => '5000',
+            ]
+        ]);
+    }
+
+    /** Clear session data for photos */
+    public function clearSession(Request $request)
+    {
+        if ($request->has('clear_session')) {
+            session()->forget('preview_form_data');
+            return response()->json(['success' => true]);
+        }
+        
+        return response()->json(['success' => false]);
     }
 
     /** Clear all temporary photos and session data */

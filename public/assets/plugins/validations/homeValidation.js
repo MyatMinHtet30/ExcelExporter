@@ -39,7 +39,7 @@
 
   function checkNumeric(input) {
     if (!input) return;
-    const v = input.value.trim();
+    const v = input.value.trim().replace(/,/g, ''); // Strip commas for validation
     if (!v) return;
     if (!NUM_REGEX.test(v)) {
       const msg =
@@ -81,8 +81,8 @@
       checkRequired(amt);
       checkRequired(unit);
 
-      const mcVal = mc && mc.value.trim();
-      const lcVal = lc && lc.value.trim();
+      const mcVal = mc && mc.value.trim().replace(/,/g, '');
+      const lcVal = lc && lc.value.trim().replace(/,/g, '');
 
       if (!mcVal && !lcVal) {
         const msg =
@@ -119,7 +119,7 @@
       const isNumericField = isAmount || isMc || isLc;
 
       if (isNumericField) {
-        const v = input.value.trim();
+        const v = input.value.trim().replace(/,/g, ''); // Strip commas for validation
         const numOk = (v === '') || NUM_REGEX.test(v);
 
         if (!numOk) {
@@ -142,8 +142,8 @@
           if (row) {
             const mc = row.querySelector('input[name*="[mc_price]"]');
             const lc = row.querySelector('input[name*="[lc_price]"]');
-            const mcVal = mc && mc.value.trim();
-            const lcVal = lc && lc.value.trim();
+            const mcVal = mc && mc.value.trim().replace(/,/g, ''); // Strip commas
+            const lcVal = lc && lc.value.trim().replace(/,/g, ''); // Strip commas
             const mcOk  = !mcVal || NUM_REGEX.test(mcVal);
             const lcOk  = !lcVal || NUM_REGEX.test(lcVal);
 

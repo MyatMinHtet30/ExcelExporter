@@ -8,7 +8,6 @@
     <title>@yield('title', 'Quotation')</title>
 
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}" type="text/css">
-    <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
     <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css">
     @stack('styles')
 </head>

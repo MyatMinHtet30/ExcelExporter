@@ -12,7 +12,32 @@
   // ====== Shortcuts ======
   const $  = (s, r=document) => r.querySelector(s);
   const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-  const to2 = n => (isFinite(n) ? Number(n) : 0).toFixed(2);
+  const to2 = n => {
+    const num = isFinite(n) ? Number(n) : 0;
+    return num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+
+  // ====== Strip commas from numeric inputs before form submission ======
+  function stripCommasFromNumericInputs(form) {
+    // Find all inputs that might contain comma-formatted numbers
+    const numericInputs = form.querySelectorAll(
+      'input[name*="amount"], input[name*="mc_price"], input[name*="lc_price"], ' +
+      'input[name*="material_total"], input[name*="labor_total"], input[name*="grand_total"], ' +
+      'input[name="misc_total"], input[name="operating_expenses"], input[name="category_ab_total"], ' +
+      'input[name="vat_total"], input[name="final_total"], input.number-input, ' +
+      '.js-mat-total, .js-lab-total, .js-grand-total, .js-amount, .js-mc, .js-lc'
+    );
+    
+    numericInputs.forEach(input => {
+      if (input.value && typeof input.value === 'string') {
+        // Remove commas but preserve decimal points
+        input.value = input.value.replace(/,/g, '');
+      }
+    });
+  }
 
   const rowsContainer = $('#rows-container');
   if (!rowsContainer) return;
@@ -24,7 +49,15 @@
       if (!ok) {
         e.preventDefault();
         homeForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        // Strip commas from all numeric inputs before submission
+        stripCommasFromNumericInputs(homeForm);
       }
+    });
+  } else if (homeForm) {
+    // If no validation function, still strip commas on submit
+    homeForm.addEventListener('submit', function (e) {
+      stripCommasFromNumericInputs(homeForm);
     });
   }
 
@@ -72,7 +105,7 @@
 
   // ====== Per-row totals ======
   function calcRow(row){
-    const val = sel => parseFloat($(sel,row)?.value) || 0;
+    const val = sel => parseFloat($(sel,row)?.value?.replace(/,/g, '')) || 0;
 
     const amount = val('input[name*="[amount]"]');
     const mc     = val('input[name*="[mc_price]"]');
@@ -82,7 +115,10 @@
     const lTotal = amount * lc;
     const gTotal = mTotal + lTotal;
 
-    const set = (cls, v) => { const el = $(cls, row); if(el) el.value = to2(v); };
+    const set = (cls, v) => { 
+      const el = $(cls, row); 
+      if(el) el.value = to2(v); 
+    };
     set('.js-mat-total',   mTotal);
     set('.js-lab-total',   lTotal);
     set('.js-grand-total', gTotal);
@@ -91,8 +127,9 @@
 function recalcSummary(){
     // Sum only ACTIVE (non-deleted) rows' grand totals
     const sum = getRows()
+   .filter(r => !isDeleted(r))
    .map(r => $('.js-grand-total', r))
-   .reduce((a,el) => a + (parseFloat(el?.value) || 0), 0);
+   .reduce((a,el) => a + (parseFloat(el?.value?.replace(/,/g, '')) || 0), 0);
 
     const operating = sum * 0.15;
     const ab        = sum + operating;
@@ -311,7 +348,7 @@ document.addEventListener('keydown', function (e) {
   }
 });
 
-  // ====== Number formatting (.number-input) ======
+  // ====== Number formatting for input fields ======
   function formatNumberInput(input) {
     let value = input.value.replace(/,/g, '');
     if (value === '' || isNaN(value)) { input.value = ''; return; }
@@ -321,20 +358,63 @@ document.addEventListener('keydown', function (e) {
     intPart = parseInt(intPart, 10).toLocaleString('en-US');
     input.value = decPart.length > 0 ? (intPart + '.' + decPart) : intPart;
   }
+
+  // Format number with 2 decimal places and commas
+  function formatCurrencyInput(input) {
+    let value = input.value.replace(/,/g, '');
+    if (value === '' || isNaN(value)) { 
+      input.value = ''; 
+      return; 
+    }
+    const num = parseFloat(value);
+    input.value = num.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  // Handle input events for number formatting
   document.addEventListener('input', function(e){
-    if(e.target.classList.contains('number-input')){
-      formatNumberInput(e.target);
+    const target = e.target;
+    
+    // Format .number-input class (existing functionality)
+    if(target.classList.contains('number-input')){
+      formatNumberInput(target);
+    }
+    
+    // Format amount, material price, and labor price fields
+    if(target.matches('input[name*="[amount]"], input[name*="[mc_price]"], input[name*="[lc_price]"], .js-amount, .js-mc, .js-lc')){
+      // Allow typing without immediate formatting (just remove invalid chars)
+      let value = target.value;
+      // Remove any non-numeric characters except decimal point and commas
+      value = value.replace(/[^0-9.,]/g, '');
+      // Ensure only one decimal point
+      const parts = value.split('.');
+      if (parts.length > 2) {
+        value = parts[0] + '.' + parts.slice(1).join('');
+      }
+      target.value = value;
     }
   });
+
+  // Handle blur events for final formatting
   document.addEventListener('blur', function(e){
-    if(e.target.classList.contains('number-input')){
-      let value = e.target.value.replace(/,/g, '');
+    const target = e.target;
+    
+    // Format .number-input class (existing functionality)
+    if(target.classList.contains('number-input')){
+      let value = target.value.replace(/,/g, '');
       if (value && !isNaN(value)) {
-        e.target.value = parseFloat(value).toLocaleString('en-US', {
+        target.value = parseFloat(value).toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         });
       }
+    }
+    
+    // Format amount, material price, and labor price fields on blur
+    if(target.matches('input[name*="[amount]"], input[name*="[mc_price]"], input[name*="[lc_price]"], .js-amount, .js-mc, .js-lc')){
+      formatCurrencyInput(target);
     }
   }, true);
 
@@ -353,6 +433,9 @@ document.addEventListener('keydown', function (e) {
         return; // ⬅️ stop here, do NOT preview
       }
     }
+
+      // Strip commas from numeric inputs before preview submission
+      stripCommasFromNumericInputs(form);
 
       // Ensure all restored photos are included in the form
       const restoredPhotoInputs = form.querySelectorAll('input[name="restored_photos[]"]');

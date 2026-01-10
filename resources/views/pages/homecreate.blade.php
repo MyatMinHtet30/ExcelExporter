@@ -4,8 +4,9 @@
 
 @push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-<link href="{{ asset('assets/css/forminput-table.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ asset('assets/css/home-forminput-table.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/css/home-common.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ asset('assets/css/photo-upload.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
@@ -166,7 +167,7 @@
                                 <div class="col-6 col-md-2 field-col">
                                     <label class="form-label">{{ __('Amount') }} <span class="star">*</span></label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control"
+                                        <input type="text" step="0.01" class="form-control js-amount"
                                             name="details[0][amount]" placeholder=".00" required
                                             data-error-required="{{ __('Amount is required') }}"
                                             data-error-number="{{ __('Please enter number only') }}">
@@ -200,7 +201,7 @@
                                 <div class="col-6 col-md-2 field-col">
                                     <label class="form-label">{{ __('Material Price') }} <span class="star">*</span></label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control"
+                                        <input type="text" step="0.01" class="form-control js-mc"
                                             name="details[0][mc_price]" placeholder=".00" required
                                             data-error-required="{{ __('Material cost or labor cost is required') }}"
                                             data-error-number="{{ __('Please enter number only') }}">
@@ -211,7 +212,7 @@
                                 <div class="col-6 col-md-2 field-col">
                                     <label class="form-label">{{ __('Labor Price') }} <span class="star">*</span></label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01" class="form-control"
+                                        <input type="text" step="0.01" class="form-control js-lc"
                                             name="details[0][lc_price]" placeholder=".00" required
                                             data-error-required="{{ __('Material cost or labor cost is required') }}"
                                             data-error-number="{{ __('Please enter number only') }}">
@@ -227,7 +228,7 @@
                                 <div class="col-12 col-md-2 field-col">
                                     <label class="form-label">{{ __('Material Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01"
+                                        <input type="text"
                                             class="form-control readonly-input js-mat-total"
                                             placeholder="0.00" readonly>
                                     </div>
@@ -237,7 +238,7 @@
                                 <div class="col-12 col-md-2 field-col">
                                     <label class="form-label">{{ __('Labor Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01"
+                                        <input type="text"
                                             class="form-control readonly-input js-lab-total"
                                             placeholder="0.00" readonly>
                                     </div>
@@ -247,7 +248,7 @@
                                 <div class="col-12 col-md-2 field-col">
                                     <label class="form-label">{{ __('Grand Total') }}</label>
                                     <div class="input-group input-42">
-                                        <input type="number" step="0.01"
+                                        <input type="text"
                                             class="form-control readonly-input js-grand-total"
                                             placeholder="0.00" readonly>
                                     </div>
@@ -400,7 +401,11 @@
                                     </div>
                                     <h5>{{ __('Upload Project Photos') }}</h5>
                                     <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
-                                    <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF. Max 5MB per photo') }}</p>
+                                    <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
+                                    <p class="text-success small mb-2">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {{ __('Now supports large HEIC files! Upload 10+ photos at once (up to 5GB total).') }}
+                                    </p>
                                     
                                     <!-- Photo counter -->
                                     <div class="photo-counter" id="photo-counter">
@@ -408,10 +413,18 @@
                                         <span id="photo-count">0</span> {{ __('photos selected') }}
                                     </div>
                                     
-                                    <!-- Photo list for restored/selected photos -->
-                                    <div class="photo-list" id="photo-list"></div>
+                                    <!-- New photos list with delete all button -->
+                                    <div class="new-photos-section" id="new-photos-section" style="display: none;">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <small class="text-muted">{{ __('New Photos') }}</small>
+                                            <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <div class="photo-list" id="photo-list"></div>
+                                    </div>
                                     
-                                    <input type="file" id="photo-input" name="photos[]" multiple accept="image/*" style="display: none;">
+                                    <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
                                     <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
                                         <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
                                     </button>
@@ -471,8 +484,10 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
 <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
+<script src="{{ asset('assets/js/chunked-upload.js') }}"></script>
 
 @if(isset($restoredData) && $restoredData)
 <script>
@@ -528,9 +543,15 @@ document.addEventListener('DOMContentLoaded', function() {
     if (restoredPhotos && restoredPhotos.length > 0) {
         const photoCountElement = document.getElementById('photo-count');
         const photoList = document.getElementById('photo-list');
+        const newPhotosSection = document.getElementById('new-photos-section');
         
         if (photoCountElement) {
             photoCountElement.textContent = restoredPhotos.length;
+        }
+        
+        // Show new photos section if we have restored photos
+        if (newPhotosSection && restoredPhotos.length > 0) {
+            newPhotosSection.style.display = 'block';
         }
         
         // Create a list of restored photos for display
@@ -539,10 +560,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 const photoItem = document.createElement('div');
                 photoItem.className = 'photo-list-item restored-photo';
                 photoItem.dataset.photoPath = photoPath;
+                
+                // Extract filename from path
+                const filename = photoPath.split('/').pop();
+                
                 photoItem.innerHTML = `
-                    <div class="photo-name" title="Restored Photo ${index + 1}">
+                    <div class="photo-name" title="Restored Photo: ${filename}">
                         <i class="fas fa-image me-1 text-warning"></i>
-                        Restored Photo ${index + 1}
+                        ${filename}
+                        <span class="format-badge badge-apple">RESTORED</span>
                     </div>
                     <div class="photo-size">Restored</div>
                     <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)">
@@ -586,6 +612,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (photoCountElement) {
             const currentCount = parseInt(photoCountElement.textContent) || 0;
             photoCountElement.textContent = Math.max(0, currentCount - 1);
+        }
+        
+        // Hide new photos section if no photos left
+        const photoList = document.getElementById('photo-list');
+        const newPhotosSection = document.getElementById('new-photos-section');
+        if (photoList && newPhotosSection) {
+            const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
+            if (!hasPhotos) {
+                newPhotosSection.style.display = 'none';
+            }
         }
     };
 });

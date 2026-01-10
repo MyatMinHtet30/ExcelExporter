@@ -22,11 +22,13 @@
     <script src="{{ asset('assets/js/horizontal-menu.js') }}"></script>
 
     <!-- Chartist Chart JS -->
+    @if(request()->routeIs('dashboard'))
     <script src="{{ asset('assets/plugins/chartist-js/chartist.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/chartist-js/chartist-plugin-tooltip.min.js') }}"></script>
 
     <!-- Dashboard JS -->
     <script src="{{ asset('assets/js/init/dashborad.js') }}"></script>
+    @endif
 
     <!-- Main JS -->
     <script src="{{ asset('assets/js/main.js') }}"></script>

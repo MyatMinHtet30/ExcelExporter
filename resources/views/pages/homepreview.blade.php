@@ -141,6 +141,23 @@
         .no-print {
             display: none !important;
         }
+        
+        .photo-gallery-wrap {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        
+        .photo-item img {
+            max-width: 100% !important;
+            height: auto !important;
+            object-fit: contain !important;
+        }
+        
+        .photo-grid {
+            display: grid !important;
+            grid-template-columns: repeat(5, 1fr) !important;
+            gap: 8px !important;
+        }
     }
 </style>
 </head>
@@ -296,8 +313,8 @@
     </div>
 
     {{-- Photo Gallery Section --}}
-    @if($photos && $photos->count() > 0)
-        <div class="photo-gallery-wrap" style=" width: 120%; max-width: 1200px; margin: 20px auto; background: #fff; border: 2px solid #000; padding: 20px; position: relative;">
+    @if($photos && count($photos) > 0)
+        <div class="photo-gallery-wrap" style="width: 120%; max-width: 1200px; margin: 20px auto; background: #fff; border: 2px solid #000; padding: 20px; position: relative; page-break-inside: avoid;">
             
             @php
                 $portraitPhotos = [];
@@ -329,7 +346,8 @@
                             <div class="photo-item" style="width: 1.5in; height: 2in; border: 1px solid #000; overflow: hidden; position: relative; z-index: 10;">
                                 <img src="{{ asset('storage/' . $photo->image_path) }}" 
                                      alt="Portrait Photo" 
-                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                     crossorigin="anonymous">
                             </div>
                         @endforeach
                     </div>
@@ -344,7 +362,8 @@
                             <div class="photo-item" style="width: 1.8in; height: 1.2in; border: 1px solid #000; overflow: hidden; position: relative; z-index: 10;">
                                 <img src="{{ asset('storage/' . $photo->image_path) }}" 
                                      alt="Landscape Photo" 
-                                     style="width: 100%; height: 100%; object-fit: cover;">
+                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                     crossorigin="anonymous">
                             </div>
                         @endforeach
                     </div>
@@ -391,12 +410,61 @@
                     throw new Error('Empty or invalid image blob');
                 }
                 
+                // Special handling for HEIC files
+                const isHeic = url.toLowerCase().includes('.heic') || url.toLowerCase().includes('.heif');
+                
+                if (isHeic) {
+                    console.log('HEIC file detected, attempting conversion:', url);
+                    
+                    // First try to find a converted JPEG version
+                    const convertedUrl = url.replace(/\.(heic|heif)$/i, '.jpg');
+                    if (convertedUrl !== url) {
+                        try {
+                            console.log('Trying converted JPEG version:', convertedUrl);
+                            return await toBase64(convertedUrl);
+                        } catch (e) {
+                            console.warn('Converted JPEG version not found, trying original HEIC');
+                        }
+                    }
+                    
+                    // If no converted version, try to process the HEIC file
+                    // But expect it might fail in browsers
+                    try {
+                        const result = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                const result = reader.result;
+                                if (result && typeof result === 'string' && result.includes(',')) {
+                                    const base64Data = result.split(',')[1];
+                                    if (base64Data && base64Data.length > 100) {
+                                        resolve(base64Data);
+                                    } else {
+                                        reject(new Error('Invalid HEIC base64 data'));
+                                    }
+                                } else {
+                                    reject(new Error('Invalid HEIC result'));
+                                }
+                            };
+                            reader.onerror = () => reject(new Error('HEIC FileReader error'));
+                            reader.readAsDataURL(blob);
+                        });
+                        
+                        console.log('HEIC conversion successful');
+                        return result;
+                    } catch (heicError) {
+                        console.warn('HEIC processing failed (expected in most browsers):', heicError.message);
+                        return null; // Return null to skip this image
+                    }
+                }
+                
+                // Handle non-HEIC files normally
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
                     reader.onloadend = () => {
                         const result = reader.result;
                         if (result && typeof result === 'string' && result.includes(',')) {
-                            resolve(result.split(',')[1]);
+                            const base64Data = result.split(',')[1];
+                            resolve(base64Data);
                         } else {
                             reject(new Error('Invalid base64 result'));
                         }
@@ -404,9 +472,19 @@
                     reader.onerror = () => reject(new Error('FileReader error'));
                     reader.readAsDataURL(blob);
                 });
+                
             } catch (error) {
                 console.error('Error converting image to base64:', error);
-                return null; // Return null instead of throwing
+                
+                // For HEIC files, this is expected - return null to skip
+                if (url.toLowerCase().includes('.heic') || url.toLowerCase().includes('.heif')) {
+                    console.warn('HEIC file processing failed (expected), skipping photo');
+                    return null;
+                }
+                
+                // For other formats, also return null instead of throwing
+                console.warn('Image processing failed, skipping photo:', url);
+                return null;
             }
         }
 
@@ -449,18 +527,19 @@
             const PHOTOS_PER_ROW = 5;
             const GAP_PX = 8;               // same as CSS gap
 
-            Swal.fire({
-                icon: 'success',
-                title: 'Download',
-                text: 'Excel downloaded successfully.',
-                timer: 2000,
-                showConfirmButton: false
-            });
+            try {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Download',
+                    text: 'Excel downloaded successfully.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
 
-            const wb = new ExcelJS.Workbook();
-            const ws = wb.addWorksheet('BOQ', {
-            properties: { defaultRowHeight: 18.7 }
-            });
+                const wb = new ExcelJS.Workbook();
+                const ws = wb.addWorksheet('BOQ', {
+                properties: { defaultRowHeight: 18.7 }
+                });
 
             // --- columns A..J (1..10) ---
             // We insert an extra column so that B & C can be merged for the "List" column,
@@ -890,7 +969,10 @@
 
                         // Function to render photos with your positioning logic
                         async function renderPhotoGroup(photoList, photoWidth, photoHeight, positions) {
-                            if (photoList.length === 0) return;
+                            if (photoList.length === 0) return { processed: 0, skipped: 0 };
+                            
+                            let processedCount = 0;
+                            let skippedCount = 0;
                             
                             // Process photos in rows of 5
                             for (let rowStart = 0; rowStart < photoList.length; rowStart += 5) {
@@ -904,6 +986,7 @@
                                     // Validate position values to prevent Excel corruption
                                     if (typeof columnPosition !== 'number' || isNaN(columnPosition) || columnPosition < 0) {
                                         console.warn(`Invalid column position for photo ${i}:`, columnPosition);
+                                        skippedCount++;
                                         continue; // Skip this photo
                                     }
                                     
@@ -913,13 +996,37 @@
                                         
                                         // Validate base64 data
                                         if (!base64 || base64.length < 100) {
-                                            console.warn(`Invalid base64 data for photo:`, photo.image_path);
+                                            console.warn(`Skipping photo due to conversion failure:`, photo.image_path);
+                                            skippedCount++;
                                             continue; // Skip this photo
                                         }
                                         
+                                        // Determine image format from file extension
+                                        const fileName = photo.image_path.toLowerCase();
+                                        let imageFormat = 'jpeg';
+                                        let mimeType = 'image/jpeg';
+                                        
+                                        if (fileName.endsWith('.png')) {
+                                            imageFormat = 'png';
+                                            mimeType = 'image/png';
+                                        } else if (fileName.endsWith('.gif')) {
+                                            imageFormat = 'gif';
+                                            mimeType = 'image/gif';
+                                        } else if (fileName.endsWith('.webp')) {
+                                            imageFormat = 'webp';
+                                            mimeType = 'image/webp';
+                                        } else if (fileName.endsWith('.bmp')) {
+                                            imageFormat = 'bmp';
+                                            mimeType = 'image/bmp';
+                                        } else {
+                                            // For HEIC, AVIF, TIFF and other formats, convert to JPEG
+                                            imageFormat = 'jpeg';
+                                            mimeType = 'image/jpeg';
+                                        }
+
                                         const imgId = wb.addImage({
-                                            base64: "data:image/jpeg;base64," + base64,
-                                            extension: "jpeg"
+                                            base64: `data:${mimeType};base64,` + base64,
+                                            extension: imageFormat
                                         });
 
                                         // Position the image with validated values
@@ -934,8 +1041,11 @@
                                             },
                                             editAs: 'absolute'
                                         });
+                                        
+                                        processedCount++;
                                     } catch (error) {
                                         console.error(`Error processing photo ${i}:`, error);
+                                        skippedCount++;
                                         // Continue with next photo instead of breaking
                                     }
                                 }
@@ -948,27 +1058,39 @@
                                     ? ROW_SPAN_PORTRAIT
                                     : ROW_SPAN_LANDSCAPE;
                             }
+                            
+                            return { processed: processedCount, skipped: skippedCount };
                         }
+
+                        let totalProcessed = 0;
+                        let totalSkipped = 0;
 
                         // Render portrait photos first
                         if (portraitPhotos.length > 0) {
-                            await renderPhotoGroup(
+                            const portraitResult = await renderPhotoGroup(
                         portraitPhotos,
                         PORTRAIT_WIDTH_PX,
                         PORTRAIT_HEIGHT_PX,
                         PHOTO_POSITIONS_PORTRAIT
                     );
+                            totalProcessed += portraitResult.processed;
+                            totalSkipped += portraitResult.skipped;
                         }
 
                         // Render landscape photos after portraits
                         if (landscapePhotos.length > 0) {
-                            await renderPhotoGroup(
+                            const landscapeResult = await renderPhotoGroup(
                                 landscapePhotos,
                                 LANDSCAPE_WIDTH_PX,
                                 LANDSCAPE_HEIGHT_PX,
                                 PHOTO_POSITIONS_LANDSCAPE
                             );
+                            totalProcessed += landscapeResult.processed;
+                            totalSkipped += landscapeResult.skipped;
                         }
+                        
+                        // Log photo processing results
+                        console.log(`Photo processing complete: ${totalProcessed} processed, ${totalSkipped} skipped`);
                 }
 
 
@@ -1002,6 +1124,28 @@
             document.body.appendChild(a);
             a.click();
             a.remove();
+            
+            } catch (error) {
+                console.error('Excel generation error:', error);
+                
+                // Check if error is related to HEIC files
+                const errorMessage = error.message || error.toString();
+                if (errorMessage.toLowerCase().includes('heic') || errorMessage.toLowerCase().includes('heif')) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Excel Generated with Limitations',
+                        html: 'Excel file generated successfully, but some HEIC photos were skipped.<br><br>HEIC photos are not fully supported in Excel. For best results, please use JPG, PNG, or other standard formats.',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Download Failed',
+                        text: 'Failed to generate Excel file. Please try again or contact support.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            }
         }
 
 
@@ -1015,59 +1159,129 @@
             });
 
             const { jsPDF } = window.jspdf;
+            
+            // Create a temporary wrapper that includes both BOQ and photos
+            const tempWrapper = document.createElement('div');
+            tempWrapper.style.cssText = `
+                background: #fff;
+                padding: 20px;
+                font-family: 'Times New Roman', serif;
+            `;
+            
+            // Clone the BOQ element
             const boqElement = document.querySelector('.boq-wrap');
             if (!boqElement) return;
-
-            boqElement.style.fontFamily = "'AngsanaPDF', 'Times New Roman', serif";
-
-            const canvas = await html2canvas(boqElement, {
-                scale: 3,
-                useCORS: true,
-                backgroundColor: '#ffffff',
-                scrollX: 0,
-                scrollY: -window.scrollY
-            });
-
-            boqElement.style.fontFamily = "'Times New Roman', serif";
-
-            const imgData = canvas.toDataURL('image/jpeg', 0.75);
-
-            const pdf = new jsPDF('landscape', 'mm', 'a4');
-
-            const pageWidth  = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-
-            const imgWidth  = pageWidth * 0.98;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-            let heightLeft = imgHeight;
-            let position = 10;
-
-            // first page
-            pdf.addImage(imgData, 'JPEG', 5, position, imgWidth, imgHeight, undefined, 'FAST');
-            heightLeft -= pageHeight;
-
-            // remaining pages
-            while (heightLeft > 0) {
-                pdf.addPage();
-                position = heightLeft - imgHeight + 10;
-                pdf.addImage(imgData, 'JPEG', 5, position, imgWidth, imgHeight, undefined, 'FAST');
-                heightLeft -= pageHeight;
+            
+            const boqClone = boqElement.cloneNode(true);
+            boqClone.style.fontFamily = "'AngsanaPDF', 'Times New Roman', serif";
+            tempWrapper.appendChild(boqClone);
+            
+            // Clone the photo gallery if it exists
+            const photoGallery = document.querySelector('.photo-gallery-wrap');
+            if (photoGallery) {
+                const photoClone = photoGallery.cloneNode(true);
+                // Add some spacing between BOQ and photos
+                photoClone.style.marginTop = '30px';
+                tempWrapper.appendChild(photoClone);
             }
+            
+            // Temporarily add to document for rendering
+            tempWrapper.style.position = 'absolute';
+            tempWrapper.style.left = '-9999px';
+            tempWrapper.style.top = '0';
+            document.body.appendChild(tempWrapper);
 
-            const listName = String(@json($list_name) || 'BOQ').trim();
-            let houseNo = String(@json($house_no) || '').trim();
+            try {
+                // Wait for all images to load before capturing
+                const images = tempWrapper.querySelectorAll('img');
+                const imagePromises = Array.from(images).map(img => {
+                    return new Promise((resolve) => {
+                        if (img.complete) {
+                            resolve();
+                        } else {
+                            img.onload = resolve;
+                            img.onerror = resolve; // Continue even if image fails to load
+                            // Timeout after 10 seconds
+                            setTimeout(resolve, 10000);
+                        }
+                    });
+                });
+                
+                await Promise.all(imagePromises);
+                
+                const canvas = await html2canvas(tempWrapper, {
+                    scale: 2, // Reduced scale for better performance with photos
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    scrollX: 0,
+                    scrollY: 0,
+                    logging: false,
+                    imageTimeout: 15000, // Increased timeout for photo loading
+                    onclone: function(clonedDoc) {
+                        // Ensure images are loaded in the cloned document
+                        const clonedImages = clonedDoc.querySelectorAll('img');
+                        clonedImages.forEach(img => {
+                            img.style.maxWidth = '100%';
+                            img.style.height = 'auto';
+                            // Force image to be visible
+                            img.style.display = 'block';
+                            img.style.visibility = 'visible';
+                        });
+                    }
+                });
 
-            // Convert slash to dash
-            houseNo = houseNo.replace(/\//g, '-');
+                const imgData = canvas.toDataURL('image/jpeg', 0.8);
 
-            let fileName = houseNo
-                ? `${listName} (${houseNo})`
-                : listName;
+                const pdf = new jsPDF('landscape', 'mm', 'a4');
 
-            fileName = fileName.replace(/[\\:*?"<>|]/g, '');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
 
-            pdf.save(fileName + '.pdf');
+                const imgWidth = pageWidth * 0.95;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                let heightLeft = imgHeight;
+                let position = 10;
+
+                // First page
+                pdf.addImage(imgData, 'JPEG', (pageWidth - imgWidth) / 2, position, imgWidth, imgHeight, undefined, 'FAST');
+                heightLeft -= (pageHeight - 20);
+
+                // Remaining pages
+                while (heightLeft > 0) {
+                    pdf.addPage();
+                    position = heightLeft - imgHeight + 10;
+                    pdf.addImage(imgData, 'JPEG', (pageWidth - imgWidth) / 2, position, imgWidth, imgHeight, undefined, 'FAST');
+                    heightLeft -= (pageHeight - 20);
+                }
+
+                const listName = String(@json($list_name) || 'BOQ').trim();
+                let houseNo = String(@json($house_no) || '').trim();
+
+                // Convert slash to dash
+                houseNo = houseNo.replace(/\//g, '-');
+
+                let fileName = houseNo
+                    ? `${listName} (${houseNo})`
+                    : listName;
+
+                fileName = fileName.replace(/[\\:*?"<>|]/g, '');
+
+                pdf.save(fileName + '.pdf');
+                
+            } catch (error) {
+                console.error('PDF generation error:', error);
+                alert('Error generating PDF. Please try again.');
+            } finally {
+                // Clean up temporary wrapper
+                document.body.removeChild(tempWrapper);
+                
+                // Restore original font
+                if (boqElement) {
+                    boqElement.style.fontFamily = "'Times New Roman', serif";
+                }
+            }
         }
 
     </script>
