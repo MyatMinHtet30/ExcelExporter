@@ -52,7 +52,7 @@
   "Operating Profit 15%": "ค่าดำเนินการและกำไร 15%",
   "Category A,B Total": "รวมราคาหมวดงาน A,B",
   "VAT 7%": "ภาษีมูลค่าเพิ่ม 7%",
-  "Total Price": "รวมราคาหมวดงานเบ็ดเตล็ด",
+  "Total Price": "ยอดรวมทั้งหมด",
   "Speak": "พูด",
   "Customer Name": "ขื่อลูกค้า",
   "Address":"ที่อยู่",
@@ -84,7 +84,7 @@
   "Preview": "ดูตัวอย่าง",
   "Operating +": "ค่าใช้จ่ายในการดำเนินงาน +",
   "Profit (15%)": "กำไร (15%)",
-  "VAT (7%)": "ภาษีมูลค่าเพิ่ม (7%)",
+  "VAT (7%)": "ภาษีมูลค่าเพิ่ม 7%",
   "Update": "อัปเดต",
 
   "Project name is required": "กรุณากรอกชื่อโครงการ",
@@ -122,5 +122,18 @@
   "Select Unit": "เลือกหน่วย",
   "Select Trooper": "เลือกผู้ควบคุมงาน",
   "168 Home company": "บริษัท 168 Home จำกัด",
-  "Pi Kaew company": "พี่แก้ว"
+  "Pi Kaew": "พี่แก้ว",
+  "Add New Item": "เพิ่มรายการ",
+  "Cost Summary": "ยอดรวมรายการทั้งหมด",
+  "Operating + Profit (15%)": "ค่าดำเนินการและกำไร 15%",
+  "Project Photos": "รูปภาพโครงการ",
+  "Upload Project Photos": "อัปโหลดรูปภาพโครงการ",
+  "Drag & drop photos here or click to browse":"คลิกหรือลากไฟล์มาที่นี่เพื่อเริ่มการอัปโหลด",
+  "Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo":"รูปแบบไฟล์ที่รองรับ: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG และไฟล์ RAW (ขนาดสูงสุดไม่เกิน 50MB ต่อรูปภาพ)",
+  "Create":"สร้าง",
+  "photos selected":"รูปภาพอัปโหลด",
+  "Browse Photos":"เลือกรูปภาพ",
+  "Click Preview to review before generating":"คลิก “ดูตัวอย่าง” เพื่อตรวจสอบก่อนสร้างไฟล์เอ็กเซล",
+  "Click Preview to review before updating":"คลิก “ดูตัวอย่าง” เพื่อตรวจสอบก่อนอัปเดตไฟล์เอ็กเซล",
+  "Do not click Preview after adding new photos":"ห้ามคลิก “ดูตัวอย่าง” หลังจากเพิ่มรูปภาพใหม่"
 }

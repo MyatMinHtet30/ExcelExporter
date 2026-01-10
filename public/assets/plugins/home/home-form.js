@@ -923,7 +923,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Hide the new photos section if no photos left
                     const newPhotosSection = document.getElementById('new-photos-section');
                     if (newPhotosSection && uploadedPhotos.length === 0) {
-                        newPhotosSection.style.display = 'none';
+                        // Keep section hidden - UI modification to hide photo list
+                        // newPhotosSection.style.display = 'none';
                     }
 
                     // Show success message
@@ -953,8 +954,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Global function to remove existing photos - now deletes ALL existing photos
-        window.removeExistingPhoto = function(photoId) {
+        // Global function to remove ALL existing photos (for delete all button)
+        window.removeAllExistingPhotos = function() {
             Swal.fire({
                 title: 'Are you sure?',
                 text: 'Delete all existing photos? This cannot be undone.',
@@ -966,34 +967,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 cancelButtonText: 'Cancel'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const allExistingPhotos = document.querySelectorAll('[data-photo-id]');
+                    // Get all existing photos
+                    const existingPhotos = document.querySelectorAll('.photo-list-item.existing-photo');
                     const form = document.getElementById('home-form');
                     
-                    allExistingPhotos.forEach(photoElement => {
-                        const currentPhotoId = photoElement.getAttribute('data-photo-id');
+                    // Process each existing photo
+                    existingPhotos.forEach(photoItem => {
+                        const photoId = photoItem.dataset.photoId;
                         
-                        // Add animation
-                        photoElement.style.transition = 'opacity 0.3s, transform 0.3s';
-                        photoElement.style.opacity = '0';
-                        photoElement.style.transform = 'scale(0.8)';
+                        // Add to delete list
+                        if (form && photoId) {
+                            const deleteInput = document.createElement('input');
+                            deleteInput.type = 'hidden';
+                            deleteInput.name = 'delete_photos[]';
+                            deleteInput.value = photoId;
+                            deleteInput.className = 'delete-photo-input';
+                            form.appendChild(deleteInput);
+                        }
+                        
+                        // Remove from display with animation
+                        photoItem.style.transition = 'opacity 0.3s, transform 0.3s';
+                        photoItem.style.opacity = '0';
+                        photoItem.style.transform = 'scale(0.8)';
                         
                         setTimeout(() => {
-                            photoElement.remove();
-                            
-                            // Add hidden input to mark for deletion
-                            if (form && currentPhotoId) {
-                                const hiddenInput = document.createElement('input');
-                                hiddenInput.type = 'hidden';
-                                hiddenInput.name = 'delete_photos[]';
-                                hiddenInput.value = currentPhotoId;
-                                form.appendChild(hiddenInput);
-                            }
+                            photoItem.remove();
                         }, 300);
                     });
                     
-                    // Update photo counter after a delay
+                    // Update counter and hide section after animation
                     setTimeout(() => {
                         updatePhotoCounter();
+                        
+                        // Hide existing photos section if empty
+                        const existingPhotosSection = document.getElementById('existing-photos-list');
+                        if (existingPhotosSection && existingPhotosSection.querySelectorAll('.photo-list-item').length === 0) {
+                            existingPhotosSection.style.display = 'none';
+                        }
                     }, 400);
 
                     // Show success message

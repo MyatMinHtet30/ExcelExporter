@@ -336,7 +336,8 @@ function initializeChunkedUpload() {
         // Show the new photos section
         const newPhotosSection = document.getElementById('new-photos-section');
         if (newPhotosSection) {
-            newPhotosSection.style.display = 'block';
+            // Keep section hidden - UI modification to hide photo list
+            // newPhotosSection.style.display = 'block';
         }
 
         // Determine format type for better display
@@ -453,7 +454,8 @@ function initializeChunkedUpload() {
                 const allUploadedPhotos = document.querySelectorAll('.photo-list-item.uploaded-photo, .photo-list-item.restored-photo');
                 
                 allUploadedPhotos.forEach(photoItem => {
-                    const tempPath = photoItem.dataset.tempPath;
+                    // Handle both uploaded photos (tempPath) and restored photos (photoPath)
+                    const tempPath = photoItem.dataset.tempPath || photoItem.dataset.photoPath;
                     
                     // Remove from display
                     photoItem.remove();
@@ -501,7 +503,8 @@ function initializeChunkedUpload() {
                 
                 // Remove each photo one by one (like individual delete)
                 allPhotos.forEach(photoItem => {
-                    const tempPath = photoItem.dataset.tempPath;
+                    // Handle both uploaded photos (tempPath) and restored photos (photoPath)
+                    const tempPath = photoItem.dataset.tempPath || photoItem.dataset.photoPath;
                     
                     // Remove from display
                     photoItem.remove();
@@ -536,61 +539,6 @@ function initializeChunkedUpload() {
         });
     };
 
-    // Global function to delete all existing photos - works like individual delete but for all
-    window.deleteAllExistingPhotosAndClearSession = function() {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'Delete all existing photos? This cannot be undone.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete all!',
-            cancelButtonText: 'Cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const existingPhotos = document.querySelectorAll('.photo-list-item.existing-photo');
-                
-                // Process each existing photo like individual delete
-                existingPhotos.forEach(photoItem => {
-                    const photoId = photoItem.dataset.photoId;
-                    
-                    // Add to delete list (same as individual delete)
-                    const form = document.getElementById('home-form');
-                    if (form && photoId) {
-                        const deleteInput = document.createElement('input');
-                        deleteInput.type = 'hidden';
-                        deleteInput.name = 'delete_photos[]';
-                        deleteInput.value = photoId;
-                        deleteInput.className = 'delete-photo-input';
-                        form.appendChild(deleteInput);
-                    }
-                    
-                    // Remove from display
-                    photoItem.remove();
-                });
-                
-                // Update counter
-                updatePhotoCounter();
-                
-                // Hide existing photos section if empty
-                const existingPhotosSection = document.getElementById('existing-photos-list');
-                if (existingPhotosSection && existingPhotosSection.querySelectorAll('.photo-list-item').length === 0) {
-                    existingPhotosSection.style.display = 'none';
-                }
-
-                // Show success message
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Deleted!',
-                    text: 'All existing photos have been deleted.',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            }
-        });
-    };
-
     // Check if new photos section should be visible
     function checkNewPhotosSection() {
         const newPhotosSection = document.getElementById('new-photos-section');
@@ -598,7 +546,8 @@ function initializeChunkedUpload() {
         
         if (newPhotosSection && photoList) {
             const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
-            newPhotosSection.style.display = hasPhotos ? 'block' : 'none';
+            // Keep section hidden - UI modification to hide photo list
+            // newPhotosSection.style.display = hasPhotos ? 'block' : 'none';
         }
     }
 }

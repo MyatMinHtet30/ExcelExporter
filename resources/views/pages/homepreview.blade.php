@@ -957,19 +957,19 @@
                         // percent: 0 = left edge, 0.5 = middle, 1 = right edge
                         
                         const PORTRAIT_POSITIONS = [
-                            { column: 'A', percent: 0.175 },  // Photo 1: Middle of column A
-                            { column: 'B', percent: 0.05 }, // Photo 2: 25% into column B
-                            { column: 'C', percent: 0.5 },  // Photo 3: Middle of column C
-                            { column: 'E', percent: 0.3 },  // Photo 4: 30% into column E
-                            { column: 'G', percent: 0.7 }   // Photo 5: 70% into column G
+                            { column: 'B', percent: 0 },  // Photo 1: Middle of column A
+                            { column: 'C', percent: 0 }, // Photo 2: 25% into column B
+                            { column: 'E', percent: 0.99 },  // Photo 3: Middle of column C
+                            { column: 'H', percent: 0 },  // Photo 4: 30% into column E
+                            // { column: 'G', percent: 0.7 }   // Photo 5: 70% into column G
                         ];
                         
                         const LANDSCAPE_POSITIONS = [
-                            { column: 'A', percent: 0.5 },  // Photo 1: Middle of column A
-                            { column: 'B', percent: 0.15 }, // Photo 2: 15% into column B
-                            { column: 'D', percent: 0.5 },  // Photo 3: Middle of column D
-                            { column: 'F', percent: 0.4 },  // Photo 4: 40% into column F
-                            { column: 'H', percent: 0.6 }   // Photo 5: 60% into column H
+                            { column: 'B', percent: 0 },  // Photo 1: Middle of column A
+                            { column: 'C', percent: 0 }, // Photo 2: 15% into column B
+                            { column: 'E', percent: 0.99 },  // Photo 3: Middle of column D
+                            { column: 'H', percent: 0 },  // Photo 4: 40% into column F
+                            // { column: 'H', percent: 0.6 }   // Photo 5: 60% into column H
                         ];
                         
                         // Function to convert column letter to index
@@ -985,7 +985,7 @@
                             const imageWidthCol = imageWidthPx / 64; // Convert pixels to column units
                             
                             // Calculate position: column start + (percent of column width) - (half image width for centering)
-                            return columnIndex + (columnWidth * percent) - (imageWidthCol / 2);
+                            return columnIndex + percent;
                         }
                         
                         // Convert position configs to actual Excel positions
@@ -1021,8 +1021,8 @@
                             let skippedCount = 0;
                             
                             // Process photos in rows of 5
-                            for (let rowStart = 0; rowStart < photoList.length; rowStart += 5) {
-                                const rowPhotos = photoList.slice(rowStart, rowStart + 5);
+                            for (let rowStart = 0; rowStart < photoList.length; rowStart += 4) {
+                                const rowPhotos = photoList.slice(rowStart, rowStart + 4);
                                 
                                 // Position each photo in this row
                                 for (let i = 0; i < rowPhotos.length && i < positions.length; i++) {
@@ -1097,8 +1097,8 @@
                                 }
                                 
                                 // Move to next row with safe integer values
-                                const ROW_SPAN_PORTRAIT = 10;   // Safe integer spacing
-                                const ROW_SPAN_LANDSCAPE = 8;   // Safe integer spacing
+                                const ROW_SPAN_PORTRAIT = 9.5;   // Safe integer spacing
+                                const ROW_SPAN_LANDSCAPE = 6;   // Safe integer spacing
 
                                 currentRow += photoHeight > photoWidth
                                     ? ROW_SPAN_PORTRAIT

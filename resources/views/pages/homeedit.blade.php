@@ -408,7 +408,7 @@
                                     <div class="summary-value" id="vatDisplayMobile">0.00</div>
                                 </div>
                                 <div class="summary-row total-row">
-                                    <div class="summary-label">{{ __('Total Price') }}:</div>
+                                    <div class="summary-label" style="font-size:18px; color: #28a745;">{{ __('Total Price') }}:</div>
                                     <div class="summary-value total-value" id="finalDisplayMobile">0.00</div>
                                 </div>
                             </div>
@@ -424,7 +424,7 @@
                             <div class="card-body">
                                 <!-- Existing Photos List -->
                                 @if($home->images->count() > 0)
-                                    <div class="existing-photos-list mb-3" id="existing-photos-list">
+                                    <div class="existing-photos-list mb-3" id="existing-photos-list" style="display: none;">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <small class="text-muted">{{ __('Existing Photos') }}</small>
                                             <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllExistingPhotosAndClearSession()" title="{{ __('Delete All Existing Photos') }}">
@@ -438,9 +438,6 @@
                                                     {{ basename($image->image_path) }}
                                                 </div>
                                                 <div class="photo-size">Existing</div>
-                                                <button type="button" class="photo-remove" onclick="removeExistingPhoto({{ $image->id }})" title="Delete All Existing Photos">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
                                             </div>
                                         @endforeach
                                     </div>
@@ -453,10 +450,10 @@
                                     <h5>{{ __('Upload Project Photos') }}</h5>
                                     <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
                                     <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
-                                    <p class="text-success small mb-2">
+                                    <!-- <p class="text-success small mb-2">
                                         <i class="fas fa-info-circle me-1"></i>
                                         {{ __('Now supports large HEIC files! Upload 10+ photos at once (up to 5GB total).') }}
-                                    </p>
+                                    </p> -->
                                     
                                     <!-- Photo counter -->
                                     <div class="photo-counter" id="photo-counter">
@@ -464,15 +461,16 @@
                                         <span id="photo-count">{{ $home->images->count() }}</span> {{ __('photos selected') }}
                                     </div>
                                     
-                                    <!-- New photos list with delete all button -->
+                                    <!-- Delete All Photos Button (moved outside hidden section) -->
+                                    <div class="d-flex justify-content-end mb-2">
+                                        <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- New photos list (hidden) -->
                                     <div class="new-photos-section" id="new-photos-section" style="display: none;">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <small class="text-muted">{{ __('New Photos') }}</small>
-                                            <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </div>
-                                        <div class="photo-list" id="photo-list"></div>
+                                        <div class="photo-list" id="photo-list" style="display: none;"></div>
                                     </div>
                                     
                                     <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
@@ -519,6 +517,10 @@
                                     <small class="text-muted">
                                         <i class="fas fa-info-circle me-1"></i>
                                         {{ __('Click Preview to review before updating') }}
+                                    </small> <br>
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {{ __('Do not click Preview after adding new photos') }}
                                     </small>
                                 </div>
                             </div>
@@ -706,7 +708,8 @@
                 
                 // Show new photos section if we have restored photos
                 if (newPhotosSection && restoredPhotos.length > 0) {
-                    newPhotosSection.style.display = 'block';
+                    // Keep section hidden - UI modification to hide photo list
+                    // newPhotosSection.style.display = 'block';
                 }
                 
                 // Create a list of restored photos for display
@@ -794,7 +797,8 @@
                         if (photoList && newPhotosSection) {
                             const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
                             if (!hasPhotos) {
-                                newPhotosSection.style.display = 'none';
+                                // Keep section hidden - UI modification to hide photo list
+                                // newPhotosSection.style.display = 'none';
                             }
                         }
 
