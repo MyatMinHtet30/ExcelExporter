@@ -28,6 +28,19 @@ Route::middleware(['web','auth'])->group(function () {
     Route::post('homes/preview', [HomeController::class, 'preview'])
         ->name('home.preview');
 
+    Route::post('homes/clear-session', [HomeController::class, 'clearSession'])
+        ->name('home.clear-session');
+
+    Route::delete('homes/photos/{image}', [HomeController::class, 'deletePhoto'])
+        ->name('home.photo.delete');
+
+    // Chunked upload routes for better handling of many photos
+    Route::post('homes/photos/upload-chunk', [HomeController::class, 'uploadPhotoChunk'])
+        ->name('home.photos.upload-chunk');
+
+    Route::get('homes/check-upload-config', [HomeController::class, 'checkUploadConfig'])
+        ->name('home.check-upload-config');
+
     Route::get('homes/{home}/export/pdf', [HomeController::class, 'exportPdf'])
         ->name('home.export.pdf');
 

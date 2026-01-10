@@ -7,11 +7,13 @@
         #rows-container .field-col {
             padding-left: 18px;
             padding-right: 18px;
+            margin-bottom: 20px;
         }
 
         #rows-container .field-col .input-group {
             padding-left: 0;
             padding-right: 0;
+            margin-bottom: 20px;
         }
 
         .item-row .card-header {
@@ -200,3 +202,56 @@
         .star {
             color: #ff0000;
         }
+/* Mobile Add Row Button Styling */
+@media (max-width: 768px) {
+    /* Mobile-only add row button */
+    #add-row-btn-mobile {
+        display: block;
+        width: 90%;
+        max-width: 300px;
+        margin: 20px auto;
+        padding: 15px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
+    
+    /* Hide desktop add row button on mobile */
+    .d-none.d-md-block {
+        display: none !important;
+    }
+    
+    /* Improve spacing for mobile */
+    #rows-container {
+        margin-bottom: 10px;
+    }
+    
+    .item-row {
+        margin-bottom: 15px;
+    }
+    
+    /* Better touch targets for mobile */
+    .item-row .input-group.input-42 > .form-control,
+    .item-row .input-group.input-42 > .btn {
+        height: 48px;
+        font-size: 16px;
+    }
+    
+    .remove-row {
+        padding: 12px;
+        font-size: 15px;
+        margin-top: 15px;
+    }
+}
+
+/* Tablet adjustments (768px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    #add-row-btn-mobile {
+        display: none;
+    }
+    
+    .summary-col {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-top: 20px;
+    }
+}

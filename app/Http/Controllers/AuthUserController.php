@@ -12,6 +12,11 @@ class AuthUserController extends Controller
     // show login page
     public function showLogin()
     {
+        // If user is already authenticated, redirect to intended page or dashboard
+        if (Auth::check()) {
+            return redirect()->intended(route('dashboard'));
+        }
+        
         return view('pages.login');
     }
 
@@ -19,14 +24,15 @@ class AuthUserController extends Controller
     public function login(LoginRequest $request)
     {
         $data = $request->validated();
+        $remember = $request->boolean('remember');
 
-        if (Auth::attempt($data, $request->boolean('remember'))) {
+        if (Auth::attempt($data, $remember)) {
             $request->session()->regenerate();
             return redirect()->intended('/dashboard');
         }
 
         return back()->withErrors(['email' => 'Invalid email or password.'])
-                     ->onlyInput('email');
+                     ->onlyInput('email', 'remember');
     }
 
     // handle logout

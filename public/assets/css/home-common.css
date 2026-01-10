@@ -62,6 +62,17 @@
         gap: 6px;
     }
 
+       .fab-btn {
+        width: 45px;
+        height: 45px;
+        bottom: 20px;
+        right: 20px;
+        font-size: 16px;
+    }
+    
+    .fab-btn.show {
+        transform: scale(1) translateY(0);
+    }
     .btn-generate .btn {
         flex: 1 1 50%;
         height: 42px;
@@ -206,3 +217,795 @@
 .star {
     color: #ff0000;
 }
+
+/* ===== Mobile Form Sections ===== */
+.form-section {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.form-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+/* Summary Items - Improved styling */
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-item.total {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 2px solid #28a745;
+}
+
+/* Mobile Action Buttons - Improved styling */
+.btn-group-vertical {
+    width: 100%;
+}
+
+.btn-group-vertical .btn {
+    margin-bottom: 10px !important;
+    padding: 15px !important;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+}
+
+.btn-group-vertical .btn:last-child {
+    margin-bottom: 0 !important;
+}
+
+/* Mobile Card Styling - Improved */
+.card.shadow-sm {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.card.shadow-sm .card-body {
+    padding: 15px;
+}
+
+.card-header.bg-primary.text-white {
+    padding: 12px 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.card-header.bg-primary.text-white h5 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Hide mobile sections on desktop */
+@media (min-width: 768px) {
+    .d-md-none .form-section {
+        display: none !important;
+    }
+}
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+    /* Make form sections look nice on mobile */
+    .form-section {
+        margin-top: 15px;
+    }
+    
+    .form-section-title {
+        font-size: 18px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    /* Improve the add row button */
+    #add-row-btn-mobile {
+        padding: 15px;
+        font-size: 16px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+        display: block;
+    }
+    
+    #add-row-btn-mobile:hover {
+        background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    }
+    
+    /* Better spacing for summary items */
+    .summary-row {
+        padding: 10px 0;
+        font-size: 14px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .summary-row.total-row {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: #28a745;
+        margin-top: 10px;
+        padding-top: 15px;
+        border-top: 2px solid #28a745;
+        border-bottom: none;
+    }
+    
+    /* Adjust existing item rows for mobile */
+    .item-row {
+        margin-bottom: 15px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .item-row .card-header {
+        padding: 15px !important;
+    }
+    
+    .item-row .input-group.input-42 > .form-control,
+    .item-row .input-group.input-42 > .btn {
+        height: 48px;
+        font-size: 16px;
+        border-radius: 6px;
+    }
+    
+    .remove-row {
+        padding: 12px;
+        font-size: 15px;
+        margin-top: 15px;
+        border-radius: 6px;
+    }
+    
+    /* Touch-friendly buttons */
+    .btn {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .btn i {
+        margin-right: 8px;
+    }
+
+    .btn_div {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+    }
+    .btn_div i {
+        margin-right: 8px;
+    }
+    
+    /* Better card styling */
+    .card {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .card-header {
+        padding: 15px !important;
+    }
+    
+    /* .card-body {
+        padding: 20px !important;
+    }
+     */
+    /* Info text styling */
+    .text-muted {
+        font-size: 13px;
+        color: #666;
+    }
+    
+    /* Mobile Header */
+    .mobile-header {
+        display: block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .mobile-header h4 {
+        margin: 0;
+        font-size: 18px;
+        text-align: center;
+    }
+    
+    .mobile-header p {
+        margin: 5px 0 0 0;
+        font-size: 13px;
+        opacity: 0.9;
+        text-align: center;
+    }
+    
+    /* Group related fields */
+    .form-section {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .form-section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    /* Better spacing for input groups */
+    .input-group.input-42 {
+        margin-bottom: 8px;
+    }
+    
+    /* Make required star more visible */
+    .star {
+        color: #ff4757;
+        font-weight: bold;
+    }
+    
+    /* Loading indicator */
+    .upload-loading {
+        display: none;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .upload-loading.active {
+        display: block;
+    }
+    
+    /* Progress bar */
+    .upload-progress {
+        height: 4px;
+        background: #e0e0e0;
+        border-radius: 2px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+    
+    .upload-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #4cd964, #5ac8fa);
+        width: 0%;
+        transition: width 0.3s;
+    }
+    
+    /* Photo upload mobile optimizations */
+    .photo-upload-area {
+        padding: 15px !important;
+    }
+    
+    .photo-upload-icon {
+        font-size: 36px !important;
+    }
+    
+    .photo-preview-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .photo-item {
+        height: 100px !important;
+    }
+    
+    .photo-remove {
+        width: 22px !important;
+        height: 22px !important;
+        font-size: 11px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .photo-preview-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .photo-item {
+        height: 140px !important;
+    }
+    
+    /* Extra small devices */
+    .photo-preview-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .summary-row {
+        font-size: 13px;
+    }
+    
+    .input-group.input-42 > .form-control,
+    .input-group.input-42 > .btn {
+        height: 48px !important;
+    }
+    
+    .btn-generate .btn {
+        padding: 12px !important;
+        font-size: 15px !important;
+    }
+}
+
+/* ---------- Photo Upload Styles ---------- */
+.photo-upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    background: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 15px;
+}
+
+.photo-upload-area:hover {
+    border-color: #007bff;
+    background: #e9f7fe;
+}
+
+.photo-upload-area.dragover {
+    border-color: #007bff;
+    background: #e9f7fe;
+    transform: scale(1.02);
+}
+
+.photo-upload-icon {
+    font-size: 40px;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.photo-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.photo-item {
+    position: relative;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-remove {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255,0,0,0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.photo-remove:hover {
+    background: rgba(255,0,0,0.9);
+}
+
+/* Upload progress */
+.upload-loading {
+    display: none;
+    text-align: center;
+    padding: 10px;
+}
+
+.upload-loading.active {
+    display: block;
+}
+
+.upload-progress {
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.upload-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4cd964, #5ac8fa);
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* ---------- Mobile-Specific Improvements ---------- */
+.mobile-header {
+    display: none;
+}
+
+/* For Summary rows in mobile view */
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row.total-row {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #28a745;
+    margin-top: 10px;
+    padding-top: 15px;
+    border-top: 2px solid #28a745;
+}
+
+.summary-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.summary-value {
+    font-weight: 600;
+    color: #555;
+}
+
+.total-value {
+    color: #28a745;
+    font-size: 1.2em;
+}
+
+/* Tablet adjustments (768px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    #add-row-btn-mobile {
+        display: none;
+    }
+    
+    .summary-col {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+        margin-top: 20px;
+    }
+}
+
+/* Animation for new rows */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.item-row:last-child {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Loading states */
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    top: 50%;
+    left: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Mobile Upload Image – reference style */
+@media (max-width: 768px) {
+    .form-control[type="file"] {
+        padding: 12px;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+}
+
+/* ===== Photo Management Styles ===== */
+.existing-photos {
+    margin-bottom: 20px;
+}
+
+.photo-list, .existing-photos-list {
+    margin-top: 15px;
+}
+
+.photo-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.photo-list-item:hover {
+    background: #e9ecef;
+}
+
+.photo-list-item.existing-photo {
+    background: #e8f5e9;
+    border-color: #c3e6cb;
+}
+
+.photo-list-item.restored-photo {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.photo-name {
+    flex: 1;
+    font-size: 14px;
+    color: #495057;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+.photo-size {
+    font-size: 12px;
+    color: #6c757d;
+    margin-right: 10px;
+    min-width: 60px;
+    text-align: right;
+}
+
+.photo-remove {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.photo-remove:hover {
+    background: #c82333;
+}
+
+.photo-thumbnail {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.photo-thumbnail:hover {
+    transform: scale(1.02);
+}
+
+.photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.photo-thumbnail:hover .photo-overlay {
+    opacity: 1;
+}
+
+.delete-photo {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.delete-photo:hover {
+    background: #c82333;
+}
+
+.delete-photo:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Photo Gallery in Preview */
+.photo-gallery-wrap {
+    page-break-inside: avoid;
+}
+
+.photo-grid {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.photo-item {
+    border: 1px solid #ccc;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Print styles for photos */
+@media print {
+    .photo-gallery-wrap {
+        page-break-before: always;
+        margin-top: 0;
+    }
+    
+    .photo-grid {
+        display: grid !important;
+        gap: 5px !important;
+    }
+    
+    .photo-item {
+        border: 1px solid #000 !important;
+        break-inside: avoid;
+    }
+}
+
+/* Mobile photo gallery adjustments */
+@media (max-width: 768px) {
+    .photo-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px;
+    }
+    
+    .photo-item {
+        width: auto !important;
+        height: 120px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .photo-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .photo-item {
+        height: 200px !important;
+    }
+}
+/* ===== Floating Action Button ===== */
+.fab-btn {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    border: none;
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+    padding: 0;
+}
+
+.fab-btn.show {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+}
+
+.fab-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+.fab-btn:active {
+    transform: scale(0.95);
+}
+
+
+.fab-btn.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.fab-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.fab-btn:active {
+    transform: scale(0.95);
+}
+
+.fab-btn i {
+    transition: transform 0.3s ease;
+}
+
+
+
+

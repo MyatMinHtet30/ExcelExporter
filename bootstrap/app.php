@@ -33,7 +33,10 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        // Add middleware for large file uploads
+        $middleware->web(append: [
+            \App\Http\Middleware\IncreaseUploadLimits::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
