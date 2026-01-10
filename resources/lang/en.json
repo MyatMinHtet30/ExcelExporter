@@ -48,9 +48,26 @@
     "Total home records created": "Total home records created",
     "Create New Home": "Create New Home",
 
-    "Condo Excel Forms": "Condo Excel Forms",
-    "Total condo records created": "Total condo records created",
-    "Create New Condo": "Create New Condo",
+  "Bill of Quantities": "Bill of Quantities",
+  "Project Name :": "Project Name :",
+  "Date:": "Date:",
+  "Dear :": "Dear :",
+  "Trooper :": "Trooper :",
+  "House No.": "House No.",
+  "List": "List",
+  "Total Amount": "Total Amount",
+  "Price/Unit": "Price/Unit",
+  "Miscellaneous work category": "Miscellaneous work category",
+  "Total miscellaneous work": "Total miscellaneous work",
+  "Operating + Profit (15%)": "Operating + Profit (15%)",
+  "After Profit": "After Profit",
+  "Final Total": "Final Total",
+  "Excel downloaded successfully.": "Excel downloaded successfully.",
+  "Download": "Download",
 
-    "View List": "View List"
+  "Condo Excel Forms": "Condo Excel Forms",
+  "Total condo records created": "Total condo records created",
+  "Create New Condo": "Create New Condo",
+  "View List": "View List"
 }
+

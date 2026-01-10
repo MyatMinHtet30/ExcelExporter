@@ -176,7 +176,7 @@
             <tr>
                 <td class="meta-label">{{ __('Project Name') }}:</td>
                 <td class="dyn">{{ $project_name }}</td>
-                <td class="right">Date: <span class="dyn">{{ $date }}</span></td>
+                <td class="right">{{ __('Date') }}: <span class="dyn">{{ $date }}</span></td>
             </tr>
             <tr>
                 <td class="meta-label">{{ __('Dear') }}:</td>
@@ -186,7 +186,7 @@
                 <td class="meta-label">Trooper :</td>
                 <td class="dyn">{{ $trooper }}</td>
                 <td class="right">
-                    House No. <span class="dyn">{{ $house_no }}</span>
+                    {{ __('House No.') }}: <span class="dyn">{{ $house_no }}</span>
                 </td>
             </tr>
         </table>
@@ -206,22 +206,22 @@
             <thead>
                 <tr class="yellow">
                     <th rowspan="2" style="border:1px solid #000;">No.</th>
-                    <th style="border:1px solid #000; text-align:center;">List</th>
-                    <th rowspan="2" style="border:1px solid #000;">Amount</th>
-                    <th rowspan="2" style="border:1px solid #000;">unit</th>
-                    <th colspan="2" style="border:1px solid #000;">Material Cost</th>
-                    <th colspan="2" style="border:1px solid #000;">Labor Cost</th>
-                    <th rowspan="2" style="border:1px solid #000;">Total Amount</th>
+                    <th style="border:1px solid #000; text-align:center;">{{ __('List') }}</th>
+                    <th rowspan="2" style="border:1px solid #000;">{{ __('Amount') }}</th>
+                    <th rowspan="2" style="border:1px solid #000;">{{ __('Unit') }}</th>
+                    <th colspan="2" style="border:1px solid #000;">{{ __('Material Cost') }}</th>
+                    <th colspan="2" style="border:1px solid #000;">{{ __('Labor Cost') }}</th>
+                    <th rowspan="2" style="border:1px solid #000;">{{ __('Total Amount') }}</th>
                 </tr>
 
                 <tr>
                     <th class="green dyn" style="border:1px solid #000; text-align:center; font-weight:700;">
                         {{ $list_name }}
                     </th>
-                    <th class="yellow" style="border:1px solid #000;">Price/Unit</th>
-                    <th class="yellow" style="border:1px solid #000;">Total Price</th>
-                    <th class="yellow" style="border:1px solid #000;">Price/Unit</th>
-                    <th class="yellow" style="border:1px solid #000;">Total Price</th>
+                    <th class="yellow" style="border:1px solid #000;">{{ __('Price') }}/{{ __('Unit') }}</th>
+                    <th class="yellow" style="border:1px solid #000;">{{ __('Total Prices') }}</th>
+                    <th class="yellow" style="border:1px solid #000;">{{ __('Price') }}/{{ __('Unit') }}</th>
+                    <th class="yellow" style="border:1px solid #000;">{{ __('Total Prices') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -229,7 +229,7 @@
                 <tr>
                     <td class="center yellow"></td>
                     <td class="yellow" style="font-weight:700; text-align:center;">
-                        Miscellaneous work category
+                        {{ __('Miscellaneous work category') }}
                     </td>
                     <td class="yellow"></td>
                     <td class="yellow"></td>
@@ -279,31 +279,31 @@
                         @endif
                     </td>
 
-                    <td class="right sum-row" colspan="5">Total price for miscellaneous work category</td>
+                    <td class="right sum-row" colspan="5">{{ __('Total price for miscellaneous work category') }}</td>
                     <td class="right pink dyn"><strong>{{ number_format($miscTotal, 2) }}</strong></td>
                 </tr>
 
                 <tr>
                     <td class="center">&nbsp;</td>
-                    <td class="right sum-row" colspan="5">Operating expenses and profit 15%</td>
+                    <td class="right sum-row" colspan="5">{{ __('Operating expenses and profit 15%') }}</td>
                     <td class="right pink dyn"><strong>{{ number_format($operating, 2) }}</strong></td>
                 </tr>
 
                 <tr>
                     <td class="center">&nbsp;</td>
-                    <td class="right sum-row" colspan="5">Total price of work category A,B</td>
+                    <td class="right sum-row" colspan="5">{{ __('Total price of work category A,B') }}</td>
                     <td class="right dyn"><strong>{{ number_format($abTotal, 2) }}</strong></td>
                 </tr>
 
                 <tr>
                     <td class="center">&nbsp;</td>
-                    <td class="right sum-row" colspan="5">Value Added Tax 7%</td>
+                    <td class="right sum-row" colspan="5">{{ __('Value Added Tax 7%') }}</td>
                     <td class="right pink dyn"><strong>{{ number_format($vat, 2) }}</strong></td>
                 </tr>
 
                 <tr>
                     <td class="center">&nbsp;</td>
-                    <td class="right sum-row" colspan="5">Total price</td>
+                    <td class="right sum-row" colspan="5">{{ __('Total_price') }}</td>
                     <td class="right yellow dyn"><strong>{{ number_format($finalTotal, 2) }}</strong></td>
                 </tr>
 
@@ -419,9 +419,9 @@
     @endif
 
     <div class="no-print btn-footer">
-        <button type="button" onclick="goBackToForm()" class="btn-lg">Cancel</button>
-        <button type="button" onclick="downloadBoqExcel()" class="btn-lg">Download Excel</button>
-        <button type="button" onclick="downloadBoqPdf()" class="btn-lg">Download PDF</button>
+        <button type="button" onclick="goBackToForm()" class="btn-lg">{{ __('Cancel') }}</button>
+        <button type="button" onclick="downloadBoqExcel()" class="btn-lg">{{ __('Download Excel') }}</button>
+        <button type="button" onclick="downloadBoqPdf()" class="btn-lg">{{ __('Download PDF') }}</button>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -559,6 +559,9 @@
 
         async function downloadBoqExcel() {
 
+            // Get translations from Laravel
+            const t = @json($translations);
+
             // ===== Photo layout constants (MATCH PREVIEW) =====
             const DPI = 96;
 
@@ -576,8 +579,8 @@
             try {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Download',
-                    text: 'Excel downloaded successfully.',
+                    title: t.download,
+                    text: t.excel_success,
                     timer: 2000,
                     showConfirmButton: false
                 });
@@ -623,7 +626,7 @@
             // ----- Row 2: title merged A-J, height 24 -----
             ws.getRow(2).height = 19;
             ws.mergeCells(2,1,2,10); // A2:J2
-            ws.getCell(2,1).value = 'Bill of Quantities';
+            ws.getCell(2,1).value = t.bill_of_quantities;
             ws.getCell(2,1).alignment = { horizontal: 'center', vertical: 'middle' };
             ws.getCell(2,1).font = { bold: true };
 
@@ -635,7 +638,7 @@
 
             // ----- Row 4: project row, height 22.7
             ws.getRow(4).height = 18.7;
-            ws.getCell(4,1).value = 'Project Name :';
+            ws.getCell(4,1).value = t.project_name;
             ws.getCell(4,1).alignment = { horizontal: 'left', vertical: 'middle' };
 
             // Merge B:C:D for project name
@@ -645,12 +648,12 @@
 
             // Shift date block one column to the right (now H4:J4)
             ws.mergeCells(4,8,4,10); // H4:J4
-            ws.getCell(4,8).value = 'Date: ' + (@json($date) || '1/1/2025');
+            ws.getCell(4,8).value = t.date + ' ' + (@json($date) || '1/1/2025');
             ws.getCell(4,8).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // ----- Row 5: Dear row, height 22.7
             ws.getRow(5).height = 18.7;
-            ws.getCell(5,1).value = 'Dear :';
+            ws.getCell(5,1).value = t.dear;
             ws.getCell(5,1).alignment = { horizontal: 'left', vertical: 'middle' };
             // Merge B:C for Dear value
             ws.mergeCells(5,2,5,3); // B5:C5
@@ -658,7 +661,7 @@
             ws.getCell(5,2).alignment = { horizontal: 'left', vertical: 'middle' };
 
             // ----- Row 6: Trooper row, height 22.7, thick bottom border
-            ws.getCell(6,1).value = 'Trooper :';
+            ws.getCell(6,1).value = t.trooper;
             ws.getCell(6,1).alignment = { horizontal: 'left', vertical: 'middle' };
 
             // Merge B:C for Trooper value
@@ -668,7 +671,7 @@
 
             // Shift House No. block one column to the right (now H6:I6 and J6)
             ws.mergeCells(6,8,6,9); // H6:I6
-            ws.getCell(6,8).value = 'House No.';
+            ws.getCell(6,8).value = t.house_no;
             ws.getCell(6,8).alignment = { horizontal: 'center', vertical: 'middle' };
             ws.getCell(6,10).value = @json($house_no);
             ws.getCell(6,10).alignment = { horizontal: 'center', vertical: 'middle' };
@@ -678,47 +681,47 @@
 
             // ----- Rows 7 & 8: double header rows -----
             ws.mergeCells(7,1,8,1);   // A7:A8 -> No.
-            ws.getCell(7,1).value = 'No';
+            ws.getCell(7,1).value = t.no;
             ws.getCell(7,1).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // Amount now in column D
             ws.mergeCells(7,4,8,4);   // D7:D8 -> Amount
-            ws.getCell(7,4).value = 'Amount';
+            ws.getCell(7,4).value = t.amount;
             ws.getCell(7,4).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // Unit now in column E
             ws.mergeCells(7,5,8,5);   // E7:E8 -> Unit
-            ws.getCell(7,5).value = 'Unit';
+            ws.getCell(7,5).value = t.unit;
             ws.getCell(7,5).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // Total Amount now in column J
             ws.mergeCells(7,10,8,10);   // J7:J8 -> Total amount
-            ws.getCell(7,10).value = 'Total Amount';
+            ws.getCell(7,10).value = t.total_amount;
             ws.getCell(7,10).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // Columns B & C merged for "List"
             ws.mergeCells(7,2,7,3); // B7:C7
             ws.mergeCells(8,2,8,3); // B8:C8
-            ws.getCell(7,2).value = 'List';
+            ws.getCell(7,2).value = t.list;
             ws.getCell(7,2).alignment = { horizontal: 'center', vertical: 'middle' };
-            ws.getCell(8,2).value = @json($list_name) || 'List';
+            ws.getCell(8,2).value = @json($list_name) || t.list;
             ws.getCell(8,2).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // Merge F & G in row7 for "Material Cost" and set sub-headers in row8
             ws.mergeCells(7,6,7,7); // F7:G7 Material cost
-            ws.getCell(7,6).value = 'Material Cost';
+            ws.getCell(7,6).value = t.material_cost;
             ws.getCell(7,6).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // Merge H & I in row7 for "Labor Cost"
             ws.mergeCells(7,8,7,9); // H7:I7 Labor Cost
-            ws.getCell(7,8).value = 'Labor Cost';
+            ws.getCell(7,8).value = t.labor_cost;
             ws.getCell(7,8).alignment = { horizontal: 'center', vertical: 'middle' };
 
             // Row 8 sub-headers for F,G,H,I
-            ws.getCell(8,6).value = 'Price/Unit';
-            ws.getCell(8,7).value = 'Total Price';
-            ws.getCell(8,8).value = 'Price/Unit';
-            ws.getCell(8,9).value = 'Total Price';
+            ws.getCell(8,6).value = t.price_unit;
+            ws.getCell(8,7).value = t.total_price;
+            ws.getCell(8,8).value = t.price_unit;
+            ws.getCell(8,9).value = t.total_price;
             for (let c of [6,7,8,9]) ws.getCell(8,c).alignment = { horizontal: 'center', vertical: 'middle' };
 
             for (let rr of [7,8]) {
@@ -743,7 +746,7 @@
             // ----- Row 9: "Miscellaneous work category" in columns B & C -----
             ws.getRow(9).height = 18.7;
             ws.mergeCells(9,2,9,3); // B9:C9
-            ws.getCell(9,2).value = 'Miscellaneous work category';
+            ws.getCell(9,2).value = t.misc_work_category;
             ws.getCell(9,2).alignment = { horizontal: 'center', vertical: 'middle' };
             // Set border for row9 cells
             for (let c=1;c<=10;c++) {
@@ -862,11 +865,11 @@
             ws.mergeCells(rr, labelColsLeft, rr, labelColsRight); // D..G
             // labels as requested:
             const labelMap = [
-                'Total price for miscellaneous work category',
-                'Operating expenses and profit 15%',
-                'Total price of work category A,B',
-                'Value Added Tax 7%',
-                'Total price'
+                t.total_misc_work,
+                t.operating_profit,
+                t.after_profit,
+                t.vat,
+                t.final_total
             ];
             ws.getCell(rr, labelColsLeft).value = labelMap[i];
             ws.getCell(rr, labelColsLeft).alignment = { horizontal: 'center', vertical: 'middle' };

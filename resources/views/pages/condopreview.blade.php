@@ -391,10 +391,13 @@ async function toBase64(url) {
   const _num = (x) => Number(String(x ?? 0).replace(/,/g,'')) || 0;
 
 async function downloadCondoExcel() {
+  // Get localized labels from server
+  const t = @json($translations ?? []);
+  
   Swal.fire({
     icon: 'success',
-    title: 'Download',
-    text: 'Excel downloaded successfully.',
+    title: t.download || 'Download',
+    text: t.excel_success || 'Excel downloaded successfully.',
     timer: 2000,
     showConfirmButton: false
   })
@@ -466,7 +469,7 @@ async function downloadCondoExcel() {
   const ANG22B = { name:'Angsana New', size:22, bold:true };
 
   const wb = new ExcelJS.Workbook();
-  const ws = wb.addWorksheet('Quotation', {
+  const ws = wb.addWorksheet(labels.quotation || 'Quotation', {
     views: [{ state:'normal', showGridLines:false }],
     properties: { defaultRowHeight: 22 }
   });
@@ -480,15 +483,15 @@ async function downloadCondoExcel() {
   ];
   const M = (a1,a2) => ws.mergeCells(`${a1}:${a2}`);
 
-  ws.getCell('B2').value = 'Address of PITA BUILD Company Limited (Head Office)';
+  ws.getCell('B2').value = labels.company_address || 'Address of PITA BUILD Company Limited (Head Office)';
   ws.getCell('B3').value = '32/20 Village No. 6, Bang Talat Subdistrict, Pak Kret District, Nonthaburi Province 11120';
-  ws.getCell('B4').value = 'Phone : 062-604-2054 , 086-901-2500                Email : k.tanapon191@gmail.com';
-  ws.getCell('B5').value = 'Taxpayer Identification Number 0125565022982';
+  ws.getCell('B4').value = (labels.phone || 'Phone') + ' : 062-604-2054 , 086-901-2500                ' + (labels.email || 'Email') + ' : k.tanapon191@gmail.com';
+  ws.getCell('B5').value = (labels.taxpayer_number || 'Taxpayer Identification Number') + ' 0125565022982';
   styleRange(ws,2,2,5,2,{font:ANG22B, alignment:{ vertical:'middle' }});
   ws.getRow(2).height = 26;
 
   M('D7','H7');
-  ws.getCell('D7').value = 'ใบเสนอราคา / Quotation';
+  ws.getCell('D7').value = 'ใบเสนอราคา / ' + (labels.quotation || 'Quotation');
   styleRange(ws,7,4,7,8,{font:ANG22B, alignment:{horizontal:'center', vertical:'middle'},
                          border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}}});
 
@@ -508,9 +511,9 @@ async function downloadCondoExcel() {
   }
 
   const metaRows = [
-    ['Customer Name', meta.customer],
-    ['Address',       meta.address],
-    ['Job name',      meta.job],
+    [t.customer_name || 'Customer Name', meta.customer],
+    [t.address || 'Address',       meta.address],
+    [t.job_name || 'Job name',      meta.job],
     ['เลขประจำตัวผู้เสียภาษีอากร', ''],
   ];
   for (let i=0; i<metaRows.length; i++){
@@ -520,10 +523,10 @@ async function downloadCondoExcel() {
     ws.getCell(`C${r}`).value = metaRows[i][1];
   }
   const metaRight = [
-    ['Quotation number', meta.qno],
-    ['Date (D/M/Y)',     meta.qdate],
-    ['Payment terms',    meta.pterm],
-    ['credit',           meta.credit],
+    [t.quotation_number || 'Quotation number', meta.qno],
+    [t.quotation_date || 'Date (D/M/Y)',     meta.qdate],
+    [t.payment_term || 'Payment terms',    meta.pterm],
+    [t.credits || 'credit',           meta.credit],
   ];
   for (let i=0; i<metaRight.length; i++){
     const r = 9+i;
@@ -562,15 +565,15 @@ async function downloadCondoExcel() {
   ws.getCell(13, 2).border = { ...(ws.getCell(13,2).border||{}), right:{style:'thin'} }; 
   ws.getCell(13, 7).border = { ...(ws.getCell(13,7).border||{}), right:{style:'thin'} };
 
-  M('A14','A15'); ws.getCell('A14').value = 'No';
-  M('B14','F15'); ws.getCell('B14').value = 'Details';
-  M('G14','G15'); ws.getCell('G14').value = 'Amount';
-  M('H14','H15'); ws.getCell('H14').value = 'Units';
-  M('I14','K14'); ws.getCell('I14').value = 'Price per unit';
-  M('L14','L15'); ws.getCell('L14').value = 'Total price';
-  ws.getCell('I15').value = 'Material cost';
-  ws.getCell('J15').value = 'Labor price';
-  ws.getCell('K15').value = 'Total';
+  M('A14','A15'); ws.getCell('A14').value = t.no || 'No';
+  M('B14','F15'); ws.getCell('B14').value = t.details || 'Details';
+  M('G14','G15'); ws.getCell('G14').value = t.amount || 'Amount';
+  M('H14','H15'); ws.getCell('H14').value = t.units || 'Units';
+  M('I14','K14'); ws.getCell('I14').value = t.price_amount || 'Price per unit';
+  M('L14','L15'); ws.getCell('L14').value = t.total_price || 'Total price';
+  ws.getCell('I15').value = t.material_cost || 'Material cost';
+  ws.getCell('J15').value = t.labor_cost || 'Labor price';
+  ws.getCell('K15').value = t.total || 'Total';
   styleRange(ws,14,1,15,12,{font:{...ANG16, bold:true}, alignment:{horizontal:'center', vertical:'middle'}});
   setRowBorder(ws,14,1,12,{style:'thin'});
   setRowBorder(ws,15,1,12,{style:'thin'});
@@ -631,9 +634,9 @@ async function downloadCondoExcel() {
   M(`A${totalRow}`,`I${totalRow}`);
   M(`A${vatRow}`,  `I${vatRow}`);
   // labels and right block
-  M(`J${totalRow}`,`K${totalRow}`); ws.getCell(`J${totalRow}`).value = 'Total';
-  M(`J${vatRow}`,`K${vatRow}`);     ws.getCell(`J${vatRow}`).value   = 'Tax 7%';
-  M(`J${grandRow}`,`K${grandRow}`); ws.getCell(`J${grandRow}`).value = 'Total price';
+  M(`J${totalRow}`,`K${totalRow}`); ws.getCell(`J${totalRow}`).value = t.total || 'Total';
+  M(`J${vatRow}`,`K${vatRow}`);     ws.getCell(`J${vatRow}`).value   = t.tax || 'Tax 7%';
+  M(`J${grandRow}`,`K${grandRow}`); ws.getCell(`J${grandRow}`).value = t.total_price || 'Total price';
 
   ws.getCell(`L${totalRow}`).value = meta.total;
   ws.getCell(`L${vatRow}`).value   = meta.vat;
