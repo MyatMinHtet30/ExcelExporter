@@ -295,7 +295,7 @@
 
 .card-header.bg-primary.text-white h5 {
     margin: 0;
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 600;
 }
 
@@ -544,7 +544,7 @@
     }
     
     .summary-row {
-        font-size: 13px;
+        font-size: 16px;
     }
     
     .input-group.input-42 > .form-control,

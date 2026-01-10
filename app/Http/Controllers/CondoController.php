@@ -258,6 +258,15 @@ class CondoController extends Controller
 
     public function preview(Request $request)
     {
+        // Handle language switching for preview
+        if ($request->has('preview_locale')) {
+            $previewLocale = $request->input('preview_locale');
+            if (in_array($previewLocale, ['en', 'th'])) {
+                Session::put('locale', $previewLocale);
+                \Log::info('Preview locale changed to: ' . $previewLocale);
+            }
+        }
+        
         App::setLocale(Session::get('locale', config('app.locale')));
 
         $header = $request->only([
@@ -482,7 +491,29 @@ class CondoController extends Controller
             'total'        => $total,
             'vat'          => $vat,
             'grand'        => $grand,
-            'autoDownload' => 'excel', 
+            'autoDownload' => 'excel',
+            'translations' => [
+                'customer_name' => __('Customer Name'),
+                'address' => __('Address'),
+                'job_name' => __('Job Name'),
+                'quotation_number' => __('Quotation Number'),
+                'quotation_date' => __('Date'),
+                'payment_term' => __('Payment Term'),
+                'credits' => __('Credits'),
+                'no' => __('No'),
+                'details' => __('Details'),
+                'amount' => __('Amount'),
+                'units' => __('Units'),
+                'material_cost' => __('Material Cost'),
+                'labor_cost' => __('Labor Cost'),
+                'price_amount' => __('Price Amount'),
+                'subtotal' => __('Subtotal'),
+                'total' => __('Total'),
+                'tax' => __('Tax (7%)'),
+                'total_price' => __('Total Price'),
+                'excel_success' => __('Excel downloaded successfully.'),
+                'download' => __('Download'),
+            ],
         ]));
     }
 
