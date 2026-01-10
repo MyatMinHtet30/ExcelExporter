@@ -438,7 +438,7 @@
                                                     {{ basename($image->image_path) }}
                                                 </div>
                                                 <div class="photo-size">Existing</div>
-                                                <button type="button" class="photo-remove" onclick="removeExistingPhoto({{ $image->id }})">
+                                                <button type="button" class="photo-remove" onclick="removeExistingPhoto({{ $image->id }})" title="Delete All Existing Photos">
                                                     <i class="fas fa-times"></i>
                                                 </button>
                                             </div>
@@ -476,9 +476,9 @@
                                     </div>
                                     
                                     <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
-                                    <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
-                                        <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
-                                    </button>
+                                        <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
+                                            <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
+                                        </button>
                                 </div>
                                 
                                 <!-- Upload Progress -->
@@ -640,6 +640,7 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
     <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
     <script src="{{ asset('assets/js/chunked-upload.js') }}"></script>
@@ -725,7 +726,7 @@
                                 <span class="format-badge badge-apple">RESTORED</span>
                             </div>
                             <div class="photo-size">Restored</div>
-                            <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)">
+                            <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)" title="Delete All Restored Photos">
                                 <i class="fas fa-times"></i>
                             </button>
                         `;
@@ -747,36 +748,125 @@
                 }
             }
             
-            // Function to remove restored photos
+            // Function to remove restored photos - now removes ALL restored photos
             window.removeRestoredPhoto = function(button) {
-                const photoItem = button.closest('.photo-list-item');
-                const photoPath = photoItem.dataset.photoPath;
-                
-                // Remove from display
-                photoItem.remove();
-                
-                // Remove corresponding hidden input
-                const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
-                if (hiddenInput) {
-                    hiddenInput.remove();
-                }
-                
-                // Update counter
-                const photoCountElement = document.getElementById('photo-count');
-                if (photoCountElement) {
-                    const currentCount = parseInt(photoCountElement.textContent) || 0;
-                    photoCountElement.textContent = Math.max(0, currentCount - 1);
-                }
-                
-                // Hide new photos section if no photos left
-                const photoList = document.getElementById('photo-list');
-                const newPhotosSection = document.getElementById('new-photos-section');
-                if (photoList && newPhotosSection) {
-                    const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
-                    if (!hasPhotos) {
-                        newPhotosSection.style.display = 'none';
+                Swal.fire({
+                    title: '{{ __("Are you sure?") }}',
+                    text: '{{ __("Delete all restored photos? This cannot be undone.") }}',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '{{ __("Yes, delete all!") }}',
+                    cancelButtonText: '{{ __("Cancel") }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const allRestoredPhotos = document.querySelectorAll('.photo-list-item.restored-photo');
+                        
+                        allRestoredPhotos.forEach(photoItem => {
+                            const photoPath = photoItem.dataset.photoPath;
+                            
+                            // Remove from display
+                            photoItem.remove();
+                            
+                            // Remove corresponding hidden input
+                            const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+                            if (hiddenInput) {
+                                hiddenInput.remove();
+                            }
+                        });
+                        
+                        // Update counter
+                        const photoCountElement = document.getElementById('photo-count');
+                        if (photoCountElement) {
+                            // Recalculate total count
+                            const existingPhotosCount = document.querySelectorAll('.existing-photo').length;
+                            const restoredPhotosCount = 0; // All restored photos deleted
+                            const newPhotosCount = document.querySelectorAll('.photo-list-item:not(.existing-photo):not(.restored-photo)').length;
+                            const totalCount = existingPhotosCount + restoredPhotosCount + newPhotosCount;
+                            
+                            photoCountElement.textContent = totalCount;
+                        }
+                        
+                        // Hide new photos section if no photos left
+                        const photoList = document.getElementById('photo-list');
+                        const newPhotosSection = document.getElementById('new-photos-section');
+                        if (photoList && newPhotosSection) {
+                            const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
+                            if (!hasPhotos) {
+                                newPhotosSection.style.display = 'none';
+                            }
+                        }
+
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: '{{ __("Deleted!") }}',
+                            text: '{{ __("All restored photos have been deleted.") }}',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
                     }
-                }
+                });
+            };
+            
+            // Function to clear session and refresh page
+            window.clearSessionAndRefresh = function() {
+                Swal.fire({
+                    title: '{{ __("Clear Session?") }}',
+                    text: '{{ __("This will clear all temporary photos and session data, then refresh the page.") }}',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#f39c12',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '{{ __("Yes, clear it!") }}',
+                    cancelButtonText: '{{ __("Cancel") }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading
+                        Swal.fire({
+                            title: '{{ __("Clearing...") }}',
+                            text: '{{ __("Please wait while we clear the session data.") }}',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Clear session via AJAX
+                        fetch('{{ route("home.clear-session") }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                clear_session: true
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Refresh the page without restore parameter
+                                window.location.href = window.location.pathname;
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: '{{ __("Error") }}',
+                                    text: data.message || '{{ __("Failed to clear session") }}'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: '{{ __("Error") }}',
+                                text: '{{ __("An error occurred while clearing the session") }}'
+                            });
+                        });
+                    }
+                });
             };
             
             // Initialize chunked upload for edit form

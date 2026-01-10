@@ -6,6 +6,7 @@
  * - Preview-on-Edit (POST without _method=PUT)
  * - Speech-to-text (Thai)
  * - Number formatting
+ * - Auto-save for mobile (prevents data loss when switching apps)
  * -----------------------------------------------------*/
 
 (function () {
@@ -19,6 +20,225 @@
       maximumFractionDigits: 2
     });
   };
+
+  // ====== Auto-save functionality for mobile ======
+  let autoSaveTimer;
+  let lastSavedData = null;
+  const AUTO_SAVE_DELAY = 3000; // 3 seconds after user stops typing
+  
+  function autoSaveFormData() {
+    const form = document.getElementById('home-form');
+    if (!form) return;
+    
+    try {
+      const formData = new FormData(form);
+      const data = {};
+      
+      // Convert FormData to regular object
+      for (let [key, value] of formData.entries()) {
+        if (data[key]) {
+          // Handle multiple values (like arrays)
+          if (Array.isArray(data[key])) {
+            data[key].push(value);
+          } else {
+            data[key] = [data[key], value];
+          }
+        } else {
+          data[key] = value;
+        }
+      }
+      
+      // Check if data has actually changed
+      const currentDataString = JSON.stringify(data);
+      if (lastSavedData === currentDataString) {
+        return; // No changes, don't save
+      }
+      
+      // Save to localStorage with timestamp
+      localStorage.setItem('home_form_autosave', JSON.stringify({
+        data: data,
+        timestamp: Date.now(),
+        url: window.location.pathname
+      }));
+      
+      lastSavedData = currentDataString;
+      
+      // Show auto-save indicator
+      showAutoSaveIndicator();
+      
+      console.log('Form auto-saved to localStorage');
+    } catch (error) {
+      console.warn('Auto-save failed:', error);
+    }
+  }
+  
+  function showAutoSaveIndicator() {
+    // Remove existing indicator
+    const existing = document.querySelector('.auto-save-indicator');
+    if (existing) existing.remove();
+    
+    // Create new indicator
+    const indicator = document.createElement('div');
+    indicator.className = 'auto-save-indicator';
+    indicator.innerHTML = '<i class="fas fa-check-circle"></i> Auto-saved';
+    indicator.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 14px;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    `;
+    
+    document.body.appendChild(indicator);
+    
+    // Animate in
+    setTimeout(() => indicator.style.opacity = '1', 10);
+    
+    // Remove after 2 seconds
+    setTimeout(() => {
+      indicator.style.opacity = '0';
+      setTimeout(() => indicator.remove(), 300);
+    }, 2000);
+  }
+  
+  function restoreFormData() {
+    try {
+      const saved = localStorage.getItem('home_form_autosave');
+      if (!saved) return;
+      
+      const { data, timestamp, url } = JSON.parse(saved);
+      
+      // Only restore if it's from the same page and within 24 hours
+      if (url !== window.location.pathname || Date.now() - timestamp > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem('home_form_autosave');
+        return;
+      }
+      
+      // Don't show restore prompt if coming back from preview (check if form has data)
+      const form = document.getElementById('home-form');
+      if (!form) return;
+      
+      // Check if form already has meaningful data (not just empty fields)
+      const hasExistingData = checkFormHasData(form);
+      if (hasExistingData) {
+        // Form already has data, probably coming back from preview - don't restore
+        localStorage.removeItem('home_form_autosave');
+        return;
+      }
+      
+      // Ask user if they want to restore only if form is truly empty
+      if (confirm('Found unsaved form data. Would you like to restore it?')) {
+        // Restore form fields
+        Object.entries(data).forEach(([key, value]) => {
+          const field = form.querySelector(`[name="${key}"]`);
+          if (field) {
+            if (field.type === 'checkbox' || field.type === 'radio') {
+              field.checked = value === 'on' || value === '1' || value === true;
+            } else {
+              field.value = Array.isArray(value) ? value[0] : value;
+            }
+          }
+        });
+        
+        // Recalculate totals after restoration
+        setTimeout(() => {
+          if (typeof recalcAll === 'function') {
+            recalcAll();
+          }
+        }, 100);
+        
+        console.log('Form data restored from auto-save');
+      }
+      
+      // Clear the auto-save data after handling
+      localStorage.removeItem('home_form_autosave');
+    } catch (error) {
+      console.warn('Failed to restore form data:', error);
+      localStorage.removeItem('home_form_autosave');
+    }
+  }
+  
+  function checkFormHasData(form) {
+    // Check if form has meaningful data (not just empty or default values)
+    const inputs = form.querySelectorAll('input[type="text"], input[type="email"], textarea, select');
+    
+    for (let input of inputs) {
+      if (input.value && input.value.trim() !== '' && input.value !== '0' && input.value !== '0.00') {
+        // Skip readonly fields and calculated totals
+        if (!input.readOnly && !input.classList.contains('readonly-input')) {
+          return true;
+        }
+      }
+    }
+    
+    return false;
+  }
+  
+  function clearAutoSave() {
+    localStorage.removeItem('home_form_autosave');
+    lastSavedData = null;
+  }
+  
+  // Set up auto-save listeners
+  function setupAutoSave() {
+    const form = document.getElementById('home-form');
+    if (!form) return;
+    
+    // Auto-save on input changes (debounced)
+    form.addEventListener('input', function() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(autoSaveFormData, AUTO_SAVE_DELAY);
+    });
+    
+    // Auto-save on select changes
+    form.addEventListener('change', function() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(autoSaveFormData, AUTO_SAVE_DELAY);
+    });
+    
+    // Clear auto-save on successful form submission
+    form.addEventListener('submit', function(e) {
+      // Check if this is a preview submission
+      const activeElement = document.activeElement;
+      const isPreview = activeElement && (
+        activeElement.getAttribute('formaction') && activeElement.getAttribute('formaction').includes('preview')
+      );
+      
+      if (isPreview) {
+        // Clear auto-save for preview submissions
+        clearAutoSave();
+      } else {
+        // Clear auto-save for regular submissions (create/update)
+        clearAutoSave();
+      }
+    });
+    
+    // Clear auto-save when preview buttons are clicked
+    const previewButtons = form.querySelectorAll('button[formaction*="preview"]');
+    previewButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        clearAutoSave();
+      });
+    });
+    
+    // Auto-save when page is about to unload (user switching apps)
+    window.addEventListener('beforeunload', function() {
+      autoSaveFormData();
+    });
+    
+    // Auto-save when page becomes hidden (mobile app switching)
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        autoSaveFormData();
+      }
+    });
+  }
 
   // ====== Strip commas from numeric inputs before form submission ======
   function stripCommasFromNumericInputs(form) {
@@ -434,6 +654,9 @@ document.addEventListener('keydown', function (e) {
       }
     }
 
+      // Clear auto-save before going to preview (user is intentionally navigating)
+      clearAutoSave();
+
       // Strip commas from numeric inputs before preview submission
       stripCommasFromNumericInputs(form);
 
@@ -509,6 +732,25 @@ addBtns.forEach(btn => {
   // ====== Initial ======
   // compute any prefilled rows (Edit), lock delete if only one active, update summary
   reindexRows();
+  
+  // Initialize auto-save functionality
+  setupAutoSave();
+  
+  // Try to restore form data on page load (only for create pages)
+  if (window.location.pathname.includes('create') || window.location.pathname.includes('homecreate') || window.location.pathname.includes('edit')) {
+    // Check if user is coming back from preview page
+    const isFromPreview = document.referrer && document.referrer.includes('preview');
+    const hasRestoreParam = window.location.search.includes('restore=1');
+    
+    if (!isFromPreview && !hasRestoreParam) {
+      // Only try auto-save restoration if not coming from preview and no session restoration
+      setTimeout(restoreFormData, 500);
+    } else {
+      // Coming back from preview or has restore param - clear any auto-save data to avoid conflicts
+      // Session restoration will handle the data restoration
+      clearAutoSave();
+    }
+  }
 })();
 
 // Mobile generate button triggers desktop button
@@ -635,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${truncateFileName(photo.name)}
                 </div>
                 <div class="photo-size">${photo.size}</div>
-                <button type="button" class="photo-remove" onclick="removePhoto('${photo.id}')">
+                <button type="button" class="photo-remove" onclick="removePhoto('${photo.id}')" title="Delete All Photos">
                     <i class="fas fa-times"></i>
                 </button>
             `;
@@ -651,20 +893,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         window.removePhoto = function(photoId) {
-            // Remove from array
-            uploadedPhotos = uploadedPhotos.filter(photo => photo.id !== photoId);
-            
-            // Remove from DOM
-            const photoElement = document.querySelector(`[data-id="${photoId}"]`);
-            if (photoElement) {
-                photoElement.remove();
-            }
-            
-            // Update photo counter
-            updatePhotoCounter();
-            
-            // Update hidden field
-            updatePhotosInput();
+            // Use SweetAlert2 for confirmation
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Delete all photos? This cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete all!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Clear all uploaded photos array
+                    uploadedPhotos = [];
+                    
+                    // Remove all photo items from DOM
+                    const allPhotoElements = document.querySelectorAll('[data-id]');
+                    allPhotoElements.forEach(element => {
+                        element.remove();
+                    });
+                    
+                    // Update photo counter
+                    updatePhotoCounter();
+                    
+                    // Update hidden field (clear all photos)
+                    updatePhotosInput();
+                    
+                    // Hide the new photos section if no photos left
+                    const newPhotosSection = document.getElementById('new-photos-section');
+                    if (newPhotosSection && uploadedPhotos.length === 0) {
+                        newPhotosSection.style.display = 'none';
+                    }
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'All photos have been deleted.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
         };
         
         function updatePhotoCounter() {
@@ -682,27 +953,59 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Global function to remove existing photos
+        // Global function to remove existing photos - now deletes ALL existing photos
         window.removeExistingPhoto = function(photoId) {
-            const photoElement = document.querySelector(`[data-photo-id="${photoId}"]`);
-            if (photoElement) {
-                // Add animation
-                photoElement.style.transition = 'opacity 0.3s, transform 0.3s';
-                photoElement.style.opacity = '0';
-                photoElement.style.transform = 'scale(0.8)';
-                
-                setTimeout(() => {
-                    photoElement.remove();
-                    updatePhotoCounter();
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Delete all existing photos? This cannot be undone.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete all!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const allExistingPhotos = document.querySelectorAll('[data-photo-id]');
+                    const form = document.getElementById('home-form');
                     
-                    // Add hidden input to mark for deletion
-                    const hiddenInput = document.createElement('input');
-                    hiddenInput.type = 'hidden';
-                    hiddenInput.name = 'delete_photos[]';
-                    hiddenInput.value = photoId;
-                    document.getElementById('home-form').appendChild(hiddenInput);
-                }, 300);
-            }
+                    allExistingPhotos.forEach(photoElement => {
+                        const currentPhotoId = photoElement.getAttribute('data-photo-id');
+                        
+                        // Add animation
+                        photoElement.style.transition = 'opacity 0.3s, transform 0.3s';
+                        photoElement.style.opacity = '0';
+                        photoElement.style.transform = 'scale(0.8)';
+                        
+                        setTimeout(() => {
+                            photoElement.remove();
+                            
+                            // Add hidden input to mark for deletion
+                            if (form && currentPhotoId) {
+                                const hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.name = 'delete_photos[]';
+                                hiddenInput.value = currentPhotoId;
+                                form.appendChild(hiddenInput);
+                            }
+                        }, 300);
+                    });
+                    
+                    // Update photo counter after a delay
+                    setTimeout(() => {
+                        updatePhotoCounter();
+                    }, 400);
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'All existing photos have been deleted.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
         };
         
         function updatePhotosInput() {

@@ -322,20 +322,60 @@
                 
                 foreach($photos as $photo) {
                     $imagePath = public_path('storage/' . $photo->image_path);
+                    
+                    // Debug logging for troubleshooting
+                    \Log::info('Processing photo for preview', [
+                        'image_path' => $photo->image_path,
+                        'full_path' => $imagePath,
+                        'file_exists' => file_exists($imagePath),
+                        'is_temp' => isset($photo->temp) ? $photo->temp : false
+                    ]);
+                    
                     if (file_exists($imagePath)) {
                         $imageSize = getimagesize($imagePath);
                         if ($imageSize) {
                             $width = $imageSize[0];
                             $height = $imageSize[1];
                             
+                            \Log::info('Photo dimensions', [
+                                'path' => $photo->image_path,
+                                'width' => $width,
+                                'height' => $height,
+                                'orientation' => $height > $width ? 'portrait' : 'landscape'
+                            ]);
+                            
                             if ($height > $width) {
                                 $portraitPhotos[] = $photo;
                             } else {
                                 $landscapePhotos[] = $photo;
                             }
+                        } else {
+                            \Log::warning('Could not get image size', [
+                                'path' => $imagePath
+                            ]);
+                        }
+                    } else {
+                        \Log::warning('Photo file not found', [
+                            'path' => $imagePath,
+                            'image_path' => $photo->image_path
+                        ]);
+                        
+                        // For temporary photos, still add them to display even if we can't determine orientation
+                        // Default to landscape if we can't determine
+                        if (isset($photo->temp) && $photo->temp) {
+                            \Log::info('Adding temp photo as landscape (fallback)', [
+                                'path' => $photo->image_path
+                            ]);
+                            $landscapePhotos[] = $photo;
                         }
                     }
                 }
+                
+                \Log::info('Photo separation complete', [
+                    'total_photos' => count($photos),
+                    'portrait_count' => count($portraitPhotos),
+                    'landscape_count' => count($landscapePhotos)
+                ]);
             @endphp
             
             {{-- Portrait Photos (smaller size - 5 per row) --}}
@@ -347,7 +387,8 @@
                                 <img src="{{ asset('storage/' . $photo->image_path) }}" 
                                      alt="Portrait Photo" 
                                      style="width: 100%; height: 100%; object-fit: cover;"
-                                     crossorigin="anonymous">
+                                     crossorigin="anonymous"
+                                     onerror="console.error('Failed to load portrait photo: {{ $photo->image_path }}'); this.style.border='2px solid red'; this.style.background='#ffebee';">
                             </div>
                         @endforeach
                     </div>
@@ -363,12 +404,17 @@
                                 <img src="{{ asset('storage/' . $photo->image_path) }}" 
                                      alt="Landscape Photo" 
                                      style="width: 100%; height: 100%; object-fit: cover;"
-                                     crossorigin="anonymous">
+                                     crossorigin="anonymous"
+                                     onerror="console.error('Failed to load landscape photo: {{ $photo->image_path }}'); this.style.border='2px solid red'; this.style.background='#ffebee';">
                             </div>
                         @endforeach
                     </div>
                 </div>
             @endif
+        </div>
+    @else
+        <div class="no-photos-message" style="text-align: center; padding: 20px; border: 1px dashed #ccc; margin: 20px 0; background: #f9f9f9;">
+            <p style="margin: 0; color: #666;">No photos uploaded yet</p>
         </div>
     @endif
 

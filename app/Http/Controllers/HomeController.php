@@ -34,6 +34,14 @@ class HomeController extends Controller
             $restoredData = $sessionData['form_data'] ?? null;
             $restoredPhotos = $sessionData['temp_photos'] ?? [];
             
+            // Debug logging
+            \Log::info('Restoring form data from session', [
+                'has_session_data' => !empty($sessionData),
+                'has_form_data' => !empty($restoredData),
+                'photos_count' => count($restoredPhotos),
+                'form_data_keys' => $restoredData ? array_keys($restoredData) : []
+            ]);
+            
             // Don't clear session data yet - keep it for multiple preview attempts
         } else {
             // Clear any old preview session data and temp photos when starting fresh
@@ -402,6 +410,11 @@ class HomeController extends Controller
         
         // Handle restored photos from form (from chunked upload or previous preview)
         if ($request->has('restored_photos') && is_array($request->input('restored_photos'))) {
+            \Log::info('Processing restored photos', [
+                'count' => count($request->input('restored_photos')),
+                'paths' => $request->input('restored_photos')
+            ]);
+            
             foreach ($request->input('restored_photos') as $tempPath) {
                 if ($tempPath && \Storage::disk('public')->exists($tempPath)) {
                     // Only add if not already in our new uploads
@@ -417,7 +430,17 @@ class HomeController extends Controller
                         $tempImage->id = 'temp_' . uniqid();
                         $tempImage->temp = true; // Add a temporary flag
                         $uploadedPhotos->push($tempImage);
+                        
+                        \Log::info('Added restored photo', [
+                            'path' => $tempPath,
+                            'exists' => \Storage::disk('public')->exists($tempPath)
+                        ]);
                     }
+                } else {
+                    \Log::warning('Restored photo not found or invalid', [
+                        'path' => $tempPath,
+                        'exists' => $tempPath ? \Storage::disk('public')->exists($tempPath) : false
+                    ]);
                 }
             }
         }

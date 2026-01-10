@@ -354,7 +354,7 @@ function initializeChunkedUpload() {
                 ${formatInfo.badge ? `<span class="format-badge ${formatInfo.badgeClass}">${formatInfo.badge}</span>` : ''}
             </div>
             <div class="photo-size">${formatFileSize(item.size)}</div>
-            <button type="button" class="photo-remove" onclick="removeUploadedPhoto(this)">
+            <button type="button" class="photo-remove" onclick="removeUploadedPhoto(this)" title="Delete All Uploaded Photos">
                 <i class="fas fa-times"></i>
             </button>
         `;
@@ -437,92 +437,158 @@ function initializeChunkedUpload() {
     }
 
     // Global function to remove uploaded photos
+    // Global function to remove uploaded photos - now removes ALL uploaded photos
     window.removeUploadedPhoto = function(button) {
-        const photoItem = button.closest('.photo-list-item');
-        const tempPath = photoItem.dataset.tempPath;
-        
-        // Remove from display
-        photoItem.remove();
-        
-        // Remove corresponding hidden input
-        const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${tempPath}"]`);
-        if (hiddenInput) {
-            hiddenInput.remove();
-        }
-        
-        // Update counter
-        updatePhotoCounter();
-        
-        // Hide new photos section if no photos left
-        checkNewPhotosSection();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Delete all uploaded photos? This cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete all!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const allUploadedPhotos = document.querySelectorAll('.photo-list-item.uploaded-photo, .photo-list-item.restored-photo');
+                
+                allUploadedPhotos.forEach(photoItem => {
+                    const tempPath = photoItem.dataset.tempPath;
+                    
+                    // Remove from display
+                    photoItem.remove();
+                    
+                    // Remove corresponding hidden input
+                    const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${tempPath}"]`);
+                    if (hiddenInput) {
+                        hiddenInput.remove();
+                    }
+                });
+                
+                // Update counter
+                updatePhotoCounter();
+                
+                // Hide new photos section if no photos left
+                checkNewPhotosSection();
+
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'All uploaded photos have been deleted.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
     };
 
     // Global function to delete all new photos - works like individual delete but for all
     window.deleteAllNewPhotosAndClearSession = function() {
-        if (confirm('Are you sure you want to delete all photos?')) {
-            // Get all uploaded and restored photos
-            const allPhotos = document.querySelectorAll('.photo-list-item.uploaded-photo, .photo-list-item.restored-photo');
-            
-            // Remove each photo one by one (like individual delete)
-            allPhotos.forEach(photoItem => {
-                const tempPath = photoItem.dataset.tempPath;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Delete all photos? This cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete all!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Get all uploaded and restored photos
+                const allPhotos = document.querySelectorAll('.photo-list-item.uploaded-photo, .photo-list-item.restored-photo');
                 
-                // Remove from display
-                photoItem.remove();
+                // Remove each photo one by one (like individual delete)
+                allPhotos.forEach(photoItem => {
+                    const tempPath = photoItem.dataset.tempPath;
+                    
+                    // Remove from display
+                    photoItem.remove();
+                    
+                    // Remove corresponding hidden input
+                    const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${tempPath}"]`);
+                    if (hiddenInput) {
+                        hiddenInput.remove();
+                    }
+                });
                 
-                // Remove corresponding hidden input
-                const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${tempPath}"]`);
-                if (hiddenInput) {
-                    hiddenInput.remove();
+                // Clear the uploader queue
+                if (window.photoUploader) {
+                    window.photoUploader.clear();
                 }
-            });
-            
-            // Clear the uploader queue
-            if (window.photoUploader) {
-                window.photoUploader.clear();
+                
+                // Update counter
+                updatePhotoCounter();
+                
+                // Hide new photos section
+                checkNewPhotosSection();
+
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'All photos have been deleted.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             }
-            
-            // Update counter
-            updatePhotoCounter();
-            
-            // Hide new photos section
-            checkNewPhotosSection();
-        }
+        });
     };
 
     // Global function to delete all existing photos - works like individual delete but for all
     window.deleteAllExistingPhotosAndClearSession = function() {
-        if (confirm('Are you sure you want to delete all existing photos? This cannot be undone.')) {
-            const existingPhotos = document.querySelectorAll('.photo-list-item.existing-photo');
-            
-            // Process each existing photo like individual delete
-            existingPhotos.forEach(photoItem => {
-                const photoId = photoItem.dataset.photoId;
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Delete all existing photos? This cannot be undone.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete all!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const existingPhotos = document.querySelectorAll('.photo-list-item.existing-photo');
                 
-                // Add to delete list (same as individual delete)
-                const form = document.getElementById('home-form');
-                if (form && photoId) {
-                    const deleteInput = document.createElement('input');
-                    deleteInput.type = 'hidden';
-                    deleteInput.name = 'delete_photos[]';
-                    deleteInput.value = photoId;
-                    deleteInput.className = 'delete-photo-input';
-                    form.appendChild(deleteInput);
+                // Process each existing photo like individual delete
+                existingPhotos.forEach(photoItem => {
+                    const photoId = photoItem.dataset.photoId;
+                    
+                    // Add to delete list (same as individual delete)
+                    const form = document.getElementById('home-form');
+                    if (form && photoId) {
+                        const deleteInput = document.createElement('input');
+                        deleteInput.type = 'hidden';
+                        deleteInput.name = 'delete_photos[]';
+                        deleteInput.value = photoId;
+                        deleteInput.className = 'delete-photo-input';
+                        form.appendChild(deleteInput);
+                    }
+                    
+                    // Remove from display
+                    photoItem.remove();
+                });
+                
+                // Update counter
+                updatePhotoCounter();
+                
+                // Hide existing photos section if empty
+                const existingPhotosSection = document.getElementById('existing-photos-list');
+                if (existingPhotosSection && existingPhotosSection.querySelectorAll('.photo-list-item').length === 0) {
+                    existingPhotosSection.style.display = 'none';
                 }
-                
-                // Remove from display
-                photoItem.remove();
-            });
-            
-            // Update counter
-            updatePhotoCounter();
-            
-            // Hide existing photos section if empty
-            const existingPhotosSection = document.getElementById('existing-photos-list');
-            if (existingPhotosSection && existingPhotosSection.querySelectorAll('.photo-list-item').length === 0) {
-                existingPhotosSection.style.display = 'none';
+
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Deleted!',
+                    text: 'All existing photos have been deleted.',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             }
-        }
+        });
     };
 
     // Check if new photos section should be visible

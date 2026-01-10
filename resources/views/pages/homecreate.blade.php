@@ -485,6 +485,7 @@
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
 <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
 <script src="{{ asset('assets/js/chunked-upload.js') }}"></script>
@@ -492,11 +493,23 @@
 @if(isset($restoredData) && $restoredData)
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Starting form restoration...');
+    
+    // Disable auto-save during restoration to prevent conflicts
+    if (typeof clearAutoSave === 'function') {
+        clearAutoSave();
+    }
+    
     // Restore form details
     const restoredDetails = @json($restoredData['details'] ?? []);
     const restoredPhotos = @json($restoredPhotos ?? []);
     
+    console.log('Restored details:', restoredDetails);
+    console.log('Restored photos:', restoredPhotos);
+    
     if (restoredDetails && restoredDetails.length > 0) {
+        console.log('Restoring', restoredDetails.length, 'detail rows');
+        
         // Clear existing rows except the first one
         const rowsContainer = document.getElementById('rows-container');
         const existingRows = rowsContainer.querySelectorAll('.item-row');
@@ -508,10 +521,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Restore each detail row
         restoredDetails.forEach((detail, index) => {
+            console.log('Restoring detail row', index, detail);
+            
             if (index > 0) {
                 // Add new row for details beyond the first
                 if (typeof window.addRow === 'function') {
                     window.addRow();
+                } else {
+                    console.error('addRow function not available');
                 }
             }
             
@@ -519,6 +536,8 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 const row = rowsContainer.children[index];
                 if (row) {
+                    console.log('Populating row', index);
+                    
                     // Populate the row with restored data
                     const categoryInput = row.querySelector('input[name*="[category_name]"]');
                     const amountInput = row.querySelector('input[name*="[amount]"]');
@@ -534,6 +553,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Trigger calculation
                     if (amountInput) amountInput.dispatchEvent(new Event('input', { bubbles: true }));
+                } else {
+                    console.error('Row not found for index', index);
                 }
             }, index * 100); // Stagger the population
         });
@@ -571,7 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span class="format-badge badge-apple">RESTORED</span>
                     </div>
                     <div class="photo-size">Restored</div>
-                    <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)">
+                    <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)" title="Delete All Restored Photos">
                         <i class="fas fa-times"></i>
                     </button>
                 `;
@@ -593,36 +614,66 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Function to remove restored photos
+    // Function to remove restored photos - now removes ALL restored photos
     window.removeRestoredPhoto = function(button) {
-        const photoItem = button.closest('.photo-list-item');
-        const photoPath = photoItem.dataset.photoPath;
-        
-        // Remove from display
-        photoItem.remove();
-        
-        // Remove corresponding hidden input
-        const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
-        if (hiddenInput) {
-            hiddenInput.remove();
-        }
-        
-        // Update counter
-        const photoCountElement = document.getElementById('photo-count');
-        if (photoCountElement) {
-            const currentCount = parseInt(photoCountElement.textContent) || 0;
-            photoCountElement.textContent = Math.max(0, currentCount - 1);
-        }
-        
-        // Hide new photos section if no photos left
-        const photoList = document.getElementById('photo-list');
-        const newPhotosSection = document.getElementById('new-photos-section');
-        if (photoList && newPhotosSection) {
-            const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
-            if (!hasPhotos) {
-                newPhotosSection.style.display = 'none';
+        Swal.fire({
+            title: '{{ __("Are you sure?") }}',
+            text: '{{ __("Delete all restored photos? This cannot be undone.") }}',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '{{ __("Yes, delete all!") }}',
+            cancelButtonText: '{{ __("Cancel") }}'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const allRestoredPhotos = document.querySelectorAll('.photo-list-item.restored-photo');
+                
+                allRestoredPhotos.forEach(photoItem => {
+                    const photoPath = photoItem.dataset.photoPath;
+                    
+                    // Remove from display
+                    photoItem.remove();
+                    
+                    // Remove corresponding hidden input
+                    const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+                    if (hiddenInput) {
+                        hiddenInput.remove();
+                    }
+                });
+                
+                // Update counter
+                const photoCountElement = document.getElementById('photo-count');
+                if (photoCountElement) {
+                    // Recalculate total count
+                    const existingPhotosCount = document.querySelectorAll('.existing-photo').length;
+                    const restoredPhotosCount = 0; // All restored photos deleted
+                    const newPhotosCount = document.querySelectorAll('.photo-list-item:not(.existing-photo):not(.restored-photo)').length;
+                    const totalCount = existingPhotosCount + restoredPhotosCount + newPhotosCount;
+                    
+                    photoCountElement.textContent = totalCount;
+                }
+                
+                // Hide new photos section if no photos left
+                const photoList = document.getElementById('photo-list');
+                const newPhotosSection = document.getElementById('new-photos-section');
+                if (photoList && newPhotosSection) {
+                    const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
+                    if (!hasPhotos) {
+                        newPhotosSection.style.display = 'none';
+                    }
+                }
+
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: '{{ __("Deleted!") }}',
+                    text: '{{ __("All restored photos have been deleted.") }}',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
             }
-        }
+        });
     };
 });
 </script>

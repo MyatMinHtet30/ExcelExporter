@@ -4,7 +4,7 @@
 
 @section('login_content')
 <div class="d-flex align-items-center justify-content-center vh-100">
-    <div class="card shadow p-4" style="min-width: 400px;">
+    <div class="card shadow p-4 login-card" style="min-width: 400px;">
         <h3 class="mb-4 text-center">Login</h3>
 
         @if(session('status'))
@@ -32,7 +32,8 @@
                 <input type="password" name="password" class="form-control" required>
             </div>
             <div class="form-check mb-3">
-                <input type="checkbox" name="remember" class="form-check-input" id="remember">
+                <input type="checkbox" name="remember" value="1" class="form-check-input" id="remember" 
+                       {{ old('remember') == '1' ? 'checked' : '' }}>
                 <label class="form-check-label" for="remember">Remember Me</label>
             </div>
             <button class="btn btn-primary w-100">Login</button>
