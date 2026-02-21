@@ -26,6 +26,11 @@ class Condo extends Model
         return $this->hasMany(CondoDetail::class);
     }
 
+    public function images()
+    {
+        return $this->hasMany(Image::class, 'condo_id');
+    }
+
     protected $appends = ['computed_subtotal','computed_vat','computed_grand_total'];
 
     public function getComputedSubtotalAttribute(): float

@@ -1,4 +1,4 @@
-/**
+git/**
  * Chunked Photo Upload Handler
  * Handles uploading multiple photos one by one to avoid POST size limits
  */
@@ -333,11 +333,13 @@ function initializeChunkedUpload() {
     function addPhotoToList(item) {
         if (!photoList) return;
 
-        // Show the new photos section
+        // Show the new photos section and photo list
         const newPhotosSection = document.getElementById('new-photos-section');
         if (newPhotosSection) {
-            // Keep section hidden - UI modification to hide photo list
-            // newPhotosSection.style.display = 'block';
+            newPhotosSection.style.display = 'block';
+        }
+        if (photoList) {
+            photoList.style.display = 'block';
         }
 
         // Determine format type for better display
@@ -354,11 +356,21 @@ function initializeChunkedUpload() {
                 ${item.filename}
                 ${formatInfo.badge ? `<span class="format-badge ${formatInfo.badgeClass}">${formatInfo.badge}</span>` : ''}
             </div>
-            <div class="photo-size">${formatFileSize(item.size)}</div>
-            <button type="button" class="photo-remove" onclick="removeUploadedPhoto(this)" title="Delete All Uploaded Photos">
-                <i class="fas fa-times"></i>
+            <button type="button" class="btn btn-sm btn-danger delete-photo-btn" data-temp-path="${item.tempPath}" title="Delete photo" style="padding: 4px 8px; font-size: 0.75rem;">
+                <i class="fas fa-trash"></i>
             </button>
         `;
+        
+        // Add delete button event listener
+        const deleteBtn = photoItem.querySelector('.delete-photo-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                deleteIndividualPhoto(item.tempPath, photoItem);
+            });
+        }
+        
         photoList.appendChild(photoItem);
     }
 
@@ -484,6 +496,26 @@ function initializeChunkedUpload() {
             }
         });
     };
+    
+    // Function to delete individual photo
+    function deleteIndividualPhoto(tempPath, photoItem) {
+        // Remove from display
+        if (photoItem) {
+            photoItem.remove();
+        }
+        
+        // Remove corresponding hidden input
+        const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${tempPath}"]`);
+        if (hiddenInput) {
+            hiddenInput.remove();
+        }
+        
+        // Update counter
+        updatePhotoCounter();
+        
+        // Hide new photos section if no photos left
+        checkNewPhotosSection();
+    }
 
     // Global function to delete all new photos - works like individual delete but for all
     window.deleteAllNewPhotosAndClearSession = function() {
@@ -546,8 +578,8 @@ function initializeChunkedUpload() {
         
         if (newPhotosSection && photoList) {
             const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
-            // Keep section hidden - UI modification to hide photo list
-            // newPhotosSection.style.display = hasPhotos ? 'block' : 'none';
+            newPhotosSection.style.display = hasPhotos ? 'block' : 'none';
+            photoList.style.display = hasPhotos ? 'block' : 'none';
         }
     }
 }

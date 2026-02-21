@@ -5,10 +5,12 @@
 @push('styles')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <link href="{{ asset('assets/css/condo-forminput-table.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset('assets/css/home-common.css') }}" rel="stylesheet" type="text/css">
+<link href="{{ asset('assets/css/photo-upload.css') }}" rel="stylesheet">
 @endpush
 
 @section('content')
-  <form action="{{ route('condo.update', $condo) }}" method="POST" id="condo-form" novalidate>
+  <form action="{{ route('condo.update', $condo) }}" method="POST" id="condo-form" novalidate enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
@@ -339,7 +341,7 @@
         </div>
 
         <!-- Footer actions + totals -->
-        <div class="col-lg-12 ">
+        <div class="col-lg-12 d-none d-md-block">
           <div class="card m-b-20">
             <div class="card-header bg-white">
               <div class="row">
@@ -381,6 +383,138 @@
                 </div>
 
               </div> <!-- row -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== Mobile View Only (NEW - shows below rows) ===== -->
+        <div class="col-12 d-md-none">
+          <!-- 1. Mobile Add Row Button (FIRST) -->
+          <div class="form-section mt-3">
+            <div class="text-center">
+              <button type="button" class="btn btn-primary btn-lg w-100" id="add-row-btn-mobile">
+                <i class="fas fa-plus-circle me-2"></i>{{ __('Add New Item') }}
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. Mobile Calculation Summary (SECOND) -->
+          <div class="form-section mt-3">
+            <div class="card shadow-sm">
+              <div class="btn_div card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>{{ __('Cost Summary') }}</h5>
+              </div>
+              <div class="card-body">
+                <div class="summary-row">
+                  <div class="summary-label">{{ __('Total') }}:</div>
+                  <div class="summary-value" id="totalDisplayMobile">0.00</div>
+                </div>
+                <div class="summary-row">
+                  <div class="summary-label">{{ __('VAT 7%') }}:</div>
+                  <div class="summary-value" id="taxDisplayMobile">0.00</div>
+                </div>
+                <div class="summary-row total-row">
+                  <div class="summary-label" style="font-size:18px; color: #28a745;">{{ __('Total Price') }}:</div>
+                  <div class="summary-value total-value" id="totalPriceDisplayMobile">0.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Photo Upload Section (THIRD - NEW) -->
+          <div class="form-section mt-3">
+            <div class="card shadow-sm">
+              <div class="btn_div card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
+              </div>
+              <div class="card-body">
+                <!-- Existing Photos List -->
+                @if($condo->images && $condo->images->count() > 0)
+                  <div class="existing-photos-list mb-3" id="existing-photos-list" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <small class="text-muted">{{ __('Existing Photos') }}</small>
+                      <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllExistingPhotosAndClearSession()" title="{{ __('Delete All Existing Photos') }}">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    @foreach($condo->images as $image)
+                      <div class="photo-list-item existing-photo" data-photo-id="{{ $image->id }}">
+                        <div class="photo-name" title="{{ basename($image->image_path) }}">
+                          <i class="fas fa-image me-1 text-success"></i>
+                          {{ basename($image->image_path) }}
+                        </div>
+                        <button type="button" class="btn btn-sm btn-danger delete-existing-photo-btn" data-photo-id="{{ $image->id }}" title="Delete photo">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    @endforeach
+                  </div>
+                @endif
+
+                <div class="photo-upload-area" id="photo-upload-area">
+                  <div class="photo-upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                  </div>
+                  <h5>{{ __('Upload Project Photos') }}</h5>
+                  <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
+                  <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
+                  
+                  <!-- Photo counter -->
+                  <div class="photo-counter" id="photo-counter">
+                    <i class="fas fa-images me-1"></i>
+                    <span id="photo-count">{{ $condo->images ? $condo->images->count() : 0 }}</span> {{ __('photos selected') }}
+                  </div>
+                  
+                  <!-- Delete All Photos Button -->
+                  <div class="d-flex justify-content-end mb-2">
+                    <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+
+                  <!-- New photos list (hidden) -->
+                  <div class="new-photos-section" id="new-photos-section" style="display: none;">
+                    <div class="photo-list" id="photo-list" style="display: none;"></div>
+                  </div>
+                  
+                  <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
+                  <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
+                    <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
+                  </button>
+                </div>
+                
+                <!-- Upload Progress -->
+                <div class="upload-loading" id="upload-loading">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <div class="upload-progress">
+                    <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Mobile Action Buttons (FOURTH) -->
+          <div class="form-section mt-3">
+            <h5 class="btn_div form-section-title">
+              <i class="fas fa-tasks me-2"></i>{{ __('Actions') }}
+            </h5>
+            <div class="card shadow-sm">
+              <div class="card-body">
+                <div class="btn-group-vertical w-100" role="group">
+                  <button type="button" class="btn btn-primary btn-lg mb-3" id="preview-btn-mobile">
+                    <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
+                  </button>
+                  
+                  <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn-mobile">
+                    <i class="fas fa-save me-2"></i>{{ __('Update') }}
+                  </button>
+                  
+                  <a href="{{ route('condo') }}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -512,6 +646,7 @@
 @push('scripts')
 <script src="{{ asset('assets/plugins/validations/condoValidation.js') }}"></script>
 <script src="{{ asset('assets/plugins/condo/condo-form.js') }}"></script>
+<script src="{{ asset('assets/js/chunked-upload.js') }}"></script>
 <script>
   // Ensure totals are recalculated on page load with prefilled values
   document.addEventListener('DOMContentLoaded', () => {
@@ -525,7 +660,9 @@
     }
 
     const previewBtn = document.getElementById('preview-btn');
-    previewBtn?.addEventListener('click', () => {
+    const previewBtnMobile = document.getElementById('preview-btn-mobile');
+    
+    function handlePreview() {
       const form = document.getElementById('condo-form');
 
       if (window.validateCondoForm && !window.validateCondoForm(form)) {
@@ -567,6 +704,183 @@
         newSpoof.name = '_method';
         newSpoof.value = 'PUT';
         form.appendChild(newSpoof);
+      }
+    }
+
+    previewBtn?.addEventListener('click', handlePreview);
+    previewBtnMobile?.addEventListener('click', handlePreview);
+
+    // Photo upload placeholder functions
+    window.deleteAllNewPhotosAndClearSession = function() {
+      const photoList = document.getElementById('photo-list');
+      const photoCount = document.getElementById('photo-count');
+      const photoInput = document.getElementById('photo-input');
+      
+      if (photoList) photoList.innerHTML = '';
+      if (photoInput) photoInput.value = '';
+      
+      const existingCount = {{ $condo->images ? $condo->images->count() : 0 }};
+      if (photoCount) photoCount.textContent = existingCount;
+      
+      console.log('All new photos cleared');
+    };
+
+    window.deleteAllExistingPhotosAndClearSession = function() {
+      const existingPhotosList = document.getElementById('existing-photos-list');
+      const photoCount = document.getElementById('photo-count');
+      
+      if (existingPhotosList) {
+        existingPhotosList.style.display = 'none';
+      }
+      if (photoCount) photoCount.textContent = '0';
+      
+      console.log('All existing photos cleared');
+    };
+
+    // Basic photo upload handling
+    const photoInput = document.getElementById('photo-input');
+    const photoUploadArea = document.getElementById('photo-upload-area');
+    const photoCount = document.getElementById('photo-count');
+    const photoList = document.getElementById('photo-list');
+    const newPhotosSection = document.getElementById('new-photos-section');
+    const existingPhotosList = document.getElementById('existing-photos-list');
+    
+    // Show existing photos if any
+    if (existingPhotosList && existingPhotosList.querySelectorAll('.photo-list-item').length > 0) {
+      existingPhotosList.style.display = 'block';
+    }
+    
+    if (photoInput && photoUploadArea) {
+      // Click to upload
+      photoUploadArea.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'I') {
+          photoInput.click();
+        }
+      });
+      
+      // File selection
+      photoInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length > 0) {
+          const existingCount = {{ $condo->images ? $condo->images->count() : 0 }};
+          updatePhotoCount(existingCount + files.length);
+          displayPhotoList(files);
+        }
+      });
+      
+      // Drag and drop
+      photoUploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        photoUploadArea.classList.add('dragover');
+      });
+      
+      photoUploadArea.addEventListener('dragleave', () => {
+        photoUploadArea.classList.remove('dragover');
+      });
+      
+      photoUploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        photoUploadArea.classList.remove('dragover');
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0) {
+          photoInput.files = e.dataTransfer.files;
+          const existingCount = {{ $condo->images ? $condo->images->count() : 0 }};
+          updatePhotoCount(existingCount + files.length);
+          displayPhotoList(files);
+        }
+      });
+    }
+    
+    function updatePhotoCount(count) {
+      if (photoCount) {
+        photoCount.textContent = count;
+      }
+    }
+    
+    function displayPhotoList(files) {
+      if (!photoList || !newPhotosSection) return;
+      
+      photoList.innerHTML = '';
+      files.forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'photo-list-item';
+        item.dataset.index = index;
+        item.innerHTML = `
+          <div class="photo-name" title="${file.name}">
+            <i class="fas fa-image me-1 text-primary"></i>
+            ${file.name}
+          </div>
+          <button type="button" class="btn btn-sm btn-danger delete-new-photo-btn" data-index="${index}" title="Delete photo">
+            <i class="fas fa-trash"></i>
+          </button>
+        `;
+        
+        // Add delete button event listener
+        const deleteBtn = item.querySelector('.delete-new-photo-btn');
+        deleteBtn.addEventListener('click', function() {
+          deleteNewPhoto(index);
+        });
+        
+        photoList.appendChild(item);
+      });
+      
+      if (files.length > 0) {
+        photoList.style.display = 'block';
+        newPhotosSection.style.display = 'block';
+      }
+    }
+    
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+    
+    function deleteNewPhoto(index) {
+      // Remove from DataTransfer
+      const dt = new DataTransfer();
+      const files = Array.from(photoInput.files);
+      files.splice(index, 1);
+      
+      files.forEach(file => dt.items.add(file));
+      photoInput.files = dt.files;
+      
+      // Update display
+      displayPhotoList(Array.from(photoInput.files));
+      updatePhotoCount();
+      
+      // Hide section if no photos
+      if (photoInput.files.length === 0 && newPhotosSection) {
+        newPhotosSection.style.display = 'none';
+      }
+    }
+    
+    // Delete existing photo handler
+    document.addEventListener('click', function(e) {
+      if (e.target.closest('.delete-existing-photo-btn')) {
+        const btn = e.target.closest('.delete-existing-photo-btn');
+        const photoId = btn.dataset.photoId;
+        const photoItem = btn.closest('.photo-list-item');
+        
+        if (confirm('Are you sure you want to delete this photo?')) {
+          // Add to deleted photos array (will be processed on form submit)
+          const deletedInput = document.createElement('input');
+          deletedInput.type = 'hidden';
+          deletedInput.name = 'deleted_photos[]';
+          deletedInput.value = photoId;
+          document.getElementById('condo-form').appendChild(deletedInput);
+          
+          // Remove from display
+          photoItem.remove();
+          
+          // Hide section if no existing photos left
+          const existingPhotosList = document.getElementById('existing-photos-list');
+          if (existingPhotosList && existingPhotosList.querySelectorAll('.photo-list-item').length === 0) {
+            existingPhotosList.style.display = 'none';
+          }
+        }
       }
     });
   });

@@ -593,11 +593,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         ${filename}
                         <span class="format-badge badge-apple">RESTORED</span>
                     </div>
-                    <div class="photo-size">Restored</div>
-                    <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)" title="Delete All Restored Photos">
-                        <i class="fas fa-times"></i>
+                    <button type="button" class="btn btn-sm btn-danger delete-restored-photo-btn" data-photo-path="${photoPath}" title="Delete photo">
+                        <i class="fas fa-trash"></i>
                     </button>
                 `;
+                
+                // Add delete button event listener
+                const deleteBtn = photoItem.querySelector('.delete-restored-photo-btn');
+                deleteBtn.addEventListener('click', function() {
+                    deleteRestoredPhotoHome(photoPath, photoItem);
+                });
+                
                 photoList.appendChild(photoItem);
             });
         }
@@ -613,6 +619,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 hiddenInput.className = 'restored-photo-input';
                 form.appendChild(hiddenInput);
             });
+        }
+    }
+    
+    // Function to delete individual restored photo
+    function deleteRestoredPhotoHome(photoPath, photoItem) {
+        // Remove from DOM
+        if (photoItem) {
+            photoItem.remove();
+        }
+        
+        // Remove the hidden input
+        const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+        if (hiddenInput) {
+            hiddenInput.remove();
+        }
+        
+        // Update photo count
+        const photoCount = document.getElementById('photo-count');
+        const remainingPhotos = document.querySelectorAll('.photo-list-item').length;
+        if (photoCount) {
+            photoCount.textContent = remainingPhotos;
+        }
+        
+        // Hide section if no photos
+        if (remainingPhotos === 0) {
+            const newPhotosSection = document.getElementById('new-photos-section');
+            if (newPhotosSection) {
+                newPhotosSection.style.display = 'none';
+            }
         }
     }
     

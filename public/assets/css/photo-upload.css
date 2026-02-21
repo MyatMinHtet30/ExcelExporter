@@ -82,16 +82,34 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 200px;
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.photo-size {
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin: 0 10px;
+.delete-photo-btn,
+.delete-restored-photo-btn,
+.delete-existing-photo-btn,
+.delete-new-photo-btn {
+    padding: 4px 8px !important;
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+    border-radius: 4px !important;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+    cursor: pointer;
+}
+
+.delete-photo-btn:hover,
+.delete-restored-photo-btn:hover,
+.delete-existing-photo-btn:hover,
+.delete-new-photo-btn:hover {
+    background-color: #c82333 !important;
+    border-color: #bd2130 !important;
+    transform: scale(1.05);
 }
 
 .photo-remove {

@@ -12,6 +12,7 @@ class Image extends Model
     protected $fillable = [
         'image_path',
         'home_id',
+        'condo_id',
         'status',
     ];
 
@@ -21,5 +22,13 @@ class Image extends Model
     public function home()
     {
         return $this->belongsTo(Home::class, 'home_id');
+    }
+
+    /**
+     * Relationship: Image belongs to a Condo
+     */
+    public function condo()
+    {
+        return $this->belongsTo(Condo::class, 'condo_id');
     }
 }

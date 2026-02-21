@@ -46,8 +46,7 @@
 
     .boq-wrap {
         /* Center page and ensure all columns stay inside the outer border */
-        width: 120%;
-        max-width: 1300px;
+        width: 1300px;
         margin: 20px auto;
         background: #fff;
         border: 2px solid #000;
@@ -155,8 +154,8 @@
         
         .photo-grid {
             display: grid !important;
-            grid-template-columns: repeat(5, 1fr) !important;
-            gap: 8px !important;
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 10px !important;
         }
     }
 </style>
@@ -314,35 +313,27 @@
 
     {{-- Photo Gallery Section --}}
     @if($photos && count($photos) > 0)
-        <div class="photo-gallery-wrap" style="width: 120%; max-width: 1200px; margin: 20px auto; background: #fff; border: 2px solid #000; padding: 20px; position: relative; page-break-inside: avoid;">
+        <div class="photo-gallery-wrap" style="width: 1300px; margin: 20px auto; background: #fff; border: 2px solid #000; padding: 0; position: relative; page-break-inside: avoid;">
             
+            <div style="padding: 20px;">
             @php
                 $portraitPhotos = [];
                 $landscapePhotos = [];
                 
                 foreach($photos as $photo) {
+                    // Try public_path first (for symlinked storage)
                     $imagePath = public_path('storage/' . $photo->image_path);
                     
-                    // Debug logging for troubleshooting
-                    \Log::info('Processing photo for preview', [
-                        'image_path' => $photo->image_path,
-                        'full_path' => $imagePath,
-                        'file_exists' => file_exists($imagePath),
-                        'is_temp' => isset($photo->temp) ? $photo->temp : false
-                    ]);
+                    // If not found, try storage_path (for temp files before symlink)
+                    if (!file_exists($imagePath)) {
+                        $imagePath = storage_path('app/public/' . $photo->image_path);
+                    }
                     
                     if (file_exists($imagePath)) {
-                        $imageSize = getimagesize($imagePath);
+                        $imageSize = @getimagesize($imagePath);
                         if ($imageSize) {
                             $width = $imageSize[0];
                             $height = $imageSize[1];
-                            
-                            \Log::info('Photo dimensions', [
-                                'path' => $photo->image_path,
-                                'width' => $width,
-                                'height' => $height,
-                                'orientation' => $height > $width ? 'portrait' : 'landscape'
-                            ]);
                             
                             if ($height > $width) {
                                 $portraitPhotos[] = $photo;
@@ -350,67 +341,46 @@
                                 $landscapePhotos[] = $photo;
                             }
                         } else {
-                            \Log::warning('Could not get image size', [
-                                'path' => $imagePath
-                            ]);
-                        }
-                    } else {
-                        \Log::warning('Photo file not found', [
-                            'path' => $imagePath,
-                            'image_path' => $photo->image_path
-                        ]);
-                        
-                        // For temporary photos, still add them to display even if we can't determine orientation
-                        // Default to landscape if we can't determine
-                        if (isset($photo->temp) && $photo->temp) {
-                            \Log::info('Adding temp photo as landscape (fallback)', [
-                                'path' => $photo->image_path
-                            ]);
+                            // If getimagesize fails, default to landscape
                             $landscapePhotos[] = $photo;
                         }
+                    } else {
+                        // File not found, default to landscape
+                        $landscapePhotos[] = $photo;
                     }
                 }
-                
-                \Log::info('Photo separation complete', [
-                    'total_photos' => count($photos),
-                    'portrait_count' => count($portraitPhotos),
-                    'landscape_count' => count($landscapePhotos)
-                ]);
             @endphp
             
-            {{-- Portrait Photos (smaller size - 5 per row) --}}
+            {{-- Portrait Photos (bigger size - 4 per row) --}}
             @if(count($portraitPhotos) > 0)
                 <div class="portrait-photos" style="margin-bottom: 15px;">
-                    <div class="photo-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                    <div class="photo-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
                         @foreach($portraitPhotos as $photo)
-                            <div class="photo-item" style="width: 1.5in; height: 2in; border: 1px solid #000; overflow: hidden; position: relative; z-index: 10;">
+                            <div class="photo-item" style="width: 2in; height: 2.67in; border: 1px solid #000; overflow: hidden; position: relative; z-index: 10;">
                                 <img src="{{ asset('storage/' . $photo->image_path) }}" 
                                      alt="Portrait Photo" 
-                                     style="width: 100%; height: 100%; object-fit: cover;"
-                                     crossorigin="anonymous"
-                                     onerror="console.error('Failed to load portrait photo: {{ $photo->image_path }}'); this.style.border='2px solid red'; this.style.background='#ffebee';">
+                                     style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                         @endforeach
                     </div>
                 </div>
             @endif
             
-            {{-- Landscape Photos (smaller size - 5 per row) --}}
+            {{-- Landscape Photos (bigger size - 4 per row) --}}
             @if(count($landscapePhotos) > 0)
                 <div class="landscape-photos">
-                    <div class="photo-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                    <div class="photo-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
                         @foreach($landscapePhotos as $photo)
-                            <div class="photo-item" style="width: 1.8in; height: 1.2in; border: 1px solid #000; overflow: hidden; position: relative; z-index: 10;">
+                            <div class="photo-item" style="width: 2.4in; height: 1.6in; border: 1px solid #000; overflow: hidden; position: relative; z-index: 10;">
                                 <img src="{{ asset('storage/' . $photo->image_path) }}" 
                                      alt="Landscape Photo" 
-                                     style="width: 100%; height: 100%; object-fit: cover;"
-                                     crossorigin="anonymous"
-                                     onerror="console.error('Failed to load landscape photo: {{ $photo->image_path }}'); this.style.border='2px solid red'; this.style.background='#ffebee';">
+                                     style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                         @endforeach
                     </div>
                 </div>
             @endif
+            </div>
         </div>
     @else
         <div class="no-photos-message" style="text-align: center; padding: 20px; border: 1px dashed #ccc; margin: 20px 0; background: #f9f9f9;">
@@ -565,16 +535,16 @@
             // ===== Photo layout constants (MATCH PREVIEW) =====
             const DPI = 96;
 
-            // Portrait (1.5in x 2in)
-            const PORTRAIT_W = 1.5 * DPI;   // 144
-            const PORTRAIT_H = 2.0 * DPI;   // 192
+            // Portrait (2in x 2.67in)
+            const PORTRAIT_W = 2.0 * DPI;   // 192
+            const PORTRAIT_H = 2.67 * DPI;  // 256
 
-            // Landscape (1.8in x 1.2in)
-            const LANDSCAPE_W = 1.8 * DPI;  // 173
-            const LANDSCAPE_H = 1.2 * DPI;  // 115
+            // Landscape (2.4in x 1.6in)
+            const LANDSCAPE_W = 2.4 * DPI;  // 230
+            const LANDSCAPE_H = 1.6 * DPI;  // 154
 
-            const PHOTOS_PER_ROW = 5;
-            const GAP_PX = 8;               // same as CSS gap
+            const PHOTOS_PER_ROW = 4;
+            const GAP_PX = 10;              // same as CSS gap
 
             try {
                 Swal.fire({
@@ -936,10 +906,10 @@
                 if (photos && photos.length > 0) {
 
                     // ===== PHOTO SETTINGS =====
-                        const PORTRAIT_WIDTH_PX = 205;   // Keep bigger size: 1.5 inches
-                        const PORTRAIT_HEIGHT_PX = 273;  // Keep bigger size: 2.0 inches
-                        const LANDSCAPE_WIDTH_PX = 215;  // Same width for consistency
-                        const LANDSCAPE_HEIGHT_PX = 161; // Keep bigger size: 1.125 inches
+                        const PORTRAIT_WIDTH_PX = 170;   // Balanced size for Excel download
+                        const PORTRAIT_HEIGHT_PX = 227;  // Balanced size for Excel download
+                        const LANDSCAPE_WIDTH_PX = 200;  // Balanced size for Excel download
+                        const LANDSCAPE_HEIGHT_PX = 133; // Balanced size for Excel download
                         
                         // ===== COLUMN WIDTHS (Excel column units) =====
                         const COL_WIDTHS = {
@@ -960,19 +930,13 @@
                         // percent: 0 = left edge, 0.5 = middle, 1 = right edge
                         
                         const PORTRAIT_POSITIONS = [
-                            { column: 'B', percent: 0 },  // Photo 1: Middle of column A
-                            { column: 'C', percent: 0 }, // Photo 2: 25% into column B
-                            { column: 'E', percent: 0.99 },  // Photo 3: Middle of column C
-                            { column: 'H', percent: 0 },  // Photo 4: 30% into column E
-                            // { column: 'G', percent: 0.7 }   // Photo 5: 70% into column G
+                            { column: 'B', percent: 0 },  // Left photo
+                            { column: 'H', percent: 0 },  // Right photo
                         ];
                         
                         const LANDSCAPE_POSITIONS = [
-                            { column: 'B', percent: 0 },  // Photo 1: Middle of column A
-                            { column: 'C', percent: 0 }, // Photo 2: 15% into column B
-                            { column: 'E', percent: 0.99 },  // Photo 3: Middle of column D
-                            { column: 'H', percent: 0 },  // Photo 4: 40% into column F
-                            // { column: 'H', percent: 0.6 }   // Photo 5: 60% into column H
+                            { column: 'B', percent: 0 },  // Left photo
+                            { column: 'H', percent: 0 },  // Right photo
                         ];
                         
                         // Function to convert column letter to index
@@ -1003,6 +967,13 @@
                         // Start photos well below the table
                         let currentRow = ws.rowCount + 3;
                         
+                        // Add "Project Photos" heading
+                        ws.mergeCells(currentRow, 1, currentRow, 10); // Merge A to J
+                        ws.getCell(currentRow, 1).value = t.photos || 'Project Photos';
+                        ws.getCell(currentRow, 1).font = { name: 'Angsana New', size: 18, bold: true };
+                        ws.getCell(currentRow, 1).alignment = { horizontal: 'left', vertical: 'middle' };
+                        currentRow += 1; // Move to next row for photos
+                        
                         // Classify photos by orientation
                         const classified = await Promise.all(
                             photos.map(async p => {
@@ -1023,9 +994,10 @@
                             let processedCount = 0;
                             let skippedCount = 0;
                             
-                            // Process photos in rows of 5
-                            for (let rowStart = 0; rowStart < photoList.length; rowStart += 4) {
-                                const rowPhotos = photoList.slice(rowStart, rowStart + 4);
+                            const photosPerRow = positions.length;
+                            // Process photos row by row
+                            for (let rowStart = 0; rowStart < photoList.length; rowStart += photosPerRow) {
+                                const rowPhotos = photoList.slice(rowStart, rowStart + photosPerRow);
                                 
                                 // Position each photo in this row
                                 for (let i = 0; i < rowPhotos.length && i < positions.length; i++) {
@@ -1100,8 +1072,8 @@
                                 }
                                 
                                 // Move to next row with safe integer values
-                                const ROW_SPAN_PORTRAIT = 9.5;   // Safe integer spacing
-                                const ROW_SPAN_LANDSCAPE = 6;   // Safe integer spacing
+                                const ROW_SPAN_PORTRAIT = 20;  // Spacing for extra large portrait photos
+                                const ROW_SPAN_LANDSCAPE = 14; // Spacing for extra large landscape photos
 
                                 currentRow += photoHeight > photoWidth
                                     ? ROW_SPAN_PORTRAIT
@@ -1231,6 +1203,21 @@
                 const photoClone = photoGallery.cloneNode(true);
                 // Add some spacing between BOQ and photos
                 photoClone.style.marginTop = '30px';
+
+                // Download-only sizing (match preview display)
+                photoClone.querySelectorAll('.portrait-photos .photo-item').forEach((item) => {
+                    item.style.setProperty('width', '2in', 'important');
+                    item.style.setProperty('height', '2.67in', 'important');
+                });
+                photoClone.querySelectorAll('.landscape-photos .photo-item').forEach((item) => {
+                    item.style.setProperty('width', '2.4in', 'important');
+                    item.style.setProperty('height', '1.6in', 'important');
+                });
+                photoClone.querySelectorAll('.photo-grid').forEach((grid) => {
+                    grid.style.setProperty('grid-template-columns', 'repeat(4, minmax(0, 1fr))', 'important');
+                    grid.style.setProperty('gap', '10px', 'important');
+                });
+
                 tempWrapper.appendChild(photoClone);
             }
             

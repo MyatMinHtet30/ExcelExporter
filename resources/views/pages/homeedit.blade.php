@@ -437,7 +437,9 @@
                                                     <i class="fas fa-image me-1 text-success"></i>
                                                     {{ basename($image->image_path) }}
                                                 </div>
-                                                <div class="photo-size">Existing</div>
+                                                <button type="button" class="btn btn-sm btn-danger delete-existing-photo-btn" data-photo-id="{{ $image->id }}" title="Delete photo">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             </div>
                                         @endforeach
                                     </div>
@@ -649,6 +651,15 @@
     <script>
         // Restore form data when coming back from preview
         document.addEventListener('DOMContentLoaded', function() {
+            // Show existing photos section if there are photos
+            const existingPhotosList = document.getElementById('existing-photos-list');
+            if (existingPhotosList) {
+                const hasExistingPhotos = existingPhotosList.querySelectorAll('.photo-list-item').length > 0;
+                if (hasExistingPhotos) {
+                    existingPhotosList.style.display = 'block';
+                }
+            }
+            
             // Restore form details
             const restoredData = @json($restoredData ?? null);
             const restoredPhotos = @json($restoredPhotos ?? []);
@@ -728,11 +739,19 @@
                                 ${filename}
                                 <span class="format-badge badge-apple">RESTORED</span>
                             </div>
-                            <div class="photo-size">Restored</div>
-                            <button type="button" class="photo-remove" onclick="removeRestoredPhoto(this)" title="Delete All Restored Photos">
-                                <i class="fas fa-times"></i>
+                            <button type="button" class="btn btn-sm btn-danger delete-restored-photo-btn" data-photo-path="${photoPath}" title="Delete photo">
+                                <i class="fas fa-trash"></i>
                             </button>
                         `;
+                        
+                        // Add delete button event listener
+                        const deleteBtn = photoItem.querySelector('.delete-restored-photo-btn');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', function() {
+                                deleteRestoredPhotoHomeEdit(photoPath, photoItem);
+                            });
+                        }
+                        
                         photoList.appendChild(photoItem);
                     });
                 }
@@ -873,10 +892,92 @@
                 });
             };
             
+            // Function to delete individual restored photo
+            function deleteRestoredPhotoHomeEdit(photoPath, photoItem) {
+                // Remove from DOM
+                if (photoItem) {
+                    photoItem.remove();
+                }
+                
+                // Remove the hidden input
+                const hiddenInput = document.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+                if (hiddenInput) {
+                    hiddenInput.remove();
+                }
+                
+                // Update photo count
+                const photoCount = document.getElementById('photo-count');
+                const existingCount = document.querySelectorAll('.existing-photo').length;
+                const restoredCount = document.querySelectorAll('.restored-photo').length;
+                const uploadedCount = document.querySelectorAll('.uploaded-photo').length;
+                const totalCount = existingCount + restoredCount + uploadedCount;
+                
+                if (photoCount) {
+                    photoCount.textContent = totalCount;
+                }
+                
+                // Hide section if no photos
+                const photoList = document.getElementById('photo-list');
+                const newPhotosSection = document.getElementById('new-photos-section');
+                if (photoList && newPhotosSection) {
+                    const hasPhotos = photoList.querySelectorAll('.photo-list-item').length > 0;
+                    if (!hasPhotos) {
+                        newPhotosSection.style.display = 'none';
+                        photoList.style.display = 'none';
+                    }
+                }
+            }
+            
             // Initialize chunked upload for edit form
             if (typeof initializeChunkedUpload === 'function') {
                 initializeChunkedUpload();
             }
+            
+            // Delete existing photo handler
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.delete-existing-photo-btn')) {
+                    const btn = e.target.closest('.delete-existing-photo-btn');
+                    const photoId = btn.dataset.photoId;
+                    const photoItem = btn.closest('.photo-list-item');
+                    
+                    Swal.fire({
+                        title: '{{ __("Are you sure?") }}',
+                        text: '{{ __("Delete this photo? This cannot be undone.") }}',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: '{{ __("Yes, delete it!") }}',
+                        cancelButtonText: '{{ __("Cancel") }}'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Add to deleted photos array (will be processed on form submit)
+                            const deletedInput = document.createElement('input');
+                            deletedInput.type = 'hidden';
+                            deletedInput.name = 'deleted_photos[]';
+                            deletedInput.value = photoId;
+                            document.getElementById('home-form').appendChild(deletedInput);
+                            
+                            // Remove from display
+                            photoItem.remove();
+                            
+                            // Hide section if no existing photos left
+                            const existingPhotosList = document.getElementById('existing-photos-list');
+                            if (existingPhotosList && existingPhotosList.querySelectorAll('.photo-list-item').length === 0) {
+                                existingPhotosList.style.display = 'none';
+                            }
+                            
+                            Swal.fire({
+                                icon: 'success',
+                                title: '{{ __("Deleted!") }}',
+                                text: '{{ __("Photo has been deleted.") }}',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    });
+                }
+            });
         });
     </script>
 @endpush

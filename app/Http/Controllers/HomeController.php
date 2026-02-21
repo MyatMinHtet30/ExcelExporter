@@ -124,7 +124,10 @@ class HomeController extends Controller
             // Handle photo uploads
             if (!empty($photos['photos'])) {
                 foreach ($photos['photos'] as $photo) {
-                    $path = $photo->store('home_photos', 'public');
+                    // Preserve original filename
+                    $originalName = $photo->getClientOriginalName();
+                    $path = $photo->storeAs('home_photos', $originalName, 'public');
+                    
                     $home->images()->create([
                         'image_path' => $path,
                         'status' => true,
@@ -328,7 +331,10 @@ class HomeController extends Controller
         // 8) Handle new photo uploads
         if (!empty($photos['photos'])) {
             foreach ($photos['photos'] as $photo) {
-                $path = $photo->store('home_photos', 'public');
+                // Preserve original filename
+                $originalName = $photo->getClientOriginalName();
+                $path = $photo->storeAs('home_photos', $originalName, 'public');
+                
                 $home->images()->create([
                     'image_path' => $path,
                     'status' => true,
