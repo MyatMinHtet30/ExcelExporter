@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Support\Facades\Storage;
 
 class CondoController extends Controller
 {
@@ -35,7 +36,7 @@ class CondoController extends Controller
     }
 
     // GET /condos/create
-    public function create()
+    public function create(Request $request)
     {
         App::setLocale(Session::get('locale', config('app.locale')));
 
@@ -54,7 +55,22 @@ class CondoController extends Controller
 
         $nextQuotationNumber = $prefix.$nextNumber;
 
-        return view('pages.createcondo', compact('nextQuotationNumber')); 
+        // Check if we're restoring from preview
+        $restoredData = null;
+        $restoredPhotos = [];
+        
+        if ($request->has('restore') && session()->has('condo_preview_form_data')) {
+            $sessionData = session()->get('condo_preview_form_data');
+            $restoredData = $sessionData['form_data'] ?? null;
+            $restoredPhotos = $sessionData['temp_photos'] ?? [];
+            
+            \Log::info('Restoring condo form data from session', [
+                'has_data' => !is_null($restoredData),
+                'photo_count' => count($restoredPhotos)
+            ]);
+        }
+
+        return view('pages.createcondo', compact('nextQuotationNumber', 'restoredData', 'restoredPhotos')); 
     }
 
     // POST /condos (header + details in one submit)
@@ -115,6 +131,41 @@ class CondoController extends Controller
             return $condo;
         });
 
+        // Handle photo uploads
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                // Preserve original filename
+                $originalName = $photo->getClientOriginalName();
+                $path = $photo->storeAs('condo_photos', $originalName, 'public');
+                
+                $condo->images()->create([
+                    'image_path' => $path,
+                    'status' => true,
+                ]);
+            }
+        }
+        
+        // Handle restored photos from preview
+        if ($request->has('restored_photos') && is_array($request->input('restored_photos'))) {
+            foreach ($request->input('restored_photos') as $tempPath) {
+                if ($tempPath && \Storage::disk('public')->exists($tempPath)) {
+                    // Move from temp to permanent location
+                    $filename = basename($tempPath);
+                    $newPath = 'condo_photos/' . $filename;
+                    
+                    \Storage::disk('public')->move($tempPath, $newPath);
+                    
+                    $condo->images()->create([
+                        'image_path' => $newPath,
+                        'status' => true,
+                    ]);
+                }
+            }
+        }
+        
+        // Clean up temp photos from session
+        $this->cleanupTempPhotos();
+
         // go to edit page so user can add/adjust details
         return redirect()
             ->route('condo')
@@ -133,7 +184,7 @@ class CondoController extends Controller
     {
         App::setLocale(Session::get('locale', config('app.locale')));
 
-        $condo->load(['details' => fn($q) => $q->orderBy('no')]);
+        $condo->load(['details' => fn($q) => $q->orderBy('no'), 'images']);
 
         foreach ($condo->details as $detail) {
             $detail->unit = $this->normalizeUnitToKey($detail->unit);
@@ -211,6 +262,17 @@ class CondoController extends Controller
             }
         });
 
+        // Handle photo uploads
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $path = $photo->store('condo_photos', 'public');
+                $condo->images()->create([
+                    'image_path' => $path,
+                    'status' => true,
+                ]);
+            }
+        }
+
         return redirect()->route('condo')->with('success', __('Updated successfully.'));
 
     }
@@ -258,6 +320,22 @@ class CondoController extends Controller
 
     public function preview(Request $request)
     {
+        // DEBUG: Check if photos are in the request
+        \Log::info('Condo Preview - Request debug', [
+            'has_file_photos' => $request->hasFile('photos'),
+            'has_photos_input' => $request->has('photos'),
+            'all_files' => $request->allFiles(),
+            'photos_value' => $request->input('photos'),
+            'content_type' => $request->header('Content-Type'),
+            'method' => $request->method(),
+        ]);
+        
+        // Also log ALL request data to see what's coming through
+        \Log::info('Condo Preview - Full request', [
+            'all_input' => $request->except(['_token']),
+            'files_count' => count($request->allFiles()),
+        ]);
+        
         // Handle language switching for preview
         if ($request->has('preview_locale')) {
             $previewLocale = $request->input('preview_locale');
@@ -337,12 +415,86 @@ class CondoController extends Controller
         // totals (reuse your helper)
         [$total, $vat, $grand] = $this->computeTotals($items);
 
+        // Get photos - handle both existing and newly uploaded
+        $photos = collect();
+        
+        // If editing existing condo, get existing photos
+        if ($condoId) {
+            $model = Condo::with('images')->find($condoId);
+            if ($model) {
+                $existingPhotos = $model->images()->where('status', true)->get();
+                $photos = $photos->merge($existingPhotos);
+                \Log::info('Condo Preview - Existing photos loaded', [
+                    'condo_id' => $condoId,
+                    'photo_count' => $existingPhotos->count()
+                ]);
+            }
+        }
+        
+        // Handle new photo uploads (temporary for preview)
+        $allTempPhotos = [];
+        if ($request->hasFile('photos')) {
+            \Log::info('Condo Preview - New photos uploaded', [
+                'count' => count($request->file('photos'))
+            ]);
+            
+            foreach ($request->file('photos') as $photo) {
+                // Store temporarily for preview
+                $tempPath = $photo->store('temp_photos', 'public');
+                $allTempPhotos[] = $tempPath;
+                
+                // Create a temporary Image model instance (not saved to DB)
+                $tempImage = new \App\Models\Image([
+                    'image_path' => $tempPath,
+                    'status' => true,
+                ]);
+                $tempImage->id = 'temp_' . uniqid();
+                $tempImage->temp = true;
+                $photos->push($tempImage);
+            }
+        }
+        
+        // Handle restored photos from previous preview
+        if ($request->has('restored_photos') && is_array($request->input('restored_photos'))) {
+            \Log::info('Condo Preview - Restored photos', [
+                'count' => count($request->input('restored_photos'))
+            ]);
+            
+            foreach ($request->input('restored_photos') as $tempPath) {
+                if ($tempPath && \Storage::disk('public')->exists($tempPath)) {
+                    if (!in_array($tempPath, $allTempPhotos)) {
+                        $allTempPhotos[] = $tempPath;
+                        
+                        $tempImage = new \App\Models\Image([
+                            'image_path' => $tempPath,
+                            'status' => true,
+                        ]);
+                        $tempImage->id = 'temp_' . uniqid();
+                        $tempImage->temp = true;
+                        $photos->push($tempImage);
+                    }
+                }
+            }
+        }
+
+        \Log::info('Condo Preview - Total photos', [
+            'total_count' => $photos->count(),
+            'photos' => $photos->pluck('image_path')->toArray()
+        ]);
+
+        // Store form data in session for back navigation
+        session()->put('condo_preview_form_data', [
+            'form_data' => $request->except(['photos', '_token']),
+            'temp_photos' => $allTempPhotos,
+            'condo_id' => $condoId,
+        ]);
+
         return view('pages.condopreview', array_merge($header, [
             'rows'  => $rows,
             'total' => $total,
             'vat'   => $vat,
             'grand' => $grand,
-            
+            'photos' => $photos instanceof \Illuminate\Support\Collection ? $photos : collect($photos),
         ]));
     }
 
@@ -350,7 +502,10 @@ class CondoController extends Controller
     {
         App::setLocale(Session::get('locale', config('app.locale')));
 
-        $condo->load(['details' => fn($q) => $q->orderBy('no')]);
+        $condo->load([
+            'details' => fn($q) => $q->orderBy('no'),
+            'images' => fn($q) => $q->where('status', true),
+        ]);
 
         // header data for view
         $header = [
@@ -417,6 +572,7 @@ class CondoController extends Controller
             'total'        => $total,
             'vat'          => $vat,
             'grand'        => $grand,
+            'photos'       => $condo->images,
             'autoDownload' => 'pdf',   
         ]));
     }
@@ -425,7 +581,10 @@ class CondoController extends Controller
     {
         App::setLocale(Session::get('locale', config('app.locale')));
 
-        $condo->load(['details' => fn($q) => $q->orderBy('no')]);
+        $condo->load([
+            'details' => fn($q) => $q->orderBy('no'),
+            'images' => fn($q) => $q->where('status', true),
+        ]);
 
         $header = [
             'customer_name'   => $condo->customer_name,
@@ -491,8 +650,14 @@ class CondoController extends Controller
             'total'        => $total,
             'vat'          => $vat,
             'grand'        => $grand,
+            'photos'       => $condo->images,
             'autoDownload' => 'excel',
             'translations' => [
+                'quotation' => __('Quotation'),
+                'company_address' => __('Address of PITA BUILD Company Limited (Head Office)'),
+                'phone' => __('Phone'),
+                'email' => __('Email'),
+                'taxpayer_number' => __('Taxpayer Identification Number'),
                 'customer_name' => __('Customer Name'),
                 'address' => __('Address'),
                 'job_name' => __('Job Name'),
@@ -511,6 +676,7 @@ class CondoController extends Controller
                 'total' => __('Total'),
                 'tax' => __('Tax (7%)'),
                 'total_price' => __('Total Price'),
+                'photos' => __('Project Photos'),
                 'excel_success' => __('Excel downloaded successfully.'),
                 'download' => __('Download'),
             ],
@@ -556,6 +722,36 @@ class CondoController extends Controller
 
         // fallback: return original raw (so nothing breaks)
         return $raw;
+    }
+    
+    /**
+     * Clean up temporary photos from session
+     */
+    private function cleanupTempPhotos()
+    {
+        if (session()->has('condo_preview_form_data')) {
+            $sessionData = session()->get('condo_preview_form_data');
+            $tempPhotos = $sessionData['temp_photos'] ?? [];
+            
+            foreach ($tempPhotos as $tempPath) {
+                if ($tempPath && \Storage::disk('public')->exists($tempPath)) {
+                    \Storage::disk('public')->delete($tempPath);
+                    \Log::info('Deleted temp photo', ['path' => $tempPath]);
+                }
+            }
+            
+            // Clear the session data
+            session()->forget('condo_preview_form_data');
+        }
+    }
+    
+    /**
+     * Clean up temp photos when user navigates away
+     */
+    public function cleanupSession(Request $request)
+    {
+        $this->cleanupTempPhotos();
+        return response()->json(['success' => true]);
     }
 
 

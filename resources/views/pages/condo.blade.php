@@ -111,6 +111,17 @@
             </div>
         </div> <!-- /row -->
     </div> <!-- /xp-contentbar -->
+    <iframe id="condo-export-frame"
+        style="
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            border: none;
+            visibility: hidden;
+        ">
+    </iframe>
 @endsection
 
 @push('scripts')
@@ -128,6 +139,25 @@
     <script src="{{ asset('assets/plugins/datatables/vfs_fonts.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables/buttons.html5.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/datatables/buttons.print.min.js') }}"></script>
+    
+    <script>
+    // Clean up temp photos when landing on condo list page
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('{{ route("condo.cleanup") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log('Temp photos cleaned up');
+            }
+        }).catch(error => {
+            console.error('Cleanup error:', error);
+        });
+    });
+    </script>
     <script src="{{ asset('assets/plugins/datatables/buttons.colVis.min.js') }}"></script>
 
     <!-- Responsive -->
@@ -212,6 +242,8 @@
     <script>
         function exportCondoPdf(condoId) {
             const iframe = document.getElementById('condo-export-frame');
+            const url = '{{ route('condo.export.pdf', ':id') }}'.replace(':id', condoId);
+            iframe.src = url;
 
             Swal.fire({
                 icon: 'success',
@@ -220,13 +252,12 @@
                 timer: 2000,
                 showConfirmButton: false
             });
-
-            const url = '{{ route('condo.export.pdf', ':id') }}'.replace(':id', condoId);
-            iframe.src = url;
         }
 
         function exportCondoExcel(condoId) {
             const iframe = document.getElementById('condo-export-frame');
+            const url = '{{ route('condo.export.excel', ':id') }}'.replace(':id', condoId);
+            iframe.src = url;
 
             Swal.fire({
                 icon: 'success',
@@ -235,9 +266,6 @@
                 timer: 2000,
                 showConfirmButton: false
             });
-
-            const url = '{{ route('condo.export.excel', ':id') }}'.replace(':id', condoId);
-            iframe.src = url;
         }
     </script>
 @endpush

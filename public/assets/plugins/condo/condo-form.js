@@ -133,6 +133,7 @@
       const tax   = total * 0.07;
       const grand = total + tax;
 
+      // Desktop displays
       const totalEl = document.getElementById('totalDisplay');
       const taxEl   = document.getElementById('taxDisplay');
       const grandEl = document.getElementById('totalPriceDisplay');
@@ -140,6 +141,15 @@
       if (totalEl) totalEl.textContent = formatNumber(total);
       if (taxEl)   taxEl.textContent   = formatNumber(tax);
       if (grandEl) grandEl.textContent = formatNumber(grand);
+
+      // Mobile displays
+      const totalElMobile = document.getElementById('totalDisplayMobile');
+      const taxElMobile   = document.getElementById('taxDisplayMobile');
+      const grandElMobile = document.getElementById('totalPriceDisplayMobile');
+
+      if (totalElMobile) totalElMobile.textContent = formatNumber(total);
+      if (taxElMobile)   taxElMobile.textContent   = formatNumber(tax);
+      if (grandElMobile) grandElMobile.textContent = formatNumber(grand);
     }
 
     function recalcAll() {
@@ -157,6 +167,25 @@
       reindexRows();
       recalcAll();
     });
+
+    // Mobile add row button
+    const addRowBtnMobile = document.getElementById('add-row-btn-mobile');
+    if (addRowBtnMobile) {
+      addRowBtnMobile.addEventListener('click', () => {
+        const current = rowsContainer.querySelectorAll('.item-row').length;
+        const html = tplHtml
+          .replaceAll('__INDEX__', current)
+          .replaceAll('__SERIAL__', current + 1);
+        rowsContainer.insertAdjacentHTML('beforeend', html);
+        reindexRows();
+        recalcAll();
+        // Scroll to the new row
+        const newRow = rowsContainer.querySelector('.item-row:last-child');
+        if (newRow) {
+          newRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }
 
     rowsContainer.addEventListener('click', (e) => {
       const btn = e.target.closest('.remove-row');

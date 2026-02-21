@@ -156,6 +156,62 @@
       .no-print{ display:none !important; width: 1180px; }
        
     }
+
+    /* Photo Gallery Styles */
+    .photo-gallery-wrap {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+    
+    .photo-item img {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+    
+    .photo-grid {
+      display: grid !important;
+      grid-template-columns: repeat(5, 1fr) !important;
+      gap: 8px !important;
+    }
+    
+    @media print {
+      .photo-gallery-wrap {
+        page-break-before: always;
+        margin-top: 0;
+      }
+      
+      .photo-grid {
+        display: grid !important;
+        gap: 5px !important;
+      }
+      
+      .photo-item {
+        border: 1px solid #000 !important;
+        break-inside: avoid;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .photo-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px;
+      }
+      
+      .photo-item {
+        width: auto !important;
+        height: 120px !important;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .photo-grid {
+        grid-template-columns: 1fr !important;
+      }
+      
+      .photo-item {
+        height: 200px !important;
+      }
+    }
     
   </style>
 </head>
@@ -315,8 +371,89 @@
     </div>
   </div>
 
+  {{-- Photo Gallery Section --}}
+  @php
+    \Log::info('Condo Preview Blade - Photos variable', [
+        'isset' => isset($photos),
+        'is_collection' => isset($photos) && $photos instanceof \Illuminate\Support\Collection,
+        'count' => isset($photos) ? (is_countable($photos) ? count($photos) : 'not countable') : 'not set',
+        'type' => isset($photos) ? gettype($photos) : 'not set'
+    ]);
+  @endphp
+  
+
+  @if($photos && count($photos) > 0)
+    <div class="photo-gallery-wrap" style="width: var(--w); margin: 20px auto; background: #fff; border: 2px solid #000; padding: 20px; position: relative; page-break-inside: avoid;">
+      
+      @php
+        $portraitPhotos = [];
+        $landscapePhotos = [];
+        
+        foreach($photos as $photo) {
+          // Try public_path first (for symlinked storage)
+          $imagePath = public_path('storage/' . $photo->image_path);
+          
+          // If not found, try storage_path (for temp files before symlink)
+          if (!file_exists($imagePath)) {
+            $imagePath = storage_path('app/public/' . $photo->image_path);
+          }
+          
+          if (file_exists($imagePath)) {
+            $imageSize = @getimagesize($imagePath);
+            if ($imageSize) {
+              $width = $imageSize[0];
+              $height = $imageSize[1];
+              
+              if ($height > $width) {
+                $portraitPhotos[] = $photo;
+              } else {
+                $landscapePhotos[] = $photo;
+              }
+            } else {
+              // If getimagesize fails, default to landscape
+              $landscapePhotos[] = $photo;
+            }
+          } else {
+            // File not found, default to landscape
+            $landscapePhotos[] = $photo;
+          }
+        }
+      @endphp
+      
+      {{-- Portrait Photos (bigger size - 4 per row) --}}
+      @if(count($portraitPhotos) > 0)
+        <div class="portrait-photos" style="margin-bottom: 15px;">
+          <div class="photo-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+            @foreach($portraitPhotos as $photo)
+              <div class="photo-item" style="width: 2in; height: 2.67in; border: 1px solid #000; overflow: hidden; position: relative; z-index: 10;">
+                <img src="{{ asset('storage/' . $photo->image_path) }}" 
+                     alt="Portrait Photo" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+            @endforeach
+          </div>
+        </div>
+      @endif
+      
+      {{-- Landscape Photos (bigger size - 4 per row) --}}
+      @if(count($landscapePhotos) > 0)
+        <div class="landscape-photos">
+          <div class="photo-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+            @foreach($landscapePhotos as $photo)
+              <div class="photo-item" style="width: 2.4in; height: 1.6in; border: 1px solid #000; overflow: hidden; position: relative; z-index: 10;">
+                <img src="{{ asset('storage/' . $photo->image_path) }}" 
+                     alt="Landscape Photo" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+            @endforeach
+          </div>
+        </div>
+      @endif
+    </div>
+  @endif
+
   <div class="no-print btn-footer">
-    <button type="button" onclick="window.history.back()" class="btn-lg">Cancel</button>
+    <button type="button" onclick="goBackToCondoForm()" class="btn-lg">Cancel</button>
     <button type="button" onclick="downloadCondoExcel()" class="btn-lg">Download Excel</button>
     <button type="button" onclick="downloadCondoPdf()" class="btn-lg">Download PDF</button>
   </div>
@@ -330,6 +467,20 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+function goBackToCondoForm() {
+    @php
+        $condoId = request()->input('condo_id') ?? (session()->get('condo_preview_form_data')['condo_id'] ?? null);
+    @endphp
+    
+    @if($condoId)
+        // Editing existing condo
+        window.location.href = '{{ route("condo.edit", ":id") }}'.replace(':id', '{{ $condoId }}') + '?restore=1';
+    @else
+        // Creating new condo
+        window.location.href = '{{ route("condo.create") }}?restore=1';
+    @endif
+}
+
 (function(){
   function bahtText(n){
     n = (typeof n === 'number') ? n : parseFloat(String(n).replace(/,/g,''));
@@ -393,6 +544,8 @@ async function toBase64(url) {
 async function downloadCondoExcel() {
   // Get localized labels from server
   const t = @json($translations ?? []);
+  const storageBaseUrl = @json(asset('storage'));
+  const photos = @json(collect($photos ?? [])->pluck('image_path')->values()->all());
   
   Swal.fire({
     icon: 'success',
@@ -469,7 +622,7 @@ async function downloadCondoExcel() {
   const ANG22B = { name:'Angsana New', size:22, bold:true };
 
   const wb = new ExcelJS.Workbook();
-  const ws = wb.addWorksheet(labels.quotation || 'Quotation', {
+  const ws = wb.addWorksheet(t.quotation || 'Quotation', {
     views: [{ state:'normal', showGridLines:false }],
     properties: { defaultRowHeight: 22 }
   });
@@ -483,15 +636,15 @@ async function downloadCondoExcel() {
   ];
   const M = (a1,a2) => ws.mergeCells(`${a1}:${a2}`);
 
-  ws.getCell('B2').value = labels.company_address || 'Address of PITA BUILD Company Limited (Head Office)';
+  ws.getCell('B2').value = t.company_address || 'Address of PITA BUILD Company Limited (Head Office)';
   ws.getCell('B3').value = '32/20 Village No. 6, Bang Talat Subdistrict, Pak Kret District, Nonthaburi Province 11120';
-  ws.getCell('B4').value = (labels.phone || 'Phone') + ' : 062-604-2054 , 086-901-2500                ' + (labels.email || 'Email') + ' : k.tanapon191@gmail.com';
-  ws.getCell('B5').value = (labels.taxpayer_number || 'Taxpayer Identification Number') + ' 0125565022982';
+  ws.getCell('B4').value = (t.phone || 'Phone') + ' : 062-604-2054 , 086-901-2500                ' + (t.email || 'Email') + ' : k.tanapon191@gmail.com';
+  ws.getCell('B5').value = (t.taxpayer_number || 'Taxpayer Identification Number') + ' 0125565022982';
   styleRange(ws,2,2,5,2,{font:ANG22B, alignment:{ vertical:'middle' }});
   ws.getRow(2).height = 26;
 
   M('D7','H7');
-  ws.getCell('D7').value = 'ใบเสนอราคา / ' + (labels.quotation || 'Quotation');
+  ws.getCell('D7').value = 'ใบเสนอราคา / ' + (t.quotation || 'Quotation');
   styleRange(ws,7,4,7,8,{font:ANG22B, alignment:{horizontal:'center', vertical:'middle'},
                          border:{top:{style:'thin'},bottom:{style:'thin'},left:{style:'thin'},right:{style:'thin'}}});
 
@@ -695,6 +848,7 @@ async function downloadCondoExcel() {
 
   const sigLine = sigHead + 1;
   const dateLine= sigHead + 2;
+  let printEndRow = dateLine + 1;
   function makeSig(from,to){
     M(`${from}${sigLine}`,`${to}${sigLine}`);
     ws.getCell(`${from}${sigLine}`).value = '( ........................................ )';
@@ -704,12 +858,81 @@ async function downloadCondoExcel() {
   makeSig('B','D'); makeSig('F','H'); makeSig('J','L');
   styleRange(ws,sigLine,2,dateLine,12,{font:ANG16, alignment:{horizontal:'center'}});
 
+  const getImageMeta = (imagePath) => {
+    const lower = String(imagePath || '').toLowerCase();
+    if (lower.endsWith('.png')) return { ext: 'png', mime: 'image/png' };
+    if (lower.endsWith('.gif')) return { ext: 'gif', mime: 'image/gif' };
+    return { ext: 'jpeg', mime: 'image/jpeg' };
+  };
+
+  if (photos.length > 0) {
+    let photoRow = dateLine + 4;
+    M(`A${photoRow}`, `L${photoRow}`);
+    ws.getCell(`A${photoRow}`).value = t.photos || 'Project Photos';
+    styleRange(ws, photoRow, 1, photoRow, 12, { font: { ...ANG18, bold: true }, alignment: { horizontal: 'left' } });
+    photoRow += 1;
+
+    const colPositions = [1, 3.8, 6.6, 9.4];
+    const portrait = [];
+    const landscape = [];
+
+    for (const imagePath of photos) {
+      try {
+        const img = new Image();
+        img.src = `${storageBaseUrl}/${imagePath}`;
+        await new Promise((resolve) => {
+          img.onload = resolve;
+          img.onerror = resolve;
+          setTimeout(resolve, 5000);
+        });
+
+        if (img.naturalHeight > img.naturalWidth) portrait.push(imagePath);
+        else landscape.push(imagePath);
+      } catch (_) {
+        landscape.push(imagePath);
+      }
+    }
+
+    const renderGroup = async (list, width, height, rowStep) => {
+      for (let i = 0; i < list.length; i += 4) {
+        const chunk = list.slice(i, i + 4);
+        for (let j = 0; j < chunk.length; j++) {
+          const imagePath = chunk[j];
+          try {
+            const base64 = await toBase64(`${storageBaseUrl}/${imagePath}`);
+            if (!base64) continue;
+
+            const metaImg = getImageMeta(imagePath);
+            const imgId = wb.addImage({
+              base64: `data:${metaImg.mime};base64,${base64}`,
+              extension: metaImg.ext,
+            });
+
+            ws.addImage(imgId, {
+              tl: { col: colPositions[j], row: photoRow },
+              ext: { width, height },
+              editAs: 'absolute',
+            });
+          } catch (_) {
+            // Skip image conversion failures
+          }
+        }
+        photoRow += rowStep;
+      }
+    };
+
+    await renderGroup(portrait, 170, 227, 12);
+    if (portrait.length > 0 && landscape.length > 0) photoRow += 1;
+    await renderGroup(landscape, 200, 133, 8.5);
+    printEndRow = Math.max(printEndRow, Math.ceil(photoRow + 1));
+  }
+
   ws.pageSetup = {
     paperSize: 9, orientation:'portrait',
     fitToPage:true, fitToWidth:1, fitToHeight:0,
     margins:{left:0.3,right:0.3,top:0.5,bottom:0.5,header:0.3,footer:0.3}
   };
-  ws.pageSetup.printArea = `A1:M${dateLine+1}`;
+  ws.pageSetup.printArea = `A1:M${printEndRow}`;
 
   // ---- save -----------------------------------------------------------------
   const buf = await wb.xlsx.writeBuffer();
@@ -735,39 +958,93 @@ async function downloadCondoPdf() {
 
   const pageEl = document.querySelector('.page');
   if (!pageEl) return;
+  const tempWrapper = document.createElement('div');
+  tempWrapper.style.cssText = 'background:#fff;padding:20px;font-family:Times New Roman, serif;';
 
-  const canvas = await html2canvas(pageEl, {
-    scale: 3,
-    useCORS: true,
-    backgroundColor: '#ffffff',
-    scrollX: 0,
-    scrollY: -window.scrollY
-  });
+  const pageClone = pageEl.cloneNode(true);
+  tempWrapper.appendChild(pageClone);
 
-  const imgData = canvas.toDataURL('image/jpeg', 0.7); 
+  const photoGallery = document.querySelector('.photo-gallery-wrap');
+  if (photoGallery) {
+    const photoClone = photoGallery.cloneNode(true);
+    photoClone.style.marginTop = '30px';
+    
+    // Ensure consistent photo sizing in PDF (match preview display)
+    photoClone.querySelectorAll('.portrait-photos .photo-item').forEach((item) => {
+      item.style.setProperty('width', '2in', 'important');
+      item.style.setProperty('height', '2.67in', 'important');
+    });
+    photoClone.querySelectorAll('.landscape-photos .photo-item').forEach((item) => {
+      item.style.setProperty('width', '2.4in', 'important');
+      item.style.setProperty('height', '1.6in', 'important');
+    });
+    photoClone.querySelectorAll('.photo-grid').forEach((grid) => {
+      grid.style.setProperty('grid-template-columns', 'repeat(4, minmax(0, 1fr))', 'important');
+      grid.style.setProperty('gap', '10px', 'important');
+    });
+    
+    tempWrapper.appendChild(photoClone);
+  }
 
-  const pdf = new jsPDF('portrait', 'mm', 'a4');
-  const pageWidth  = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
+  tempWrapper.style.position = 'absolute';
+  tempWrapper.style.left = '-9999px';
+  tempWrapper.style.top = '0';
+  document.body.appendChild(tempWrapper);
 
-  const imgWidth  = canvas.width;
-  const imgHeight = canvas.height;
+  let pdf = null;
+  try {
+    const images = tempWrapper.querySelectorAll('img');
+    const waits = Array.from(images).map((img) => new Promise((resolve) => {
+      if (img.complete) return resolve();
+      img.onload = resolve;
+      img.onerror = resolve;
+      setTimeout(resolve, 10000);
+    }));
+    await Promise.all(waits);
 
-  const targetWidth  = pageWidth * 0.98;
-  const ratio        = targetWidth / imgWidth;
-  const targetHeight = imgHeight * ratio;
+    const canvas = await html2canvas(tempWrapper, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: 0,
+      logging: false,
+      imageTimeout: 15000
+    });
 
-  const x = (pageWidth - targetWidth) / 2;
-  const y = 5;
+    const imgData = canvas.toDataURL('image/jpeg', 0.8);
+    pdf = new jsPDF('portrait', 'mm', 'a4');
 
-  pdf.addImage(imgData, 'JPEG', x, y, targetWidth, targetHeight, undefined, 'FAST');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const renderWidth = pageWidth * 0.95;
+    const renderHeight = (canvas.height * renderWidth) / canvas.width;
+
+    let heightLeft = renderHeight;
+    let position = 10;
+
+    pdf.addImage(imgData, 'JPEG', (pageWidth - renderWidth) / 2, position, renderWidth, renderHeight, undefined, 'FAST');
+    heightLeft -= (pageHeight - 20);
+
+    while (heightLeft > 0) {
+      pdf.addPage();
+      position = heightLeft - renderHeight + 10;
+      pdf.addImage(imgData, 'JPEG', (pageWidth - renderWidth) / 2, position, renderWidth, renderHeight, undefined, 'FAST');
+      heightLeft -= (pageHeight - 20);
+    }
+  } finally {
+    document.body.removeChild(tempWrapper);
+  }
 
   const safe = s => String(s || '').replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ').trim();
   const job  = safe(@json($job_name ?? 'Condo'));
   const addr = safe(@json($address ?? ''));
   const filename = addr ? `${job} (${addr}).pdf` : `${job}.pdf`;
 
-  pdf.save(filename);
+  if (pdf) {
+    pdf.save(filename);
+  }
 }
 
 </script>

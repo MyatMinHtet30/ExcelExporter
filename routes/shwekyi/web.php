@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
         Route::match(['put','patch'],'/{condo}', [CondoController::class, 'update'])->name('condo.update'); // 👈
         Route::delete('/{condo}',     [CondoController::class, 'destroy'])->name('condo.destroy');// delete
         Route::post('/preview', [CondoController::class, 'preview'])->name('condo.preview');
+        Route::post('/cleanup-session', [CondoController::class, 'cleanupSession'])->name('condo.cleanup');
 
     });
 

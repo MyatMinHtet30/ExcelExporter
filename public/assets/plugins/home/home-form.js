@@ -866,6 +866,7 @@ document.addEventListener('DOMContentLoaded', function() {
             updatePhotosInput();
         }
         
+        // Render photo item - Updated to match condo format v2.0
         function renderPhotoItem(photo) {
             const photoItem = document.createElement('div');
             photoItem.className = 'photo-list-item';
@@ -874,13 +875,22 @@ document.addEventListener('DOMContentLoaded', function() {
             photoItem.innerHTML = `
                 <div class="photo-name" title="${photo.name}">
                     <i class="fas fa-image me-1 text-primary"></i>
-                    ${truncateFileName(photo.name)}
+                    ${photo.name}
                 </div>
-                <div class="photo-size">${photo.size}</div>
-                <button type="button" class="photo-remove" onclick="removePhoto('${photo.id}')" title="Delete All Photos">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="btn btn-sm btn-danger delete-photo-btn" data-photo-id="${photo.id}" title="Delete photo">
+                    <i class="fas fa-trash"></i>
                 </button>
             `;
+            
+            // Add delete button event listener
+            const deleteBtn = photoItem.querySelector('.delete-photo-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    removePhoto(photo.id);
+                });
+            }
             
             if (photoList) photoList.appendChild(photoItem);
         }
