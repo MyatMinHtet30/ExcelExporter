@@ -239,6 +239,211 @@
     }
 }
 
+/* iPad-specific styling (768px to 1024px) */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .photo-upload-area {
+        padding: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 2px dashed #007bff;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .photo-upload-area:hover,
+    .photo-upload-area.drag-over {
+        border-color: #0056b3;
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(0, 123, 255, 0.15);
+    }
+    
+    .photo-upload-icon {
+        font-size: 64px;
+        color: #007bff;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+    }
+    
+    .photo-upload-area h5 {
+        color: #007bff;
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .photo-upload-area p {
+        color: #6c757d;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    
+    .photo-upload-area p.small {
+        font-size: 14px;
+        color: #868e96;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+    
+    .photo-counter {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .photo-counter i {
+        font-size: 18px;
+    }
+    
+    .delete-all-btn {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 50% !important;
+        width: 32px !important;
+        height: 32px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        font-size: 16px !important;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    .delete-all-btn:hover {
+        background: linear-gradient(135deg, #c82333 0%, #bd2130 100%) !important;
+        transform: scale(1.1) !important;
+        box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4) !important;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    }
+    
+    .photo-list-item {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .photo-list-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+    }
+    
+    .photo-name {
+        font-size: 15px;
+        font-weight: 500;
+        max-width: 300px;
+    }
+    
+    .photo-size {
+        font-size: 14px;
+        color: #6c757d;
+        margin: 0 15px;
+    }
+    
+    .photo-remove {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .photo-remove:hover {
+        background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+    }
+    
+    .upload-loading {
+        padding: 30px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        margin-top: 20px;
+    }
+    
+    .upload-progress {
+        height: 10px;
+        background: #e9ecef;
+        border-radius: 5px;
+        margin-top: 20px;
+        overflow: hidden;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .upload-progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #007bff, #0056b3, #007bff);
+        background-size: 200% 100%;
+        animation: shimmer 2s ease-in-out infinite;
+        border-radius: 5px;
+    }
+    
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+    
+    .format-badge {
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-left: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .new-photos-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: 1px solid #dee2e6;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .existing-photos-list {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        border: 1px solid #c3e6cb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.1);
+    }
+}
+
 /* Loading spinner */
 .spinner-border {
     width: 2rem;

@@ -756,6 +756,40 @@ if (mobileAddBtn) {
     mobileAddBtn.addEventListener('click', addRow);
 }
 
+// Handle iPad grid button
+const iPadGridAddBtn = document.getElementById('add-row-btn-ipad');
+if (iPadGridAddBtn) {
+    iPadGridAddBtn.addEventListener('click', addRow);
+}
+
+// Handle iPad floating button
+const iPadFabAddBtn = document.getElementById('ipad-add-row-fab');
+if (iPadFabAddBtn) {
+    iPadFabAddBtn.addEventListener('click', addRow);
+    
+    // Show iPad FAB when page loads and when scrolling in rows area
+    function showiPadFab() {
+        iPadFabAddBtn.classList.add('show');
+    }
+    
+    // Show after a short delay for smooth entrance
+    setTimeout(showiPadFab, 1000);
+    
+    // Also show when user scrolls near the rows area
+    const rowsContainer = document.getElementById('rows-container');
+    if (rowsContainer) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    showiPadFab();
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        observer.observe(rowsContainer);
+    }
+}
+
 // Legacy support for edit page button
 const editAddBtn = document.getElementById('add-row-btn-edit');
 if (editAddBtn) {

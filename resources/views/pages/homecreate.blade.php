@@ -347,129 +347,261 @@
                     </div>
                 </div>
                 <!-- ===== Mobile View Only (NEW - shows below rows) ===== -->
-                <div class="col-12 d-md-none">
-                    <!-- 1. Mobile Add Row Button (FIRST) -->
-                    <div class="form-section mt-3">
+                <div class="col-12 mobile-photo-section">
+                    <!-- Mobile Add Row Button - Standalone (no grid/container) -->
+                    <div class="mobile-add-row-only">
                         <div class="text-center">
-                            <button type="button" class="btn btn-primary btn-lg w-100" id="add-row-btn-mobile">
+                            <button type="button" class="btn btn-primary btn-lg" id="add-row-btn-mobile">
                                 <i class="fas fa-plus-circle me-2"></i>{{ __('Add New Item') }}
                             </button>
                         </div>
                     </div>
+                    
+                    <!-- Mobile Photo Upload Section -->
+                    <div class="mobile-photo-upload">
+                        <div class="form-section">
+                            <div class="card shadow-sm">
+                                <div class="btn_div card-header bg-primary text-white">
+                                    <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="photo-upload-area" id="photo-upload-area">
+                                        <div class="photo-upload-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <h5>{{ __('Upload Project Photos') }}</h5>
+                                        <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
+                                        <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
+                                        
+                                        <!-- Photo counter -->
+                                        <div class="photo-counter" id="photo-counter">
+                                            <i class="fas fa-images me-1"></i>
+                                            <span id="photo-count">0</span> {{ __('photos selected') }}
+                                        </div>
+                                        
+                                        <!-- Delete All Photos Button -->
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
 
-                    <!-- 2. Mobile Calculation Summary (SECOND) -->
-                    <div class="form-section mt-3">
-                        <div class="card shadow-sm">
-                            <div class="btn_div card-header bg-primary text-white">
-                                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>{{ __('Cost Summary') }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="summary-row">
-                                    <div class="summary-label">{{ __('Total') }}:</div>
-                                    <div class="summary-value" id="miscDisplayMobile">0.00</div>
-                                </div>
-                                <div class="summary-row">
-                                    <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
-                                    <div class="summary-value" id="operatingDisplayMobile">0.00</div>
-                                </div>
-                                <div class="summary-row">
-                                    <div class="summary-label">{{ __('Category A,B Total') }}:</div>
-                                    <div class="summary-value" id="abDisplayMobile">0.00</div>
-                                </div>
-                                <div class="summary-row">
-                                    <div class="summary-label">{{ __('VAT (7%)') }}:</div>
-                                    <div class="summary-value" id="vatDisplayMobile">0.00</div>
-                                </div>
-                                <div class="summary-row total-row" >
-                                    <div class="summary-label" style="font-size:18px; color: #28a745;">{{ __('Total Price') }}:</div>
-                                    <div class="summary-value total-value" id="finalDisplayMobile">0.00</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 3. Photo Upload Section (THIRD - NEW) -->
-                    <div class="form-section mt-3">
-                        <div class="card shadow-sm">
-                            <div class="btn_div card-header bg-primary text-white">
-                                <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="photo-upload-area" id="photo-upload-area">
-                                    <div class="photo-upload-icon">
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                    </div>
-                                    <h5>{{ __('Upload Project Photos') }}</h5>
-                                    <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
-                                    <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
-                                    <!-- <p class="text-success small mb-2">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        {{ __('Now supports large HEIC files! Upload 10+ photos at once (up to 5GB total).') }}
-                                    </p> -->
-                                    
-                                    <!-- Photo counter -->
-                                    <div class="photo-counter" id="photo-counter">
-                                        <i class="fas fa-images me-1"></i>
-                                        <span id="photo-count">0</span> {{ __('photos selected') }}
-                                    </div>
-                                    
-                                    <!-- Delete All Photos Button (moved outside hidden section) -->
-                                    <div class="d-flex justify-content-end mb-2">
-                                        <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
-                                            <i class="fas fa-times"></i>
+                                        <!-- New photos list (hidden) -->
+                                        <div class="new-photos-section" id="new-photos-section" style="display: none;">
+                                            <div class="photo-list" id="photo-list" style="display: none;"></div>
+                                        </div>
+                                        
+                                        <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
+                                        <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
+                                            <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
                                         </button>
                                     </div>
-
-                                    <!-- New photos list (hidden) -->
-                                    <div class="new-photos-section" id="new-photos-section" style="display: none;">
-                                        <div class="photo-list" id="photo-list" style="display: none;"></div>
-                                    </div>
                                     
-                                    <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
-                                    <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
-                                        <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
-                                    </button>
-                                </div>
-                                
-                                <!-- Upload Progress -->
-                                <div class="upload-loading" id="upload-loading">
-                                    <div class="spinner-border text-primary" role="status">
-                                    </div>
-                                    <div class="upload-progress">
-                                        <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                                    <!-- Upload Progress -->
+                                    <div class="upload-loading" id="upload-loading">
+                                        <div class="spinner-border text-primary" role="status">
+                                        </div>
+                                        <div class="upload-progress">
+                                            <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                                        </div>
                                     </div>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
 
-                    <!-- 4. Mobile Action Buttons (FOURTH) -->
-                    <div class="form-section mt-3">
-                        <h5 class="btn_div form-section-title">
-                            <i class="fas fa-tasks me-2"></i>{{ __('Actions') }}
-                        </h5>
-                        <div class="card shadow-sm">
-                            <div class="card-body">
-                                <div class="btn-group-vertical w-100" role="group">
-                                    <button type="submit" class="btn btn-primary btn-lg mb-3" formaction="{{ route('home.preview') }}">
-                                        <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
-                                    </button>
-                                    
-                                    <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn-mobile">
-                                        <i class="fas fa-file-excel me-2"></i>{{ __('Create') }}
-                                    </button>
-                                    
-                                    <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
-                                        <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
-                                    </a>
+                    <!-- Mobile Cost Summary -->
+                    <div class="mobile-cost-summary">
+                        <div class="form-section">
+                            <div class="card shadow-sm">
+                                <div class="btn_div card-header bg-primary text-white">
+                                    <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>{{ __('Cost Summary') }}</h5>
                                 </div>
-                                
-                                <div class="mt-3 text-center">
-                                    <small class="text-muted">
-                                        <i class="fas fa-info-circle me-1"></i>
-                                        {{ __('Click Preview to review before generating') }}
-                                    </small>
+                                <div class="card-body">
+                                    <div class="summary-row">
+                                        <div class="summary-label">{{ __('Total') }}:</div>
+                                        <div class="summary-value" id="miscDisplayMobile">0.00</div>
+                                    </div>
+                                    <div class="summary-row">
+                                        <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
+                                        <div class="summary-value" id="operatingDisplayMobile">0.00</div>
+                                    </div>
+                                    <div class="summary-row">
+                                        <div class="summary-label">{{ __('Category A,B Total') }}:</div>
+                                        <div class="summary-value" id="abDisplayMobile">0.00</div>
+                                    </div>
+                                    <div class="summary-row">
+                                        <div class="summary-label">{{ __('VAT (7%)') }}:</div>
+                                        <div class="summary-value" id="vatDisplayMobile">0.00</div>
+                                    </div>
+                                    <div class="summary-row total-row" >
+                                        <div class="summary-label" style="font-size:18px; color: #28a745;">{{ __('Total Price') }}:</div>
+                                        <div class="summary-value total-value" id="finalDisplayMobile">0.00</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Action Buttons -->
+                    <div class="mobile-action-buttons">
+                        <div class="form-section">
+                            <h5 class="btn_div form-section-title">
+                                <i class="fas fa-tasks me-2"></i>{{ __('Actions') }}
+                            </h5>
+                            <div class="card shadow-sm">
+                                <div class="card-body">
+                                    <div class="btn-group-vertical w-100" role="group">
+                                        <button type="submit" class="btn btn-primary btn-lg mb-3" formaction="{{ route('home.preview') }}">
+                                            <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
+                                        </button>
+                                        
+                                        <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn-mobile">
+                                            <i class="fas fa-file-excel me-2"></i>{{ __('Create') }}
+                                        </button>
+                                        
+                                        <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
+                                            <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
+                                        </a>
+                                    </div>
+                                    
+                                    <div class="mt-3 text-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            {{ __('Click Preview to review before generating') }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- iPad-specific 2-column layout -->
+                    <div class="ipad-layout">
+                        <!-- Left Column: Add Row + Photo Upload -->
+                        <div class="ipad-left-column">
+                            <!-- iPad Add Row Button - Standalone Above Photo Section -->
+                            <div class="ipad-add-row-above-photo">
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-primary btn-lg ipad-add-row-btn" id="add-row-btn-ipad">
+                                        <i class="fas fa-plus-circle me-2"></i>{{ __('Add New Item') }}
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Photo Upload Section -->
+                            <div class="form-section">
+                                <div class="card shadow-sm">
+                                    <div class="btn_div card-header bg-primary text-white">
+                                        <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="photo-upload-area" id="photo-upload-area">
+                                            <div class="photo-upload-icon">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                            </div>
+                                            <h5>{{ __('Upload Project Photos') }}</h5>
+                                            <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
+                                            <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
+                                            
+                                            <!-- Photo counter -->
+                                            <div class="photo-counter" id="photo-counter">
+                                                <i class="fas fa-images me-1"></i>
+                                                <span id="photo-count">0</span> {{ __('photos selected') }}
+                                            </div>
+                                            
+                                            <!-- Delete All Photos Button -->
+                                            <div class="d-flex justify-content-end mb-2">
+                                                <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- New photos list (hidden) -->
+                                            <div class="new-photos-section" id="new-photos-section" style="display: none;">
+                                                <div class="photo-list" id="photo-list" style="display: none;"></div>
+                                            </div>
+                                            
+                                            <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
+                                            <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
+                                                <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Upload Progress -->
+                                        <div class="upload-loading" id="upload-loading">
+                                            <div class="spinner-border text-primary" role="status">
+                                            </div>
+                                            <div class="upload-progress">
+                                                <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Summary + Actions Only -->
+                        <div class="ipad-right-column">
+                            <!-- 1. Calculation Summary -->
+                            <div class="form-section">
+                                <div class="card shadow-sm">
+                                    <div class="btn_div card-header bg-primary text-white">
+                                        <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>{{ __('Cost Summary') }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="summary-row">
+                                            <div class="summary-label">{{ __('Total') }}:</div>
+                                            <div class="summary-value" id="miscDisplayMobile">0.00</div>
+                                        </div>
+                                        <div class="summary-row">
+                                            <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
+                                            <div class="summary-value" id="operatingDisplayMobile">0.00</div>
+                                        </div>
+                                        <div class="summary-row">
+                                            <div class="summary-label">{{ __('Category A,B Total') }}:</div>
+                                            <div class="summary-value" id="abDisplayMobile">0.00</div>
+                                        </div>
+                                        <div class="summary-row">
+                                            <div class="summary-label">{{ __('VAT (7%)') }}:</div>
+                                            <div class="summary-value" id="vatDisplayMobile">0.00</div>
+                                        </div>
+                                        <div class="summary-row total-row" >
+                                            <div class="summary-label" style="font-size:18px; color: #28a745;">{{ __('Total Price') }}:</div>
+                                            <div class="summary-value total-value" id="finalDisplayMobile">0.00</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Action Buttons -->
+                            <div class="form-section">
+                                <h5 class="btn_div form-section-title">
+                                    <i class="fas fa-tasks me-2"></i>{{ __('Actions') }}
+                                </h5>
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="btn-group-vertical w-100" role="group">
+                                            <button type="submit" class="btn btn-primary btn-lg mb-3" formaction="{{ route('home.preview') }}">
+                                                <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
+                                            </button>
+                                            
+                                            <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn-mobile">
+                                                <i class="fas fa-file-excel me-2"></i>{{ __('Create') }}
+                                            </button>
+                                            
+                                            <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
+                                                <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
+                                            </a>
+                                        </div>
+                                        
+                                        <div class="mt-3 text-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                {{ __('Click Preview to review before generating') }}
+                                            </small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -479,6 +611,12 @@
             </div>
                 <div id="fab-btn" class="fab-btn">
                     <i id="fab-icon" class="fas fa-plus"></i>
+                </div>
+                
+                <!-- iPad Floating Add Row Button -->
+                <div id="ipad-add-row-fab" class="ipad-add-row-fab">
+                    <i class="fas fa-plus"></i>
+                    <span class="fab-text">{{ __('Add Row') }}</span>
                 </div>
         </div>
     </form>
