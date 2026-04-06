@@ -137,9 +137,9 @@
                                                 {{ __('168 Home company') }}
                                             </option>
 
-                                            <option value="{{ __('Pi Kaew company') }}"
-                                                {{ old('trooper', $home->trooper) === __('Pi Kaew company') ? 'selected' : '' }}>
-                                                {{ __('Pi Kaew company') }}
+                                            <option value="{{ __('Pi Kaew') }}"
+                                                {{ old('trooper', $home->trooper) === __('Pi Kaew') ? 'selected' : '' }}>
+                                                {{ __('Pi Kaew') }}
                                             </option>
                                         </select>
                                     </div>
@@ -304,7 +304,7 @@
                                                 {{ __('Add Row') }}</button>
                                         </div>
                                         <div class="form-group btn-generate d-flex flex-wrap gap-2">
-                                            <a href="{{ route('home') }}" class="btn btn-secondary">
+                                            <a href="{{ route('home') }}" class="btn btn-secondary" onclick="clearEditSessionOnCancel()">
                                                 {{ __('Cancel') }}
                                             </a>
                                             <button type="button" class="btn btn-primary" id="preview-btn">
@@ -427,18 +427,26 @@
                                     <div class="existing-photos-list mb-3" id="existing-photos-list" style="display: none;">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <small class="text-muted">{{ __('Existing Photos') }}</small>
-                                            <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllExistingPhotosAndClearSession()" title="{{ __('Delete All Existing Photos') }}">
+                                            <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllPhotosInEdit()" title="{{ __('Delete All Photos') }}">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
                                         @foreach($home->images as $image)
-                                            <div class="photo-list-item existing-photo" data-photo-id="{{ $image->id }}">
+                                            @php
+                                                $isDeleted = isset($deletedPhotoIds) && in_array($image->id, $deletedPhotoIds);
+                                            @endphp
+                                            <div class="photo-list-item existing-photo {{ $isDeleted ? 'deleted' : '' }}" 
+                                                 data-photo-id="{{ $image->id }}"
+                                                 style="{{ $isDeleted ? 'opacity: 0.5; text-decoration: line-through;' : '' }}">
                                                 <div class="photo-name" title="{{ basename($image->image_path) }}">
                                                     <i class="fas fa-image me-1 text-success"></i>
                                                     {{ basename($image->image_path) }}
                                                 </div>
                                                 <div class="photo-size">Existing</div>
                                             </div>
+                                            @if($isDeleted)
+                                                <input type="hidden" name="delete_photos[]" value="{{ $image->id }}" class="delete-photo-input">
+                                            @endif
                                         @endforeach
                                     </div>
                                 @endif
@@ -458,12 +466,12 @@
                                     <!-- Photo counter -->
                                     <div class="photo-counter" id="photo-counter">
                                         <i class="fas fa-images me-1"></i>
-                                        <span id="photo-count">{{ $home->images->count() }}</span> {{ __('photos selected') }}
+                                        <span id="photo-count">{{ $home->images->count() + (isset($restoredPhotos) ? count($restoredPhotos) : 0) }}</span> {{ __('photos selected') }}
                                     </div>
                                     
                                     <!-- Delete All Photos Button (moved outside hidden section) -->
                                     <div class="d-flex justify-content-end mb-2">
-                                        <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                        <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllPhotosInEdit()" title="{{ __('Delete All Photos') }}">
                                             <i class="fas fa-times"></i>
                                         </button>
                                     </div>
@@ -508,7 +516,7 @@
                                         <i class="fas fa-save me-2"></i>{{ __('Update') }}
                                     </button>
                                     
-                                    <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
+                                    <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg" onclick="clearEditSessionOnCancel()">
                                         <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
                                     </a>
                                 </div>
@@ -694,30 +702,35 @@
                 });
             }
             
-            // Restore photos
-            if (restoredPhotos && restoredPhotos.length > 0) {
+            // Restore photos (but exclude deleted ones)
+            const deletedPhotoIds = @json($deletedPhotoIds ?? []);
+            const restoredPhotosFromSession = @json($restoredPhotos ?? []);
+            
+            console.log('Restoring photos from session:', {
+                restoredPhotosCount: restoredPhotosFromSession.length,
+                restoredPhotos: restoredPhotosFromSession,
+                deletedPhotoIds: deletedPhotoIds
+            });
+            
+            if (restoredPhotosFromSession && restoredPhotosFromSession.length > 0) {
                 const photoCountElement = document.getElementById('photo-count');
                 const photoList = document.getElementById('photo-list');
                 const newPhotosSection = document.getElementById('new-photos-section');
                 
-                if (photoCountElement) {
-                    // Count existing photos + restored photos
-                    const existingCount = document.querySelectorAll('.existing-photo').length;
-                    photoCountElement.textContent = existingCount + restoredPhotos.length;
-                }
-                
-                // Show new photos section if we have restored photos
-                if (newPhotosSection && restoredPhotos.length > 0) {
-                    // Keep section hidden - UI modification to hide photo list
-                    // newPhotosSection.style.display = 'block';
-                }
-                
-                // Create a list of restored photos for display
+                // Create a list of restored photos for display (only if not deleted)
                 if (photoList) {
-                    restoredPhotos.forEach((photoPath, index) => {
+                    restoredPhotosFromSession.forEach((photoPath, index) => {
+                        // Check if this photo is already in the list
+                        const existingItem = photoList.querySelector(`[data-photo-path="${photoPath}"], [data-temp-path="${photoPath}"]`);
+                        if (existingItem) {
+                            console.log('Photo already in list, skipping:', photoPath);
+                            return; // Skip if already exists
+                        }
+                        
                         const photoItem = document.createElement('div');
                         photoItem.className = 'photo-list-item restored-photo';
                         photoItem.dataset.photoPath = photoPath;
+                        photoItem.dataset.tempPath = photoPath; // Also set tempPath for consistency
                         
                         // Extract filename from path
                         const filename = photoPath.split('/').pop();
@@ -734,19 +747,68 @@
                             </button>
                         `;
                         photoList.appendChild(photoItem);
+                        console.log('Added restored photo to list:', filename);
                     });
                 }
                 
-                // Create hidden inputs for restored photos
+                // Create hidden inputs for restored photos (avoid duplicates, but only if not deleted)
                 const form = document.getElementById('home-form');
                 if (form) {
-                    restoredPhotos.forEach((photoPath, index) => {
+                    restoredPhotosFromSession.forEach((photoPath, index) => {
+                        // Check if input already exists
+                        const existingInput = form.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+                        if (existingInput) {
+                            console.log('Hidden input already exists for:', photoPath);
+                            return; // Skip if already exists
+                        }
+                        
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
                         hiddenInput.name = 'restored_photos[]';
                         hiddenInput.value = photoPath;
                         hiddenInput.className = 'restored-photo-input';
                         form.appendChild(hiddenInput);
+                        console.log('Created hidden input for restored photo:', photoPath);
+                    });
+                    
+                    // Log all restored photo inputs
+                    const allRestoredInputs = Array.from(form.querySelectorAll('input[name="restored_photos[]"]')).map(input => input.value);
+                    console.log('All restored_photos[] inputs after restoration:', allRestoredInputs.length, allRestoredInputs);
+                }
+                
+                // Update photo counter after restoring
+                if (photoCountElement && typeof updatePhotoCounter === 'function') {
+                    updatePhotoCounter();
+                } else if (photoCountElement) {
+                    // Fallback if updatePhotoCounter is not available yet
+                    const existingCount = document.querySelectorAll('.existing-photo:not(.deleted)').length;
+                    const uploadedCount = document.querySelectorAll('.uploaded-photo:not(.deleted)').length;
+                    const restoredCount = document.querySelectorAll('.restored-photo:not(.deleted)').length;
+                    photoCountElement.textContent = existingCount + uploadedCount + restoredCount;
+                    console.log('Photo counter updated (fallback):', {
+                        existing: existingCount,
+                        uploaded: uploadedCount,
+                        restored: restoredCount,
+                        total: existingCount + uploadedCount + restoredCount
+                    });
+                }
+            }
+            
+            // Restore deleted photo IDs from session (so they stay deleted when coming back from preview)
+            if (deletedPhotoIds && deletedPhotoIds.length > 0) {
+                const form = document.getElementById('home-form');
+                if (form) {
+                    deletedPhotoIds.forEach(photoId => {
+                        // Check if delete input already exists
+                        const existingDeleteInput = form.querySelector(`input[name="delete_photos[]"][value="${photoId}"]`);
+                        if (!existingDeleteInput) {
+                            const deleteInput = document.createElement('input');
+                            deleteInput.type = 'hidden';
+                            deleteInput.name = 'delete_photos[]';
+                            deleteInput.value = photoId;
+                            deleteInput.className = 'delete-photo-input';
+                            form.appendChild(deleteInput);
+                        }
                     });
                 }
             }
@@ -877,6 +939,141 @@
             if (typeof initializeChunkedUpload === 'function') {
                 initializeChunkedUpload();
             }
+            
+            // Initialize photo counter on page load
+            const photoCountElement = document.getElementById('photo-count');
+            if (photoCountElement && typeof updatePhotoCounter === 'function') {
+                updatePhotoCounter();
+            } else if (photoCountElement) {
+                // Fallback initialization
+                const existingCount = document.querySelectorAll('.existing-photo:not(.deleted)').length;
+                const uploadedCount = document.querySelectorAll('.uploaded-photo:not(.deleted)').length;
+                const restoredCount = document.querySelectorAll('.restored-photo:not(.deleted)').length;
+                photoCountElement.textContent = existingCount + uploadedCount + restoredCount;
+            }
+            
+            // Function to clear session when cancel is clicked
+            window.clearEditSessionOnCancel = function() {
+                // Clear preview session data when canceling (not saving)
+                fetch('{{ route("home.clear-session") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify({
+                        clear_session: true
+                    })
+                }).catch(error => {
+                    console.warn('Failed to clear session:', error);
+                });
+                // Continue with navigation
+                return true;
+            };
+            
+            // Unified function to delete ALL photos (existing + new + restored)
+            window.deleteAllPhotosInEdit = function() {
+                Swal.fire({
+                    title: "{{ __('Are you sure?') }}",
+                    text: '{{ __("Delete all photos? . They will be permanently deleted when you click Update.") }}',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '{{ __("Yes, delete all!") }}',
+                    cancelButtonText: '{{ __("Cancel") }}'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const form = document.getElementById('home-form');
+                        if (!form) return;
+                        
+                        // 1. Mark all existing photos for deletion
+                        const existingPhotos = document.querySelectorAll('.photo-list-item.existing-photo:not(.deleted)');
+                        existingPhotos.forEach(photoItem => {
+                            const photoId = photoItem.dataset.photoId;
+                            
+                            if (photoId) {
+                                // Check if delete input already exists
+                                const existingDeleteInput = form.querySelector(`input[name="delete_photos[]"][value="${photoId}"]`);
+                                if (!existingDeleteInput) {
+                                    const deleteInput = document.createElement('input');
+                                    deleteInput.type = 'hidden';
+                                    deleteInput.name = 'delete_photos[]';
+                                    deleteInput.value = photoId;
+                                    deleteInput.className = 'delete-photo-input';
+                                    form.appendChild(deleteInput);
+                                }
+                                
+                                // Mark as deleted visually
+                                photoItem.classList.add('deleted');
+                                photoItem.style.opacity = '0.5';
+                                photoItem.style.textDecoration = 'line-through';
+                            }
+                        });
+                        
+                        // 2. Remove all new/uploaded photos (they're not saved yet, so just remove them)
+                        const uploadedPhotos = document.querySelectorAll('.photo-list-item.uploaded-photo:not(.deleted)');
+                        uploadedPhotos.forEach(photoItem => {
+                            const tempPath = photoItem.dataset.tempPath;
+                            
+                            // Remove from display
+                            photoItem.classList.add('deleted');
+                            photoItem.style.opacity = '0.5';
+                            photoItem.style.textDecoration = 'line-through';
+                            
+                            // Remove corresponding hidden input
+                            const hiddenInput = form.querySelector(`input[name="restored_photos[]"][value="${tempPath}"]`);
+                            if (hiddenInput) {
+                                hiddenInput.remove();
+                            }
+                        });
+                        
+                        // 3. Remove all restored photos
+                        const restoredPhotos = document.querySelectorAll('.photo-list-item.restored-photo:not(.deleted)');
+                        restoredPhotos.forEach(photoItem => {
+                            const photoPath = photoItem.dataset.photoPath;
+                            
+                            // Mark as deleted visually
+                            photoItem.classList.add('deleted');
+                            photoItem.style.opacity = '0.5';
+                            photoItem.style.textDecoration = 'line-through';
+                            
+                            // Remove corresponding hidden input
+                            const hiddenInput = form.querySelector(`input[name="restored_photos[]"][value="${photoPath}"]`);
+                            if (hiddenInput) {
+                                hiddenInput.remove();
+                            }
+                        });
+                        
+                        // 4. Clear uploader queue if it exists
+                        if (window.photoUploader) {
+                            window.photoUploader.clear();
+                        }
+                        
+                        // 5. Update counter
+                        if (typeof updatePhotoCounter === 'function') {
+                            updatePhotoCounter();
+                        } else {
+                            const photoCountElement = document.getElementById('photo-count');
+                            if (photoCountElement) {
+                                const existingCount = document.querySelectorAll('.existing-photo:not(.deleted)').length;
+                                const uploadedCount = document.querySelectorAll('.uploaded-photo:not(.deleted)').length;
+                                const restoredCount = document.querySelectorAll('.restored-photo:not(.deleted)').length;
+                                photoCountElement.textContent = existingCount + uploadedCount + restoredCount;
+                            }
+                        }
+                        
+                        // Show success message
+                        Swal.fire({
+                            icon: 'success',
+                            title: '{{ __("Deleted!") }}',
+                            text: '{{ __("All photos have been marked for deletion. They will be permanently deleted when you click Update.") }}',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    }
+                });
+            };
         });
     </script>
 @endpush

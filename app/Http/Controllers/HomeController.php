@@ -170,18 +170,24 @@ class HomeController extends Controller
         // Check if we need to restore form data from preview
         $restoredData = null;
         $restoredPhotos = [];
+        $deletedPhotoIds = [];
         if ($request->get('restore') && session()->has('preview_form_data')) {
             $sessionData = session()->get('preview_form_data');
             $restoredData = $sessionData['form_data'] ?? null;
             $restoredPhotos = $sessionData['temp_photos'] ?? [];
+            $deletedPhotoIds = $sessionData['deleted_photo_ids'] ?? [];
             
             // Don't clear session data yet - keep it for multiple preview attempts
         } else {
             // Clear any old preview session data and temp photos when starting fresh edit
-            $this->clearTempPhotosAndSession();
+            // BUT preserve deletions if user is coming back from preview (they clicked back, not cancel)
+            // Only clear if this is a completely fresh edit (no restore parameter)
+            if (!$request->get('restore')) {
+                $this->clearTempPhotosAndSession();
+            }
         }
         
-        return view('pages.homeedit', compact('home', 'restoredData', 'restoredPhotos'));
+        return view('pages.homeedit', compact('home', 'restoredData', 'restoredPhotos', 'deletedPhotoIds'));
     }
 
     /** Update */
@@ -409,39 +415,38 @@ class HomeController extends Controller
         }
         
         // Handle restored photos from form (from chunked upload or previous preview)
-        if ($request->has('restored_photos') && is_array($request->input('restored_photos'))) {
-            \Log::info('Processing restored photos', [
-                'count' => count($request->input('restored_photos')),
-                'paths' => $request->input('restored_photos')
-            ]);
-            
-            foreach ($request->input('restored_photos') as $tempPath) {
-                if ($tempPath && \Storage::disk('public')->exists($tempPath)) {
-                    // Only add if not already in our new uploads
-                    if (!in_array($tempPath, $allTempPhotos)) {
-                        $allTempPhotos[] = $tempPath;
-                        
-                        // Create a temporary Image model instance (not saved to DB)
-                        $tempImage = new Image([
-                            'image_path' => $tempPath,
-                            'status' => true,
-                        ]);
-                        // Set a temporary ID to avoid issues with JSON serialization
-                        $tempImage->id = 'temp_' . uniqid();
-                        $tempImage->temp = true; // Add a temporary flag
-                        $uploadedPhotos->push($tempImage);
-                        
-                        \Log::info('Added restored photo', [
-                            'path' => $tempPath,
-                            'exists' => \Storage::disk('public')->exists($tempPath)
-                        ]);
-                    }
-                } else {
-                    \Log::warning('Restored photo not found or invalid', [
-                        'path' => $tempPath,
-                        'exists' => $tempPath ? \Storage::disk('public')->exists($tempPath) : false
-                    ]);
+        if ($request->has('restored_photos')) {
+            try {
+                $restoredPhotosInput = $request->input('restored_photos');
+                
+                // Handle both array and single value
+                if (!is_array($restoredPhotosInput)) {
+                    $restoredPhotosInput = [$restoredPhotosInput];
                 }
+                
+                // Remove empty values and duplicates
+                $restoredPhotosInput = array_filter(array_unique($restoredPhotosInput));
+                
+                foreach ($restoredPhotosInput as $tempPath) {
+                    if ($tempPath && \Storage::disk('public')->exists($tempPath)) {
+                        // Only add if not already in our new uploads
+                        if (!in_array($tempPath, $allTempPhotos)) {
+                            $allTempPhotos[] = $tempPath;
+                            
+                            // Create a temporary Image model instance (not saved to DB)
+                            $tempImage = new Image([
+                                'image_path' => $tempPath,
+                                'status' => true,
+                            ]);
+                            // Set a temporary ID to avoid issues with JSON serialization
+                            $tempImage->id = 'temp_' . uniqid();
+                            $tempImage->temp = true; // Add a temporary flag
+                            $uploadedPhotos->push($tempImage);
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Error processing restored photos: ' . $e->getMessage());
             }
         }
 
@@ -497,8 +502,31 @@ class HomeController extends Controller
                 ?? now();
             
             // Combine existing photos with uploaded photos
-            $existingPhotos = $home->images()->where('status', true)->get();
-            $allPhotos = $existingPhotos->merge($uploadedPhotos);
+            // Only include existing photos that are not marked for deletion
+            $deletePhotoIds = $request->input('delete_photos', []);
+            $existingPhotos = $home->images()
+                ->where('status', true)
+                ->whereNotIn('id', $deletePhotoIds)
+                ->get();
+            
+            // Filter out deleted photos from uploaded photos
+            // If a photo path is in delete_photos, exclude it
+            $filteredUploadedPhotos = $uploadedPhotos->filter(function($photo) use ($deletePhotoIds) {
+                // For uploaded photos, we need to check if they're marked for deletion
+                // Since they're temp photos, we'll check the restored_photos array
+                return true; // Include all uploaded photos for now
+            });
+            
+            // Merge existing photos with uploaded photos (new + restored)
+            $allPhotos = $existingPhotos->merge($filteredUploadedPhotos);
+            
+            \Log::info('Preview photos for edit', [
+                'existing_count' => $existingPhotos->count(),
+                'uploaded_count' => $filteredUploadedPhotos->count(),
+                'total_count' => $allPhotos->count(),
+                'delete_photo_ids' => $deletePhotoIds,
+                'all_temp_photos' => $allTempPhotos
+            ]);
         } else {
             // CREATE PAGE → always show today's date
             $previewDate = now();
@@ -509,17 +537,27 @@ class HomeController extends Controller
 
         if ($trooperStr === __('168 Home company')) {
             $logo_choice = '168_home';
-        } elseif ($trooperStr === __('Pi Kaew company')) {
+        } elseif ($trooperStr === __('Pi Kaew')) {
             $logo_choice = 'pi_kaew';
         } else {
             $logo_choice = 'none';
         }
 
         // Store form data in session for back navigation
+        // For edit mode, include existing photo IDs so they can be preserved
+        $existingPhotoIds = [];
+        $deletedPhotoIds = [];
+        if ($home) {
+            $existingPhotoIds = $home->images()->where('status', true)->pluck('id')->toArray();
+            $deletedPhotoIds = $request->input('delete_photos', []);
+        }
+        
         session()->put('preview_form_data', [
             'form_data' => $data,
             'temp_photos' => $allTempPhotos, // Use the deduplicated list
             'home_id' => $home ? $home->id : null,
+            'existing_photo_ids' => $existingPhotoIds, // Store existing photo IDs for edit mode
+            'deleted_photo_ids' => $deletedPhotoIds, // Store deleted photo IDs so they stay deleted when coming back
         ]);
 
         return view('pages.homepreview', [
@@ -706,7 +744,7 @@ class HomeController extends Controller
 
         if ($trooperStr === __('168 Home company')) {
             $logo_choice = '168_home';
-        } elseif ($trooperStr === __('Pi Kaew company')) {
+        } elseif ($trooperStr === __('Pi Kaew')) {
             $logo_choice = 'pi_kaew';
         } else {
             $logo_choice = 'none';

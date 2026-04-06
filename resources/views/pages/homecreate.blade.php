@@ -120,8 +120,8 @@
                                             </option>
 
                                             <option value="{{ __('Pi Kaew') }}"
-                                            {{ old('trooper', $restoredData['trooper'] ?? '') === __('Pi Kaew company') ? 'selected' : '' }}>
-                                            {{ __('Pi Kaew company') }}
+                                            {{ old('trooper', $restoredData['trooper'] ?? '') === __('Pi Kaew') ? 'selected' : '' }}>
+                                            {{ __('Pi Kaew') }}
                                             </option>
                                         </select>
                                     </div>

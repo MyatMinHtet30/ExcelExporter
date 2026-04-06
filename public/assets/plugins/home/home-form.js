@@ -661,12 +661,51 @@ document.addEventListener('keydown', function (e) {
       stripCommasFromNumericInputs(form);
 
       // Ensure all restored photos are included in the form
-      const restoredPhotoInputs = form.querySelectorAll('input[name="restored_photos[]"]');
-      restoredPhotoInputs.forEach(input => {
-        if (!input.value) {
-          input.remove(); // Remove empty inputs
-        }
-      });
+      try {
+        // Collect all uploaded photos from the DOM and ensure they have hidden inputs
+        const uploadedPhotoItems = form.querySelectorAll('.photo-list-item.uploaded-photo:not(.deleted)');
+        uploadedPhotoItems.forEach(function(photoItem) {
+          const tempPath = photoItem.dataset.tempPath;
+          if (tempPath) {
+            const existingInput = form.querySelector('input[name="restored_photos[]"][value="' + tempPath + '"]');
+            if (!existingInput) {
+              const hiddenInput = document.createElement('input');
+              hiddenInput.type = 'hidden';
+              hiddenInput.name = 'restored_photos[]';
+              hiddenInput.value = tempPath;
+              hiddenInput.className = 'uploaded-photo-input restored-photo-input';
+              form.appendChild(hiddenInput);
+            }
+          }
+        });
+        
+        // Also collect restored photos
+        const restoredPhotoItems = form.querySelectorAll('.photo-list-item.restored-photo:not(.deleted)');
+        restoredPhotoItems.forEach(function(photoItem) {
+          const photoPath = photoItem.dataset.photoPath || photoItem.dataset.tempPath;
+          if (photoPath) {
+            const existingInput = form.querySelector('input[name="restored_photos[]"][value="' + photoPath + '"]');
+            if (!existingInput) {
+              const hiddenInput = document.createElement('input');
+              hiddenInput.type = 'hidden';
+              hiddenInput.name = 'restored_photos[]';
+              hiddenInput.value = photoPath;
+              hiddenInput.className = 'restored-photo-input';
+              form.appendChild(hiddenInput);
+            }
+          }
+        });
+        
+        // Remove empty inputs
+        const restoredPhotoInputs = form.querySelectorAll('input[name="restored_photos[]"]');
+        restoredPhotoInputs.forEach(function(input) {
+          if (!input.value) {
+            input.remove();
+          }
+        });
+      } catch (error) {
+        console.error('Error preparing photos for preview:', error);
+      }
 
       const spoof = form.querySelector('input[name="_method"]');
       let spoofWasDisabled = false;

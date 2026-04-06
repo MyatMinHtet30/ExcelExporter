@@ -226,31 +226,79 @@ function initializeChunkedUpload() {
         uploadUrl: '/homes/photos/upload-chunk',
         maxConcurrent: 5, // Upload 5 photos simultaneously for faster processing
         onProgress: function(progress) {
-            // Update progress bar
-            const percentage = Math.round((progress.completed / progress.total) * 100);
-            if (uploadProgressBar) {
-                uploadProgressBar.style.width = percentage + '%';
-            }
+            try {
+                // Update progress bar
+                const total = progress.total || (this.completedUploads.length + this.failedUploads.length + this.uploadQueue.length + this.activeUploads);
+                const percentage = total > 0 ? Math.round((progress.completed / total) * 100) : 0;
+                if (uploadProgressBar) {
+                    uploadProgressBar.style.width = percentage + '%';
+                }
 
-            // Add photo to list
-            if (progress.item && progress.item.status === 'completed') {
-                addPhotoToList(progress.item);
-                updatePhotoCounter();
+                // Add photo to list and create hidden input immediately when each photo completes
+                if (progress.item && progress.item.status === 'completed') {
+                    addPhotoToList(progress.item);
+                    
+                    // Create hidden input immediately for this photo (don't wait for all uploads to complete)
+                    const form = document.getElementById('home-form');
+                    if (form && progress.item.tempPath) {
+                        // Check if input already exists
+                        const existingInput = form.querySelector('input[name="restored_photos[]"][value="' + progress.item.tempPath + '"]');
+                        if (!existingInput) {
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = 'restored_photos[]';
+                            hiddenInput.value = progress.item.tempPath;
+                            hiddenInput.className = 'uploaded-photo-input restored-photo-input';
+                            form.appendChild(hiddenInput);
+                        }
+                    }
+                    
+                    if (typeof updatePhotoCounter === 'function') {
+                        updatePhotoCounter();
+                    }
+                }
+            } catch (error) {
+                console.error('Error in onProgress:', error);
             }
         },
         onComplete: function(result) {
-            // Hide loading
-            if (uploadLoading) {
-                uploadLoading.style.display = 'none';
-            }
+            try {
+                // Hide loading
+                if (uploadLoading) {
+                    uploadLoading.style.display = 'none';
+                }
 
-            // Add hidden inputs for completed uploads
-            addHiddenInputsForPhotos(result.completed);
-
-            console.log(`Upload complete: ${result.completed.length} successful, ${result.failed.length} failed`);
-            
-            if (result.failed.length > 0) {
-                alert(`${result.failed.length} photos failed to upload. Please try uploading them individually.`);
+                // Add hidden inputs for completed uploads (only for any that might be missing)
+                // Note: Hidden inputs are already created in onProgress for each photo, 
+                // but we'll double-check here to ensure none are missing
+                if (typeof addHiddenInputsForPhotos === 'function') {
+                    addHiddenInputsForPhotos(result.completed);
+                }
+                
+                // Verify all completed photos have hidden inputs
+                const form = document.getElementById('home-form');
+                if (form && result.completed) {
+                    result.completed.forEach(function(item) {
+                        if (item.tempPath) {
+                            const input = form.querySelector('input[name="restored_photos[]"][value="' + item.tempPath + '"]');
+                            if (!input) {
+                                // Create it now
+                                const hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.name = 'restored_photos[]';
+                                hiddenInput.value = item.tempPath;
+                                hiddenInput.className = 'uploaded-photo-input restored-photo-input';
+                                form.appendChild(hiddenInput);
+                            }
+                        }
+                    });
+                }
+                
+                if (result.failed && result.failed.length > 0) {
+                    alert(result.failed.length + ' photos failed to upload. Please try uploading them individually.');
+                }
+            } catch (error) {
+                console.error('Error in onComplete:', error);
             }
         },
         onError: function(message) {
@@ -333,6 +381,13 @@ function initializeChunkedUpload() {
     function addPhotoToList(item) {
         if (!photoList) return;
 
+        // Check if this photo is already in the list (avoid duplicates)
+        const existingItem = photoList.querySelector(`[data-temp-path="${item.tempPath}"]`);
+        if (existingItem) {
+            console.log('Photo already in list, skipping:', item.filename);
+            return;
+        }
+
         // Show the new photos section
         const newPhotosSection = document.getElementById('new-photos-section');
         if (newPhotosSection) {
@@ -360,6 +415,8 @@ function initializeChunkedUpload() {
             </button>
         `;
         photoList.appendChild(photoItem);
+        
+        console.log('Photo added to list:', item.filename, 'Total photos in list:', photoList.querySelectorAll('.photo-list-item').length);
     }
 
     function getFormatInfo(extension) {
@@ -403,30 +460,50 @@ function initializeChunkedUpload() {
     function updatePhotoCounter() {
         if (!photoCounter) return;
         
-        const existingCount = document.querySelectorAll('.existing-photo').length;
-        const uploadedCount = document.querySelectorAll('.uploaded-photo').length;
-        const restoredCount = document.querySelectorAll('.restored-photo').length;
+        // Exclude deleted photos from count
+        const existingCount = document.querySelectorAll('.existing-photo:not(.deleted)').length;
+        const uploadedCount = document.querySelectorAll('.uploaded-photo:not(.deleted)').length;
+        const restoredCount = document.querySelectorAll('.restored-photo:not(.deleted)').length;
         
-        photoCounter.textContent = existingCount + uploadedCount + restoredCount;
+        const totalCount = existingCount + uploadedCount + restoredCount;
+        photoCounter.textContent = totalCount;
+        
+        console.log('Photo counter updated:', {
+            existing: existingCount,
+            uploaded: uploadedCount,
+            restored: restoredCount,
+            total: totalCount
+        });
     }
+    
+    // Make updatePhotoCounter globally available
+    window.updatePhotoCounter = updatePhotoCounter;
 
     function addHiddenInputsForPhotos(completedUploads) {
         const form = document.getElementById('home-form');
         if (!form) return;
 
-        // Remove old uploaded photo inputs
-        const oldInputs = form.querySelectorAll('input[name="restored_photos[]"].uploaded-photo-input');
-        oldInputs.forEach(input => input.remove());
-
-        // Add new inputs
+        // Add new inputs (avoid duplicates)
         completedUploads.forEach(item => {
+            // Check if input already exists
+            const existingInput = form.querySelector(`input[name="restored_photos[]"][value="${item.tempPath}"]`);
+            if (existingInput) {
+                console.log('Hidden input already exists for:', item.tempPath);
+                return; // Skip if already exists
+            }
+            
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'restored_photos[]';
             hiddenInput.value = item.tempPath;
             hiddenInput.className = 'uploaded-photo-input restored-photo-input';
             form.appendChild(hiddenInput);
+            
+            console.log('Added hidden input for:', item.tempPath);
         });
+        
+        // Update counter after adding hidden inputs
+        updatePhotoCounter();
     }
 
     function formatFileSize(bytes) {
