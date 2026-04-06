@@ -615,8 +615,18 @@
                 
                 <!-- iPad Floating Add Row Button -->
                 <div id="ipad-add-row-fab" class="ipad-add-row-fab">
-                    <i class="fas fa-plus"></i>
-                    <span class="fab-text">{{ __('Add Row') }}</span>
+                    <div class="fab-main">
+                        <i class="fas fa-plus"></i>
+                        <span class="fab-text">{{ __('Add Row') }}</span>
+                    </div>
+                    <div class="fab-arrows">
+                        <button type="button" class="fab-arrow fab-arrow-up" id="fab-arrow-up" title="Scroll to Top">
+                            <i class="fas fa-chevron-up"></i>
+                        </button>
+                        <button type="button" class="fab-arrow fab-arrow-down" id="fab-arrow-down" title="Scroll to Bottom">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
                 </div>
         </div>
     </form>

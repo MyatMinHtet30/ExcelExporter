@@ -789,29 +789,78 @@
     }
 }
 
-/* iPad Add Row Button Styling */
+/* iPad Add Row Button - Balanced Size with Rounded Corners */
 .ipad-add-row-btn {
-    padding: 16px 24px;
-    font-size: 17px;
+    padding: 14px 28px;
+    font-size: 1.25rem;
     font-weight: 600;
-    border-radius: 10px;
+    border-radius: 8px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
     transition: all 0.3s ease;
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.ipad-add-row-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    transition: left 0.5s;
+}
+
+.ipad-add-row-btn:hover::before {
+    left: 100%;
 }
 
 .ipad-add-row-btn:hover {
     background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
 }
 
 .ipad-add-row-btn:active {
     transform: translateY(0);
+    box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+}
+
+.ipad-add-row-btn i {
+    font-size: 1.4rem;
+    margin-right: 10px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* iPad Add Row Button - Standalone Above Photo Section */
+.ipad-add-row-above-photo {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+/* iPad Left Column - Consistent spacing */
+.ipad-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
 /* Hide iPad Add Row button on phone and desktop */
@@ -1424,67 +1473,69 @@
         height: 200px !important;
     }
 }
-/* iPad Floating Add Row Button */
+
+/* iPad Floating Add Row Button - Enhanced with Arrows */
 .ipad-add-row-fab {
     position: fixed;
-    bottom: 90px; /* Above the existing FAB */
-    right: 25px;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.ipad-add-row-fab .fab-main {
     width: 60px;
     height: 60px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    cursor: pointer;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-    z-index: 1001;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
     transition: all 0.3s ease;
-    border: none;
-    opacity: 0;
-    transform: scale(0.8) translateY(10px);
-    text-align: center;
+    position: relative;
     overflow: hidden;
 }
 
-.ipad-add-row-fab.show {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-}
-
-.ipad-add-row-fab:hover {
-    transform: scale(1.1);
-    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.5);
-    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-}
-
-.ipad-add-row-fab:active {
-    transform: scale(0.95);
-}
-
-.ipad-add-row-fab i {
-    transition: transform 0.3s ease;
-}
-
-.ipad-add-row-fab:hover i {
-    transform: rotate(90deg);
-}
-
-.fab-text {
+.ipad-add-row-fab .fab-main::before {
+    content: '';
     position: absolute;
-    right: 70px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 14px;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.ipad-add-row-fab .fab-main:hover::before {
+    left: 100%;
+}
+
+.ipad-add-row-fab .fab-main:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+}
+
+.ipad-add-row-fab .fab-main i {
+    font-size: 20px;
+    margin-bottom: 2px;
+}
+
+.ipad-add-row-fab .fab-text {
+    font-size: 8px;
     font-weight: 600;
-    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     opacity: 0;
-    transform: translateX(10px);
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease;
     pointer-events: none;
 }
 

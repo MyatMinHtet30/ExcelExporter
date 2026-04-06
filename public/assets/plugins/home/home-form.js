@@ -763,9 +763,38 @@ if (iPadGridAddBtn) {
 }
 
 // Handle iPad floating button
+// iPad FAB Arrow Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const fabArrowUp = document.getElementById('fab-arrow-up');
+    const fabArrowDown = document.getElementById('fab-arrow-down');
+    
+    if (fabArrowUp) {
+        fabArrowUp.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+    
+    if (fabArrowDown) {
+        fabArrowDown.addEventListener('click', function() {
+            window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth'
+            });
+        });
+    }
+});
+
+// iPad FAB Add Button Functionality
 const iPadFabAddBtn = document.getElementById('ipad-add-row-fab');
 if (iPadFabAddBtn) {
-    iPadFabAddBtn.addEventListener('click', addRow);
+    // Click on main button to add row
+    const fabMain = iPadFabAddBtn.querySelector('.fab-main');
+    if (fabMain) {
+        fabMain.addEventListener('click', addRow);
+    }
     
     // Show iPad FAB when page loads and when scrolling in rows area
     function showiPadFab() {
