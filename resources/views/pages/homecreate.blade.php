@@ -523,7 +523,7 @@
                                             </div>
                                             
                                             <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
-                                            <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
+                                            <button type="button" class="btn btn-primary browse-photo-button mt-3" onclick="document.getElementById('photo-input').click()">
                                                 <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
                                             </button>
                                         </div>

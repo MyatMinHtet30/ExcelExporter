@@ -860,7 +860,7 @@
 .ipad-left-column {
     display: flex;
     flex-direction: column;
-    gap: 25px;
+    gap: 2px;
 }
 
 /* Hide iPad Add Row button on phone and desktop */
@@ -984,6 +984,18 @@
         visibility: visible !important;
         position: static !important;
         left: auto !important;
+        border-radius: 25px !important;
+        font-family: Poppins !important;
+        font-size: 17px !important;
+        font-weight: bold !important;
+
+    }
+
+    .browse-photo-button {
+        width: 180px;
+        height: 50px;
+        font-size: 16px !important;
+        border-radius: 25px !important;
     }
     
     .ipad-stacked-layout {
