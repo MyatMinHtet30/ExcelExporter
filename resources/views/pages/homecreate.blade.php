@@ -357,8 +357,8 @@
                         </div>
                     </div>
                     
-                    <!-- Mobile Photo Upload Section -->
-                    <div class="mobile-photo-upload">
+                    <!-- Mobile Photo Upload Section (phone only, hidden on iPad) -->
+                    <div class="mobile-photo-upload mobile-only-photo">
                         <div class="form-section">
                             <div class="card shadow-sm">
                                 <div class="btn_div card-header bg-primary text-white">
@@ -478,9 +478,9 @@
                     
                     <!-- iPad-specific 2-column layout -->
                     <div class="ipad-layout">
-                        <!-- Left Column: Add Row + Photo Upload -->
+                        <!-- Left Column: Add Row + Photo Upload (iPad only) -->
                         <div class="ipad-left-column">
-                            <!-- iPad Add Row Button - Standalone Above Photo Section -->
+                            <!-- iPad Add Row Button -->
                             <div class="ipad-add-row-above-photo">
                                 <div class="text-center">
                                     <button type="button" class="btn btn-primary btn-lg ipad-add-row-btn" id="add-row-btn-ipad">
@@ -489,51 +489,48 @@
                                 </div>
                             </div>
                             
-                            <!-- Photo Upload Section -->
-                            <div class="form-section">
-                                <div class="card shadow-sm">
-                                    <div class="btn_div card-header bg-primary text-white">
-                                        <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="photo-upload-area" id="photo-upload-area">
-                                            <div class="photo-upload-icon">
-                                                <i class="fas fa-cloud-upload-alt"></i>
-                                            </div>
-                                            <h5>{{ __('Upload Project Photos') }}</h5>
-                                            <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
-                                            <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
-                                            
-                                            <!-- Photo counter -->
-                                            <div class="photo-counter" id="photo-counter">
-                                                <i class="fas fa-images me-1"></i>
-                                                <span id="photo-count">0</span> {{ __('photos selected') }}
-                                            </div>
-                                            
-                                            <!-- Delete All Photos Button -->
-                                            <div class="d-flex justify-content-end mb-2">
-                                                <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
-                                                    <i class="fas fa-times"></i>
+                            <!-- Photo Upload Section (iPad only — same IDs as phone, shown here via CSS) -->
+                            <div class="ipad-photo-upload">
+                                <div class="form-section">
+                                    <div class="card shadow-sm">
+                                        <div class="btn_div card-header bg-primary text-white">
+                                            <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="photo-upload-area" id="photo-upload-area-ipad">
+                                                <div class="photo-upload-icon">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                </div>
+                                                <h5>{{ __('Upload Project Photos') }}</h5>
+                                                <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
+                                                <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
+                                                
+                                                <div class="photo-counter" id="photo-counter-ipad">
+                                                    <i class="fas fa-images me-1"></i>
+                                                    <span id="photo-count-ipad">0</span> {{ __('photos selected') }}
+                                                </div>
+                                                
+                                                <div class="d-flex justify-content-end mb-2">
+                                                    <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+
+                                                <div class="new-photos-section" id="new-photos-section-ipad" style="display: none;">
+                                                    <div class="photo-list" id="photo-list-ipad" style="display: none;"></div>
+                                                </div>
+                                                
+                                                <input type="file" id="photo-input-ipad" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
+                                                <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input-ipad').click()">
+                                                    <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
                                                 </button>
                                             </div>
-
-                                            <!-- New photos list (hidden) -->
-                                            <div class="new-photos-section" id="new-photos-section" style="display: none;">
-                                                <div class="photo-list" id="photo-list" style="display: none;"></div>
-                                            </div>
                                             
-                                            <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
-                                            <button type="button" class="btn btn-primary browse-photo-button mt-3" onclick="document.getElementById('photo-input').click()">
-                                                <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Upload Progress -->
-                                        <div class="upload-loading" id="upload-loading">
-                                            <div class="spinner-border text-primary" role="status">
-                                            </div>
-                                            <div class="upload-progress">
-                                                <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                                            <div class="upload-loading" id="upload-loading-ipad">
+                                                <div class="spinner-border text-primary" role="status"></div>
+                                                <div class="upload-progress">
+                                                    <div class="upload-progress-bar" id="upload-progress-bar-ipad"></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -552,23 +549,23 @@
                                     <div class="card-body">
                                         <div class="summary-row">
                                             <div class="summary-label">{{ __('Total') }}:</div>
-                                            <div class="summary-value" id="miscDisplayMobile">0.00</div>
+                                            <div class="summary-value" id="miscDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row">
                                             <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
-                                            <div class="summary-value" id="operatingDisplayMobile">0.00</div>
+                                            <div class="summary-value" id="operatingDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row">
                                             <div class="summary-label">{{ __('Category A,B Total') }}:</div>
-                                            <div class="summary-value" id="abDisplayMobile">0.00</div>
+                                            <div class="summary-value" id="abDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row">
                                             <div class="summary-label">{{ __('VAT (7%)') }}:</div>
-                                            <div class="summary-value" id="vatDisplayMobile">0.00</div>
+                                            <div class="summary-value" id="vatDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row total-row" >
                                             <div class="summary-label" style="font-size:18px; color: #28a745;">{{ __('Total Price') }}:</div>
-                                            <div class="summary-value total-value" id="finalDisplayMobile">0.00</div>
+                                            <div class="summary-value total-value" id="finalDisplayIpad">0.00</div>
                                         </div>
                                     </div>
                                 </div>
@@ -610,23 +607,7 @@
                 <!-- ===== /Mobile View Only ===== -->
             </div>
                 <div id="fab-btn" class="fab-btn">
-                    <i id="fab-icon" class="fas fa-plus"></i>
-                </div>
-                
-                <!-- iPad Floating Add Row Button -->
-                <div id="ipad-add-row-fab" class="ipad-add-row-fab">
-                    <div class="fab-main">
-                        <i class="fas fa-plus"></i>
-                        <span class="fab-text">{{ __('Add Row') }}</span>
-                    </div>
-                    <div class="fab-arrows">
-                        <button type="button" class="fab-arrow fab-arrow-up" id="fab-arrow-up" title="Scroll to Top">
-                            <i class="fas fa-chevron-up"></i>
-                        </button>
-                        <button type="button" class="fab-arrow fab-arrow-down" id="fab-arrow-down" title="Scroll to Bottom">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
+                    <i id="fab-icon" class="fas fa-arrow-down"></i>
                 </div>
         </div>
     </form>
@@ -638,6 +619,20 @@
 <script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
 <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
 <script src="{{ asset('assets/js/chunked-upload.js') }}"></script>
+
+<script>
+// Sync iPad photo counter from phone counter on any change
+document.addEventListener('DOMContentLoaded', function() {
+    const phoneCount = document.getElementById('photo-count');
+    const ipadCount  = document.getElementById('photo-count-ipad');
+    if (!phoneCount || !ipadCount) return;
+
+    const observer = new MutationObserver(function() {
+        ipadCount.textContent = phoneCount.textContent;
+    });
+    observer.observe(phoneCount, { childList: true, characterData: true, subtree: true });
+});
+</script>
 
 @if(isset($restoredData) && $restoredData)
 <script>

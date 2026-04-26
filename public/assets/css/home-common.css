@@ -870,35 +870,53 @@
     }
 }
 
-/* Mobile Elements - Show on phones, hide on iPad/desktop */
+/* Mobile Elements visibility */
 .mobile-photo-upload,
 .mobile-cost-summary,
 .mobile-action-buttons {
     display: block;
 }
 
-/* Show mobile elements only on phones */
+/* Phone: show everything */
 @media (max-width: 767px) {
     .mobile-photo-upload,
     .mobile-cost-summary,
     .mobile-action-buttons {
         display: block !important;
     }
-    
     .mobile-add-row-only {
+        display: block !important;
+    }
+    /* Hide iPad-only photo section on phone */
+    .ipad-photo-upload {
+        display: none !important;
+    }
+}
+
+/* iPad: hide cost/actions/add-row (handled by ipad-layout), keep photo upload visible */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .mobile-cost-summary,
+    .mobile-action-buttons,
+    .mobile-add-row-only {
+        display: none !important;
+    }
+    /* Hide phone-only photo section on iPad */
+    .mobile-only-photo {
+        display: none !important;
+    }
+    /* Show iPad photo section */
+    .ipad-photo-upload {
         display: block !important;
     }
 }
 
-/* Hide mobile elements on iPad and desktop */
-@media (min-width: 768px) {
+/* Desktop: hide all mobile elements */
+@media (min-width: 1025px) {
     .mobile-photo-upload,
     .mobile-cost-summary,
-    .mobile-action-buttons {
-        display: none !important;
-    }
-    
-    .mobile-add-row-only {
+    .mobile-action-buttons,
+    .mobile-add-row-only,
+    .ipad-photo-upload {
         display: none !important;
     }
 }
@@ -1216,7 +1234,8 @@
         display: block;
         margin-bottom: 8px;
     }
-}
+
+    
 
 /* Tablet adjustments (768px to 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {

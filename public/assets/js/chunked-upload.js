@@ -458,22 +458,19 @@ function initializeChunkedUpload() {
     }
 
     function updatePhotoCounter() {
-        if (!photoCounter) return;
-        
         // Exclude deleted photos from count
         const existingCount = document.querySelectorAll('.existing-photo:not(.deleted)').length;
         const uploadedCount = document.querySelectorAll('.uploaded-photo:not(.deleted)').length;
         const restoredCount = document.querySelectorAll('.restored-photo:not(.deleted)').length;
-        
         const totalCount = existingCount + uploadedCount + restoredCount;
-        photoCounter.textContent = totalCount;
-        
-        console.log('Photo counter updated:', {
-            existing: existingCount,
-            uploaded: uploadedCount,
-            restored: restoredCount,
-            total: totalCount
-        });
+
+        // Update phone counter
+        const el = document.getElementById('photo-count');
+        if (el) el.textContent = totalCount;
+
+        // Sync iPad counter
+        const elIpad = document.getElementById('photo-count-ipad');
+        if (elIpad) elIpad.textContent = totalCount;
     }
     
     // Make updatePhotoCounter globally available
@@ -597,6 +594,9 @@ function initializeChunkedUpload() {
                 if (window.photoUploader) {
                     window.photoUploader.clear();
                 }
+                if (window.photoUploaderIpad) {
+                    window.photoUploaderIpad.clear();
+                }
                 
                 // Update counter
                 updatePhotoCounter();
@@ -630,4 +630,88 @@ function initializeChunkedUpload() {
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', initializeChunkedUpload);
+document.addEventListener('DOMContentLoaded', function() {
+    initializeChunkedUpload();       // phone uploader
+    initializeChunkedUploadIpad();   // iPad uploader (separate IDs, same logic)
+});
+
+// iPad uploader — uses -ipad suffixed IDs, same logic as phone
+function initializeChunkedUploadIpad() {
+    const photoInput     = document.getElementById('photo-input-ipad');
+    const photoUploadArea= document.getElementById('photo-upload-area-ipad');
+    const photoList      = document.getElementById('photo-list-ipad');
+    const uploadLoading  = document.getElementById('upload-loading-ipad');
+    const uploadProgressBar = document.getElementById('upload-progress-bar-ipad');
+
+    if (!photoInput || !photoUploadArea) return;
+
+    window.photoUploaderIpad = new ChunkedPhotoUploader({
+        uploadUrl: '/homes/photos/upload-chunk',
+        maxConcurrent: 5,
+        onProgress: function(progress) {
+            try {
+                const total = progress.total || 1;
+                const pct   = Math.round((progress.completed / total) * 100);
+                if (uploadProgressBar) uploadProgressBar.style.width = pct + '%';
+
+                if (progress.item && progress.item.status === 'completed') {
+                    // Add to hidden list (same as phone — list stays hidden)
+                    if (photoList) {
+                        const exists = photoList.querySelector(`[data-temp-path="${progress.item.tempPath}"]`);
+                        if (!exists) {
+                            const div = document.createElement('div');
+                            div.className = 'photo-list-item uploaded-photo';
+                            div.dataset.tempPath = progress.item.tempPath;
+                            photoList.appendChild(div);
+                        }
+                    }
+                    // Add hidden input to form
+                    const form = document.getElementById('home-form');
+                    if (form && progress.item.tempPath) {
+                        const existing = form.querySelector(`input[name="restored_photos[]"][value="${progress.item.tempPath}"]`);
+                        if (!existing) {
+                            const inp = document.createElement('input');
+                            inp.type = 'hidden';
+                            inp.name = 'restored_photos[]';
+                            inp.value = progress.item.tempPath;
+                            inp.className = 'uploaded-photo-input restored-photo-input';
+                            form.appendChild(inp);
+                        }
+                    }
+                    // Sync counter
+                    if (typeof window.updatePhotoCounter === 'function') window.updatePhotoCounter();
+                }
+            } catch(e) { console.error('iPad upload progress error:', e); }
+        },
+        onComplete: function() {
+            if (uploadLoading) uploadLoading.style.display = 'none';
+            if (uploadProgressBar) uploadProgressBar.style.width = '0%';
+        },
+        onError: function(msg) { console.error('iPad upload error:', msg); }
+    });
+
+    photoInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            if (uploadLoading) uploadLoading.style.display = 'block';
+            if (uploadProgressBar) uploadProgressBar.style.width = '0%';
+            window.photoUploaderIpad.addFiles(Array.from(e.target.files));
+            e.target.value = '';
+        }
+    });
+
+    ['dragover','dragleave','drop'].forEach(function(evt) {
+        photoUploadArea.addEventListener(evt, function(e) {
+            e.preventDefault();
+            if (evt === 'dragover') photoUploadArea.classList.add('drag-over');
+            if (evt === 'dragleave') photoUploadArea.classList.remove('drag-over');
+            if (evt === 'drop') {
+                photoUploadArea.classList.remove('drag-over');
+                const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+                if (files.length) {
+                    if (uploadLoading) uploadLoading.style.display = 'block';
+                    window.photoUploaderIpad.addFiles(files);
+                }
+            }
+        });
+    });
+}

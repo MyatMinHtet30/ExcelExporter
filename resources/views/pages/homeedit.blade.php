@@ -153,7 +153,7 @@
                 <div id="rows-container" class="col-12">
                     @php $i = 0; @endphp
                     @foreach($home->details as $detail)
-                        <div class="card m-b-2 item-row" data-row-index="{{ $i }}">
+                        <div class="card m-b-20 item-row" data-row-index="{{ $i }}">
     <div class="card-header bg-white">
 
         {{-- Line 1 --}}
@@ -384,8 +384,8 @@
                         </div>
                     </div>
                     
-                    <!-- Mobile Photo Upload Section -->
-                    <div class="mobile-photo-upload">
+                    <!-- Mobile Photo Upload Section (phone only) -->
+                    <div class="mobile-photo-upload mobile-only-photo">
                         <div class="form-section">
                             <div class="card shadow-sm">
                                 <div class="btn_div card-header bg-primary text-white">
@@ -429,20 +429,17 @@
                                         <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
                                         <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
                                         
-                                        <!-- Photo counter -->
                                         <div class="photo-counter" id="photo-counter">
                                             <i class="fas fa-images me-1"></i>
                                             <span id="photo-count">{{ $home->images->count() + (isset($restoredPhotos) ? count($restoredPhotos) : 0) }}</span> {{ __('photos selected') }}
                                         </div>
                                         
-                                        <!-- Delete All Photos Button -->
                                         <div class="d-flex justify-content-end mb-2">
                                             <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllPhotosInEdit()" title="{{ __('Delete All Photos') }}">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
 
-                                        <!-- New photos list (hidden) -->
                                         <div class="new-photos-section" id="new-photos-section" style="display: none;">
                                             <div class="photo-list" id="photo-list" style="display: none;"></div>
                                         </div>
@@ -453,10 +450,8 @@
                                         </button>
                                     </div>
                                     
-                                    <!-- Upload Progress -->
                                     <div class="upload-loading" id="upload-loading">
-                                        <div class="spinner-border text-primary" role="status">
-                                        </div>
+                                        <div class="spinner-border text-primary" role="status"></div>
                                         <div class="upload-progress">
                                             <div class="upload-progress-bar" id="upload-progress-bar"></div>
                                         </div>
@@ -549,80 +544,70 @@
                                 </div>
                             </div>
                             
-                            <!-- Photo Upload Section -->
-                            <div class="form-section">
-                                <div class="card shadow-sm">
-                                    <div class="btn_div card-header bg-primary text-white">
-                                        <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <!-- Existing Photos List -->
-                                        @if($home->images->count() > 0)
-                                            <div class="existing-photos-list mb-3" id="existing-photos-list" style="display: none;">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <small class="text-muted">{{ __('Existing Photos') }}</small>
+                            <!-- Photo Upload Section (iPad only) -->
+                            <div class="ipad-photo-upload">
+                                <div class="form-section">
+                                    <div class="card shadow-sm">
+                                        <div class="btn_div card-header bg-primary text-white">
+                                            <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <!-- Existing Photos List (iPad) -->
+                                            @if($home->images->count() > 0)
+                                                <div class="existing-photos-list mb-3" id="existing-photos-list-ipad" style="display: none;">
+                                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                                        <small class="text-muted">{{ __('Existing Photos') }}</small>
+                                                        <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllPhotosInEdit()" title="{{ __('Delete All Photos') }}">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                    @foreach($home->images as $image)
+                                                        @php $isDeleted = isset($deletedPhotoIds) && in_array($image->id, $deletedPhotoIds); @endphp
+                                                        <div class="photo-list-item existing-photo {{ $isDeleted ? 'deleted' : '' }}"
+                                                             data-photo-id="{{ $image->id }}"
+                                                             style="{{ $isDeleted ? 'opacity:0.5;text-decoration:line-through;' : '' }}">
+                                                            <div class="photo-name" title="{{ basename($image->image_path) }}">
+                                                                <i class="fas fa-image me-1 text-success"></i>
+                                                                {{ basename($image->image_path) }}
+                                                            </div>
+                                                            <div class="photo-size">Existing</div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+
+                                            <div class="photo-upload-area" id="photo-upload-area-ipad">
+                                                <div class="photo-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                                                <h5>{{ __('Upload Project Photos') }}</h5>
+                                                <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
+                                                <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
+
+                                                <div class="photo-counter" id="photo-counter-ipad">
+                                                    <i class="fas fa-images me-1"></i>
+                                                    <span id="photo-count-ipad">{{ $home->images->count() + (isset($restoredPhotos) ? count($restoredPhotos) : 0) }}</span> {{ __('photos selected') }}
+                                                </div>
+
+                                                <div class="d-flex justify-content-end mb-2">
                                                     <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllPhotosInEdit()" title="{{ __('Delete All Photos') }}">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
-                                                @foreach($home->images as $image)
-                                                    @php
-                                                        $isDeleted = isset($deletedPhotoIds) && in_array($image->id, $deletedPhotoIds);
-                                                    @endphp
-                                                    <div class="photo-list-item existing-photo {{ $isDeleted ? 'deleted' : '' }}" 
-                                                         data-photo-id="{{ $image->id }}"
-                                                         style="{{ $isDeleted ? 'opacity: 0.5; text-decoration: line-through;' : '' }}">
-                                                        <div class="photo-name" title="{{ basename($image->image_path) }}">
-                                                            <i class="fas fa-image me-1 text-success"></i>
-                                                            {{ basename($image->image_path) }}
-                                                        </div>
-                                                        <div class="photo-size">Existing</div>
-                                                    </div>
-                                                    @if($isDeleted)
-                                                        <input type="hidden" name="delete_photos[]" value="{{ $image->id }}" class="delete-photo-input">
-                                                    @endif
-                                                @endforeach
-                                            </div>
-                                        @endif
 
-                                        <div class="photo-upload-area" id="photo-upload-area">
-                                            <div class="photo-upload-icon">
-                                                <i class="fas fa-cloud-upload-alt"></i>
-                                            </div>
-                                            <h5>{{ __('Upload Project Photos') }}</h5>
-                                            <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
-                                            <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
-                                            
-                                            <!-- Photo counter -->
-                                            <div class="photo-counter" id="photo-counter">
-                                                <i class="fas fa-images me-1"></i>
-                                                <span id="photo-count">{{ $home->images->count() + (isset($restoredPhotos) ? count($restoredPhotos) : 0) }}</span> {{ __('photos selected') }}
-                                            </div>
-                                            
-                                            <!-- Delete All Photos Button -->
-                                            <div class="d-flex justify-content-end mb-2">
-                                                <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllPhotosInEdit()" title="{{ __('Delete All Photos') }}">
-                                                    <i class="fas fa-times"></i>
+                                                <div class="new-photos-section" id="new-photos-section-ipad" style="display: none;">
+                                                    <div class="photo-list" id="photo-list-ipad" style="display: none;"></div>
+                                                </div>
+
+                                                <input type="file" id="photo-input-ipad" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
+                                                <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input-ipad').click()">
+                                                    <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
                                                 </button>
                                             </div>
 
-                                            <!-- New photos list (hidden) -->
-                                            <div class="new-photos-section" id="new-photos-section" style="display: none;">
-                                                <div class="photo-list" id="photo-list" style="display: none;"></div>
-                                            </div>
-                                            
-                                            <input type="file" id="photo-input" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display: none;">
-                                            <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input').click()">
-                                                <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Upload Progress -->
-                                        <div class="upload-loading" id="upload-loading">
-                                            <div class="spinner-border text-primary" role="status">
-                                            </div>
-                                            <div class="upload-progress">
-                                                <div class="upload-progress-bar" id="upload-progress-bar"></div>
+                                            <div class="upload-loading" id="upload-loading-ipad">
+                                                <div class="spinner-border text-primary" role="status"></div>
+                                                <div class="upload-progress">
+                                                    <div class="upload-progress-bar" id="upload-progress-bar-ipad"></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -641,23 +626,23 @@
                                     <div class="card-body">
                                         <div class="summary-row">
                                             <div class="summary-label">{{ __('Total') }}:</div>
-                                            <div class="summary-value" id="miscDisplayMobile">0.00</div>
+                                            <div class="summary-value" id="miscDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row">
                                             <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
-                                            <div class="summary-value" id="operatingDisplayMobile">0.00</div>
+                                            <div class="summary-value" id="operatingDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row">
                                             <div class="summary-label">{{ __('Category A,B Total') }}:</div>
-                                            <div class="summary-value" id="abDisplayMobile">0.00</div>
+                                            <div class="summary-value" id="abDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row">
                                             <div class="summary-label">{{ __('VAT (7%)') }}:</div>
-                                            <div class="summary-value" id="vatDisplayMobile">0.00</div>
+                                            <div class="summary-value" id="vatDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row total-row">
                                             <div class="summary-label" style="font-size:18px; color: #28a745;">{{ __('Total Price') }}:</div>
-                                            <div class="summary-value total-value" id="finalDisplayMobile">0.00</div>
+                                            <div class="summary-value total-value" id="finalDisplayIpad">0.00</div>
                                         </div>
                                     </div>
                                 </div>
@@ -671,11 +656,11 @@
                                 <div class="card shadow-sm">
                                     <div class="card-body">
                                         <div class="btn-group-vertical w-100" role="group">
-                                            <button type="button" class="btn btn-primary btn-lg mb-3" id="preview-btn-mobile">
+                                            <button type="button" class="btn btn-primary btn-lg mb-3" id="preview-btn-ipad">
                                                 <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
                                             </button>
                                             
-                                            <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn-mobile">
+                                            <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn-ipad">
                                                 <i class="fas fa-save me-2"></i>{{ __('Update') }}
                                             </button>
                                             
@@ -704,30 +689,14 @@
 
             </div>{{-- /row --}}
             <div id="fab-btn" class="fab-btn">
-                <i id="fab-icon" class="fas fa-plus"></i>
-            </div>
-            
-            <!-- iPad Floating Add Row Button -->
-            <div id="ipad-add-row-fab" class="ipad-add-row-fab">
-                <div class="fab-main">
-                    <i class="fas fa-plus"></i>
-                    <span class="fab-text">{{ __('Add Row') }}</span>
-                </div>
-                <div class="fab-arrows">
-                    <button type="button" class="fab-arrow fab-arrow-up" id="fab-arrow-up" title="Scroll to Top">
-                        <i class="fas fa-chevron-up"></i>
-                    </button>
-                    <button type="button" class="fab-arrow fab-arrow-down" id="fab-arrow-down" title="Scroll to Bottom">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                </div>
+                <i id="fab-icon" class="fas fa-arrow-down"></i>
             </div>
         </div>{{-- /xp-contentbar --}}
     </form>
 
     {{-- Template for new rows (no id) --}}
     <template id="row-template">
-        <div class="card m-b-2 item-row" data-row-index="__INDEX__">
+        <div class="card m-b-20 item-row" data-row-index="__INDEX__">
             <div class="card-header bg-white">
                 <div class="row g-3 g-compact align-items-end">
                     <input type="hidden" name="details[__INDEX__][id]" value="">
@@ -835,6 +804,20 @@
     <script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
     <script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
     <script src="{{ asset('assets/js/chunked-upload.js') }}"></script>
+
+    <script>
+    // Sync iPad photo counter from phone counter
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneCount = document.getElementById('photo-count');
+        const ipadCount  = document.getElementById('photo-count-ipad');
+        if (!phoneCount || !ipadCount) return;
+        const observer = new MutationObserver(function() {
+            ipadCount.textContent = phoneCount.textContent;
+        });
+        observer.observe(phoneCount, { childList: true, characterData: true, subtree: true });
+    });
+    </script>
+
     <script>
         // Restore form data when coming back from preview
         document.addEventListener('DOMContentLoaded', function() {

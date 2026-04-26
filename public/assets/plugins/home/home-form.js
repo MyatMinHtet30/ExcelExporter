@@ -371,6 +371,13 @@ function recalcSummary(){
     setTxt('vatDisplayMobile')(vat);
     setTxt('finalDisplayMobile')(finalT);
 
+    // Update IPAD displays
+    setTxt('miscDisplayIpad')(sum);
+    setTxt('operatingDisplayIpad')(operating);
+    setTxt('abDisplayIpad')(ab);
+    setTxt('vatDisplayIpad')(vat);
+    setTxt('finalDisplayIpad')(finalT);
+
     const setVal=id=>val=>{ const el=$('#'+id); if(el) el.value      = to2(val); };
     setVal('misc_total')(sum);
     setVal('operating_expenses')(operating);
@@ -860,6 +867,8 @@ const mobileGenerateBtn = document.getElementById('generate-btn-mobile');
 const desktopGenerateBtn = document.getElementById('generate-btn');
 const mobilePreviewBtn = document.getElementById('preview-btn-mobile');
 const desktopPreviewBtn = document.getElementById('preview-btn');
+const ipadPreviewBtn = document.getElementById('preview-btn-ipad');
+const ipadGenerateBtn = document.getElementById('generate-btn-ipad');
 
 if (mobileGenerateBtn && desktopGenerateBtn) {
     mobileGenerateBtn.addEventListener('click', function(e) {
@@ -872,6 +881,21 @@ if (mobilePreviewBtn && desktopPreviewBtn) {
     mobilePreviewBtn.addEventListener('click', function(e) {
         e.preventDefault();
         desktopPreviewBtn.click();
+    });
+}
+
+// iPad buttons delegate to desktop (same logic, no duplication)
+if (ipadPreviewBtn && desktopPreviewBtn) {
+    ipadPreviewBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        desktopPreviewBtn.click();
+    });
+}
+
+if (ipadGenerateBtn && desktopGenerateBtn) {
+    ipadGenerateBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        desktopGenerateBtn.click();
     });
 }
 
@@ -1174,8 +1198,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let lastScrollTop = 0;
         let isScrolling;
         
-        // Show FAB only on mobile
-        const isMobile = window.innerWidth <= 768;
+        // Show FAB on mobile and iPad (up to 1024px)
+        const isMobile = window.innerWidth <= 1024;
         if (isMobile) {
             fabBtn.classList.add('show');
         }
@@ -1243,7 +1267,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Handle window resize
         window.addEventListener('resize', function() {
-            const isMobileNow = window.innerWidth <= 768;
+            const isMobileNow = window.innerWidth <= 1024;
             if (isMobileNow) {
                 fabBtn.classList.add('show');
             } else {
