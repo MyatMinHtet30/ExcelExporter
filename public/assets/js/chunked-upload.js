@@ -458,19 +458,16 @@ function initializeChunkedUpload() {
     }
 
     function updatePhotoCounter() {
-        // Exclude deleted photos from count
         const existingCount = document.querySelectorAll('.existing-photo:not(.deleted)').length;
         const uploadedCount = document.querySelectorAll('.uploaded-photo:not(.deleted)').length;
         const restoredCount = document.querySelectorAll('.restored-photo:not(.deleted)').length;
         const totalCount = existingCount + uploadedCount + restoredCount;
 
-        // Update phone counter
-        const el = document.getElementById('photo-count');
-        if (el) el.textContent = totalCount;
-
-        // Sync iPad counter
-        const elIpad = document.getElementById('photo-count-ipad');
-        if (elIpad) elIpad.textContent = totalCount;
+        // Sync all counters: phone, iPad, desktop
+        ['photo-count', 'photo-count-ipad', 'photo-count-desktop'].forEach(function(id) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = totalCount;
+        });
     }
     
     // Make updatePhotoCounter globally available
@@ -631,8 +628,9 @@ function initializeChunkedUpload() {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
-    initializeChunkedUpload();       // phone uploader
-    initializeChunkedUploadIpad();   // iPad uploader (separate IDs, same logic)
+    initializeChunkedUpload();        // phone uploader
+    initializeChunkedUploadIpad();    // iPad uploader
+    initializeChunkedUploadDesktop(); // desktop uploader
 });
 
 // iPad uploader — uses -ipad suffixed IDs, same logic as phone
@@ -710,6 +708,86 @@ function initializeChunkedUploadIpad() {
                 if (files.length) {
                     if (uploadLoading) uploadLoading.style.display = 'block';
                     window.photoUploaderIpad.addFiles(files);
+                }
+            }
+        });
+    });
+}
+
+// Desktop uploader — uses -desktop suffixed IDs, same logic as iPad
+function initializeChunkedUploadDesktop() {
+    const photoInput      = document.getElementById('photo-input-desktop');
+    const photoUploadArea = document.getElementById('photo-upload-area-desktop');
+    const photoList       = document.getElementById('photo-list-desktop');
+    const uploadLoading   = document.getElementById('upload-loading-desktop');
+    const uploadProgressBar = document.getElementById('upload-progress-bar-desktop');
+
+    if (!photoInput || !photoUploadArea) return;
+
+    window.photoUploaderDesktop = new ChunkedPhotoUploader({
+        uploadUrl: '/homes/photos/upload-chunk',
+        maxConcurrent: 5,
+        onProgress: function(progress) {
+            try {
+                const total = progress.total || 1;
+                const pct = Math.round((progress.completed / total) * 100);
+                if (uploadProgressBar) uploadProgressBar.style.width = pct + '%';
+
+                if (progress.item && progress.item.status === 'completed') {
+                    if (photoList) {
+                        const exists = photoList.querySelector('[data-temp-path="' + progress.item.tempPath + '"]');
+                        if (!exists) {
+                            const div = document.createElement('div');
+                            div.className = 'photo-list-item uploaded-photo';
+                            div.dataset.tempPath = progress.item.tempPath;
+                            photoList.appendChild(div);
+                        }
+                    }
+                    const form = document.getElementById('home-form');
+                    if (form && progress.item.tempPath) {
+                        const existing = form.querySelector('input[name="restored_photos[]"][value="' + progress.item.tempPath + '"]');
+                        if (!existing) {
+                            const inp = document.createElement('input');
+                            inp.type = 'hidden';
+                            inp.name = 'restored_photos[]';
+                            inp.value = progress.item.tempPath;
+                            inp.className = 'uploaded-photo-input restored-photo-input';
+                            form.appendChild(inp);
+                        }
+                    }
+                    if (typeof window.updatePhotoCounter === 'function') window.updatePhotoCounter();
+                }
+            } catch(e) { console.error('Desktop upload error:', e); }
+        },
+        onComplete: function() {
+            if (uploadLoading) uploadLoading.style.display = 'none';
+            if (uploadProgressBar) uploadProgressBar.style.width = '0%';
+        },
+        onError: function(msg) { console.error('Desktop upload error:', msg); }
+    });
+
+    photoInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            if (uploadLoading) uploadLoading.style.display = 'block';
+            if (uploadProgressBar) uploadProgressBar.style.width = '0%';
+            window.photoUploaderDesktop.addFiles(Array.from(e.target.files));
+            e.target.value = '';
+        }
+    });
+
+    ['dragover', 'dragleave', 'drop'].forEach(function(evt) {
+        photoUploadArea.addEventListener(evt, function(e) {
+            e.preventDefault();
+            if (evt === 'dragover') photoUploadArea.classList.add('drag-over');
+            if (evt === 'dragleave') photoUploadArea.classList.remove('drag-over');
+            if (evt === 'drop') {
+                photoUploadArea.classList.remove('drag-over');
+                const files = Array.from(e.dataTransfer.files).filter(function(f) {
+                    return f.type.startsWith('image/');
+                });
+                if (files.length) {
+                    if (uploadLoading) uploadLoading.style.display = 'block';
+                    window.photoUploaderDesktop.addFiles(files);
                 }
             }
         });

@@ -264,77 +264,86 @@
                     </div>
                 </div>
 
-                <!-- ===== Desktop Actions + Summary (Keep as is - hidden on mobile) ===== -->
-                <div class="col-lg-12 d-none d-md-block">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <div class="row">
-                                <!-- Left: buttons -->
-                                <div class="col-md-8 col-5">
-                                    <div class="card-body left-controls">
-                                        <div class="form-group d-none d-md-block">
-                                            <button type="button" class="btn btn-primary" id="add-row-btn">+
-                                                {{ __('Add Row') }}</button>
+                <!-- ===== Desktop Actions + Summary (>1024px) ===== -->
+                <div class="col-lg-12 d-none d-md-block desktop-controls">
+                    <div class="desktop-layout">
+
+                        <!-- Left Column: Add Row + Photo Upload -->
+                        <div class="desktop-left-column">
+                            <div class="desktop-add-row-above-photo">
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-primary btn-lg desktop-add-row-btn" id="add-row-btn">
+                                        <i class="fas fa-plus-circle me-2"></i>{{ __('Add New Item') }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-section">
+                                <div class="card shadow-sm">
+                                    <div class="btn_div card-header bg-primary text-white">
+                                        <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="photo-upload-area" id="photo-upload-area-desktop">
+                                            <div class="photo-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                                            <h5>{{ __('Upload Project Photos') }}</h5>
+                                            <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
+                                            <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
+                                            <div class="photo-counter" id="photo-counter-desktop">
+                                                <i class="fas fa-images me-1"></i>
+                                                <span id="photo-count-desktop">0</span> {{ __('photos selected') }}
+                                            </div>
+                                            <div class="d-flex justify-content-end mb-2">
+                                                <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <div class="new-photos-section" id="new-photos-section-desktop" style="display:none;">
+                                                <div class="photo-list" id="photo-list-desktop" style="display:none;"></div>
+                                            </div>
+                                            <input type="file" id="photo-input-desktop" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display:none;">
+                                            <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input-desktop').click()">
+                                                <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
+                                            </button>
                                         </div>
-                                        <div class="form-group btn-generate d-flex flex-wrap gap-2">
-                                            <a href="{{ route('home') }}" class="btn btn-secondary">
-                                                {{ __('Cancel') }}
-                                            </a>
-                                            <button type="submit" class="btn btn-primary" formaction="{{ route('home.preview') }}">
-                                                {{ __('Preview') }}
-                                            </button>
-                                            <button type="submit" class="btn btn-success" id="generate-btn">
-                                                {{ __('Create') }}
-                                            </button>
+                                        <div class="upload-loading" id="upload-loading-desktop">
+                                            <div class="spinner-border text-primary" role="status"></div>
+                                            <div class="upload-progress">
+                                                <div class="upload-progress-bar" id="upload-progress-bar-desktop"></div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
 
-                                <!-- Right: compact totals -->
-                                <div class="col-4 col-sm-4 col-md-3 col-lg-4 ms-md-auto summary-col">
-                                    <div class="text-end" style="min-width:200px">
-                                        <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
-                                            <strong>{{ __('Total') }}:</strong>
-                                            <span class="ms-2" id="miscDisplay">0.00</span>
+                        <!-- Middle Column: Cost Summary -->
+                        <div class="desktop-middle-column">
+                            <div class="form-section">
+                                <div class="card shadow-sm">
+                                    <div class="btn_div card-header bg-primary text-white">
+                                        <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>{{ __('Cost Summary') }}</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="summary-row">
+                                            <div class="summary-label">{{ __('Total') }}:</div>
+                                            <div class="summary-value" id="miscDisplay">0.00</div>
                                         </div>
-
-                                        <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
-                                            <strong class="text-start">
-                                                <span class="d-none d-md-inline">
-                                                    {{ __('Operating + Profit (15%)') }}
-                                                </span>
-                                                <span class="d-inline d-md-none">
-                                                    <span class="d-block">{{ __('Operating +') }}</span>
-                                                    <span class="d-block">{{ __('Profit (15%)') }}</span>
-                                                </span>
-                                            </strong>
-                                            <span class="ms-2" id="operatingDisplay">0.00</span>
+                                        <div class="summary-row">
+                                            <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
+                                            <div class="summary-value" id="operatingDisplay">0.00</div>
                                         </div>
-
-                                        <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
-                                            <strong class="text-start">
-                                                <span class="d-none d-md-inline">
-                                                    {{ __('Category A,B Total') }}
-                                                </span>
-                                                <span class="d-inline d-md-none">
-                                                    <span class="d-block">{{ __('Category A,B') }}</span>
-                                                    <span class="d-block">{{ __('Total') }}</span>
-                                                </span>
-                                            </strong>
-                                            <span class="ms-2" id="abDisplay">0.00</span>
+                                        <div class="summary-row">
+                                            <div class="summary-label">{{ __('Category A,B Total') }}:</div>
+                                            <div class="summary-value" id="abDisplay">0.00</div>
                                         </div>
-
-                                        <div class="d-flex justify-content-between border p-2 mb-2 bg-light">
-                                            <strong>{{ __('VAT (7%)') }}</strong>
-                                            <span class="ms-2" id="vatDisplay">0.00</span>
+                                        <div class="summary-row">
+                                            <div class="summary-label">{{ __('VAT (7%)') }}:</div>
+                                            <div class="summary-value" id="vatDisplay">0.00</div>
                                         </div>
-
-                                        <div class="d-flex justify-content-between border p-2 bg-light">
-                                            <strong>{{ __('Total Price') }}:</strong>
-                                            <span class="ms-2" id="finalDisplay">0.00</span>
+                                        <div class="summary-row total-row">
+                                            <div class="summary-label" style="font-size:18px;color:#28a745;">{{ __('Total Price') }}:</div>
+                                            <div class="summary-value total-value" id="finalDisplay">0.00</div>
                                         </div>
-
-                                        <!-- Hidden inputs for backend -->
                                         <input type="hidden" id="misc_total" name="misc_total">
                                         <input type="hidden" id="operating_expenses" name="operating_expenses">
                                         <input type="hidden" id="category_ab_total" name="category_ab_total">
@@ -344,6 +353,37 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Right Column: Actions -->
+                        <div class="desktop-right-column">
+                            <div class="form-section">
+                                <h5 class="btn_div form-section-title">
+                                    <i class="fas fa-tasks me-2"></i>{{ __('Actions') }}
+                                </h5>
+                                <div class="card shadow-sm">
+                                    <div class="card-body">
+                                        <div class="btn-group-vertical w-100" role="group">
+                                            <button type="submit" class="btn btn-primary btn-lg mb-3" formaction="{{ route('home.preview') }}">
+                                                <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
+                                            </button>
+                                            <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn">
+                                                <i class="fas fa-file-excel me-2"></i>{{ __('Create') }}
+                                            </button>
+                                            <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
+                                                <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
+                                            </a>
+                                        </div>
+                                        <div class="mt-3 text-center">
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                {{ __('Click Preview to review before generating') }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
                 <!-- ===== Mobile View Only (NEW - shows below rows) ===== -->
