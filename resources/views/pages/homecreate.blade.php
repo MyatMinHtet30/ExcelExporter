@@ -291,21 +291,24 @@
                                         <!-- Material Total -->
                                         <div class="items-field-col total-col">
                                             <label>{{ __('Material Total') }}</label>
-                                            <div class="total-value js-mat-total">0.00</div>
+                                            <input type="text" class="form-control readonly-input js-mat-total"
+                                                placeholder="0.00" readonly>
                                         </div>
 
                                         <!-- Labor Total -->
                                         <div class="items-field-col total-col">
                                             <label>{{ __('Labor Total') }}</label>
-                                            <div class="total-value js-lab-total">0.00</div>
+                                            <input type="text" class="form-control readonly-input js-lab-total"
+                                                placeholder="0.00" readonly>
                                         </div>
-                                    </div>
 
-                                    <!-- Grand Total Row -->
-                                    <div class="grand-total-row">
-                                        <div class="grand-total-field">
+                                        <!-- Grand Total -->
+                                        <div class="items-field-col grand-total-col">
                                             <label>{{ __('Grand Total') }}</label>
-                                            <div class="grand-total-value js-grand-total">0.00</div>
+                                            <div class="grand-total-container">
+                                                <input type="text" class="form-control readonly-input js-grand-total grand-total-input"
+                                                    placeholder="0.00" readonly>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

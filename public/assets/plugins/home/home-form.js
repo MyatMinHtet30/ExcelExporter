@@ -447,9 +447,14 @@ function recalcSummary(){
     let serialCounter = 1;
     rows.forEach(row => {
       const serial = $('.serial', row);
+      const itemNumber = $('.item-number', row);
       if (!serial) return;
       if (!isDeleted(row)) {
         serial.value = serialCounter++;
+        // Update item number display in header
+        if (itemNumber) {
+          itemNumber.textContent = 'No. ' + (serialCounter - 1);
+        }
       } else {
         // keep its shown number or blank—choose your UX
         // serial.value = '';
@@ -505,6 +510,8 @@ function recalcSummary(){
           inp.value = '';
         }
       });
+      
+            
       // Make sure it's not visually deleted
       newRow.classList.remove('row-deleted');
     }
