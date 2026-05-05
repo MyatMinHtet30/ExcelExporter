@@ -15,377 +15,445 @@
         <div class="xp-contentbar">
             <div class="row">
 
-                <!-- Top info cards -->
-                <div class="col-lg-6 col-md-6 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Project Name') }} <span class="star">*</span></h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
+                <!-- Enhanced Project Information Section -->
+                <div class="col-12">
+                    <div class="project-info-container">
+                        <div class="project-info-title">
+                            <h2>{{ __('Project Information') }}</h2>
+                            <p>{{ __('Please fill in the details for your home building quotation') }}</p>
+                        </div>
+                        
+                        <div class="project-info-grid">
+                            <!-- Project Name -->
+                            <div class="project-field-card">
+                                <div class="project-field-header">
+                                    <label>
+                                        <span class="field-icon">
+                                            <i class="fas fa-building"></i>
+                                        </span>
+                                        {{ __('Project Name') }}
+                                        <span class="required-star">*</span>
+                                    </label>
+                                </div>
+                                <div class="project-field-body">
+                                    <div class="input-group">
                                         <input type="text" class="form-control" name="project_name" id="project_name"
                                             placeholder="{{ __('Enter project name') }}" 
                                             value="{{ old('project_name', $restoredData['project_name'] ?? '') }}" required
                                             data-error-required="{{ __('Project name is required') }}">
-                                        @error('project_name') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                        <button type="button" class="mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
                                         </button>
                                     </div>
+                                    @error('project_name') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-lg-6 col-md-6 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('List Name') }} <span class="star">*</span></h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="list_name" id="list_name" placeholder="{{ __('Enter list name') }}"
+                            <!-- List Name -->
+                            <div class="project-field-card">
+                                <div class="project-field-header">
+                                    <label>
+                                        <span class="field-icon">
+                                            <i class="fas fa-list"></i>
+                                        </span>
+                                        {{ __('List Name') }}
+                                        <span class="required-star">*</span>
+                                    </label>
+                                </div>
+                                <div class="project-field-body">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="list_name" id="list_name" 
+                                            placeholder="{{ __('Enter list name') }}"
                                             value="{{ old('list_name', $restoredData['list_name'] ?? '') }}" required
                                             data-error-required="{{ __('List name is required') }}">
-                                        @error('list_name') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                                        <button type="button" class="mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
                                         </button>
                                     </div>
+                                    @error('list_name') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-
-                <div class="col-lg-4 col-md-4 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Dear') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="dear" id="dear" placeholder="{{ __('Enter recipient name') }}"
-                                            value="{{ old('dear', $restoredData['dear'] ?? '') }}" nullable>
-                                        @error('dear') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                            <!-- Client Name (Dear) -->
+                            <div class="project-field-card">
+                                <div class="project-field-header">
+                                    <label>
+                                        <span class="field-icon">
+                                            <i class="fas fa-user"></i>
+                                        </span>
+                                        {{ __('Client Name') }}
+                                    </label>
+                                </div>
+                                <div class="project-field-body">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="dear" id="dear" 
+                                            placeholder="{{ __('Enter client name') }}"
+                                            value="{{ old('dear', $restoredData['dear'] ?? '') }}">
+                                        <button type="button" class="mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
                                         </button>
                                     </div>
+                                    @error('dear') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <div class="col-lg-4 col-md-4 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('House No') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control" name="house_no" id="house_no" placeholder="{{ __('Enter house no.') }}"
-                                            value="{{ old('house_no', $restoredData['house_no'] ?? '') }}" nullable>
-                                        @error('house_no') <small class="text-danger d-block mt-1">{{ $message }}</small> @enderror
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
+                            <!-- House Number -->
+                            <div class="project-field-card">
+                                <div class="project-field-header">
+                                    <label>
+                                        <span class="field-icon">
+                                            <i class="fas fa-home"></i>
+                                        </span>
+                                        {{ __('House Number') }}
+                                    </label>
+                                </div>
+                                <div class="project-field-body">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="house_no" id="house_no" 
+                                            placeholder="{{ __('Enter house number') }}"
+                                            value="{{ old('house_no', $restoredData['house_no'] ?? '') }}">
+                                        <button type="button" class="mic-btn"
                                             onclick="startDictation(this)" title="{{ __('Speak') }}">
                                             <i class="fas fa-microphone"></i>
                                         </button>
                                     </div>
+                                    @error('house_no') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!--  trooper -->
-                <div class="col-lg-4 col-md-4 col-12">
-                    <div class="card m-b-20">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-black">{{ __('Trooper') }}</h5>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="input-group input-42">
-                                        <select name="trooper" id="trooper" class="form-control" required data-error-required="{{ __('Trooper is required') }}">
+                            <!-- Street Address -->
+                            <div class="project-field-card">
+                                <div class="project-field-header">
+                                    <label>
+                                        <span class="field-icon">
+                                            <i class="fas fa-road"></i>
+                                        </span>
+                                        {{ __('Street Address') }}
+                                    </label>
+                                </div>
+                                <div class="project-field-body">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="street" id="street" 
+                                            placeholder="{{ __('Enter street address') }}"
+                                            value="{{ old('street', $restoredData['street'] ?? '') }}">
+                                        <button type="button" class="mic-btn"
+                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                    @error('street') <small class="text-danger">{{ $message }}</small> @enderror
+                                </div>
+                            </div>
 
+                            <!-- Quarter/Area -->
+                            <div class="project-field-card">
+                                <div class="project-field-header">
+                                    <label>
+                                        <span class="field-icon">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </span>
+                                        {{ __('Quarter/Area') }}
+                                    </label>
+                                </div>
+                                <div class="project-field-body">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="quarter" id="quarter" 
+                                            placeholder="{{ __('Enter quarter or area') }}"
+                                            value="{{ old('quarter', $restoredData['quarter'] ?? '') }}">
+                                        <button type="button" class="mic-btn"
+                                            onclick="startDictation(this)" title="{{ __('Speak') }}">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                    @error('quarter') <small class="text-danger">{{ $message }}</small> @enderror
+                                </div>
+                            </div>
+
+                            <!-- Construction Company (Trooper) -->
+                            <div class="project-field-card">
+                                <div class="project-field-header">
+                                    <label>
+                                        <span class="field-icon">
+                                            <i class="fas fa-hard-hat"></i>
+                                        </span>
+                                        {{ __('Construction Company') }}
+                                        <span class="required-star">*</span>
+                                    </label>
+                                </div>
+                                <div class="project-field-body">
+                                    <div class="input-group">
+                                        <select name="trooper" id="trooper" class="form-control select-field" required 
+                                            data-error-required="{{ __('Company is required') }}">
+                                            <option value="" selected disabled>{{ __('Select Company') }}</option>
                                             <option value="{{ __('168 Home company') }}"
-                                            {{ old('trooper', $restoredData['trooper'] ?? '') === __('168 Home company') ? 'selected' : '' }}>
-                                            {{ __('168 Home company') }}
+                                                {{ old('trooper', $restoredData['trooper'] ?? '') === __('168 Home company') ? 'selected' : '' }}>
+                                                {{ __('168 Home company') }}
                                             </option>
-
                                             <option value="{{ __('Pi Kaew') }}"
-                                            {{ old('trooper', $restoredData['trooper'] ?? '') === __('Pi Kaew') ? 'selected' : '' }}>
-                                            {{ __('Pi Kaew') }}
+                                                {{ old('trooper', $restoredData['trooper'] ?? '') === __('Pi Kaew') ? 'selected' : '' }}>
+                                                {{ __('Pi Kaew') }}
                                             </option>
                                         </select>
                                     </div>
+                                    @error('trooper') <small class="text-danger">{{ $message }}</small> @enderror
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ---------- Dynamic item rows ---------- -->
-                <div id="rows-container" class="col-12">
-                    <div class="card m-b-20 item-row">
-                        <div class="card-header bg-white">
-
-                           <!-- Line 1 -->
-                            <div class="row g-3 g-compact align-items-start">
-
-                                <!-- No -->
-                                <div class="col-3 col-sm-2 col-md-1 field-col">
-                                    <label class="form-label">{{ __('No') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="number" class="form-control readonly-input serial"
-                                            name="details[0][no]" value="1" min="1" readonly>
-                                    </div>
+                <!-- Enhanced Construction Items Section -->
+                <div class="col-12">
+                    <div class="items-section-container">
+                        <div class="items-section-title">
+                            <h2>{{ __('Construction Items') }}</h2>
+                            <p>{{ __('Add all construction materials and labor costs for your project') }}</p>
+                        </div>
+                        
+                        <div id="rows-container">
+                            <div class="item-row-card card m-b-20 item-row">
+                                <div class="item-row-header card-header bg-white">
+                                    <span class="item-number">{{ __('No') }} 1</span>
+                                    <button type="button" class="remove-item-btn remove-row">
+                                        <i class="fas fa-trash"></i>
+                                        {{ __('Remove') }}
+                                    </button>
                                 </div>
+                                
+                                <div class="item-row-body card-body">
+                                    <div class="items-table-layout">
+                                        <!-- Category -->
+                                        <div class="items-field-col category-col">
+                                            <label>{{ __('Category') }} <span class="required-star">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control"
+                                                    name="details[0][category_name]"
+                                                    placeholder="{{ __('Category A / B / ...') }}" required
+                                                    data-error-required="{{ __('Category is required') }}">
+                                                <button type="button" class="mic-btn"
+                                                    onclick="startDictation(this)">
+                                                    <i class="fas fa-microphone"></i>
+                                                </button>
+                                            </div>
+                                        </div>
 
-                                <!-- Category -->
-                                <div class="col-12 col-sm-6 col-md-3 field-col">
-                                    <label class="form-label">{{ __('Category') }} <span class="star">*</span></label>
-                                    <div class="input-group input-42">
-                                        <input type="text" class="form-control"
-                                            name="details[0][category_name]"
-                                            placeholder="{{ __('Category A / B / ...') }}" required
-                                            data-error-required="{{ __('Category is required') }}">
-                                        <button type="button" class="btn btn-outline-secondary mic-btn"
-                                                onclick="startDictation(this)">
-                                            <i class="fas fa-microphone"></i>
-                                        </button>
+                                        <!-- Amount -->
+                                        <div class="items-field-col amount-col">
+                                            <label>{{ __('Amount') }} <span class="required-star">*</span></label>
+                                            <input type="text" step="0.01" class="form-control js-amount"
+                                                name="details[0][amount]" placeholder=".00" required
+                                                data-error-required="{{ __('Amount is required') }}"
+                                                data-error-number="{{ __('Please enter number only') }}">
+                                        </div>
+
+                                        <!-- Unit -->
+                                        <div class="items-field-col unit-col">
+                                            <label>{{ __('Unit') }} <span class="required-star">*</span></label>
+                                            <select class="form-select units" name="details[0][unit]" required
+                                                data-error-required="{{ __('Unit is required') }}">
+                                                <option value="" selected disabled>{{ __('Select Unit') }}</option>
+                                                <option value="{{ __('sq.m') }}">{{ __('sq.m') }}</option>
+                                                <option value="{{ __('m') }}">{{ __('m') }}</option>
+                                                <option value="{{ __('lump sum') }}">{{ __('lump sum') }}</option>
+                                                <option value="{{ __('leaf') }}">{{ __('leaf') }}</option>
+                                                <option value="{{ __('trip') }}">{{ __('trip') }}</option>
+                                                <option value="{{ __('point') }}">{{ __('point') }}</option>
+                                                <option value="{{ __('day') }}">{{ __('day') }}</option>
+                                                <option value="{{ __('piece') }}">{{ __('piece') }}</option>
+                                                <option value="{{ __('floor') }}">{{ __('floor') }}</option>
+                                                <option value="{{ __('set') }}">{{ __('set') }}</option>
+                                                <option value="{{ __('sheet') }}">{{ __('sheet') }}</option>
+                                                <option value="{{ __('unit') }}">{{ __('unit') }}</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Material Price -->
+                                        <div class="items-field-col price-col">
+                                            <label>{{ __('Material Price') }} <span class="required-star">*</span></label>
+                                            <input type="text" step="0.01" class="form-control js-mc"
+                                                name="details[0][mc_price]" placeholder=".00" required
+                                                data-error-required="{{ __('Material cost or labor cost is required') }}"
+                                                data-error-number="{{ __('Please enter number only') }}">
+                                        </div>
+
+                                        <!-- Labor Price -->
+                                        <div class="items-field-col price-col">
+                                            <label>{{ __('Labor Price') }} <span class="required-star">*</span></label>
+                                            <input type="text" step="0.01" class="form-control js-lc"
+                                                name="details[0][lc_price]" placeholder=".00" required
+                                                data-error-required="{{ __('Material cost or labor cost is required') }}"
+                                                data-error-number="{{ __('Please enter number only') }}">
+                                        </div>
+
+                                        <!-- Material Total -->
+                                        <div class="items-field-col total-col">
+                                            <label>{{ __('Material Total') }}</label>
+                                            <div class="total-value js-mat-total">0.00</div>
+                                        </div>
+
+                                        <!-- Labor Total -->
+                                        <div class="items-field-col total-col">
+                                            <label>{{ __('Labor Total') }}</label>
+                                            <div class="total-value js-lab-total">0.00</div>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <!-- Amount -->
-                                <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Amount') }} <span class="star">*</span></label>
-                                    <div class="input-group input-42">
-                                        <input type="text" step="0.01" class="form-control js-amount"
-                                            name="details[0][amount]" placeholder=".00" required
-                                            data-error-required="{{ __('Amount is required') }}"
-                                            data-error-number="{{ __('Please enter number only') }}">
+                                    <!-- Grand Total Row -->
+                                    <div class="grand-total-row">
+                                        <div class="grand-total-field">
+                                            <label>{{ __('Grand Total') }}</label>
+                                            <div class="grand-total-value js-grand-total">0.00</div>
+                                        </div>
                                     </div>
-                                </div>
-
-                                <!-- Unit -->
-                                <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Unit') }} <span class="star">*</span></label>
-                                    <div class="input-group input-42">
-                                        <select class="form-control units" name="details[0][unit]" required
-                                            data-error-required="{{ __('Unit is required') }}">
-                                            <option value="" selected disabled>{{ __('Select Unit') }}</option>
-                                            <option value="{{ __('sq.m') }}">{{ __('sq.m') }}</option>
-                                            <option value="{{ __('m') }}">{{ __('m') }}</option>
-                                            <option value="{{ __('lump sum') }}">{{ __('lump sum') }}</option>
-                                            <option value="{{ __('leaf') }}">{{ __('leaf') }}</option>
-                                            <option value="{{ __('trip') }}">{{ __('trip') }}</option>
-                                            <option value="{{ __('point') }}">{{ __('point') }}</option>
-                                            <option value="{{ __('day') }}">{{ __('day') }}</option>
-                                            <option value="{{ __('piece') }}">{{ __('piece') }}</option>
-                                            <option value="{{ __('floor') }}">{{ __('floor') }}</option>
-                                            <option value="{{ __('set') }}">{{ __('set') }}</option>
-                                            <option value="{{ __('sheet') }}">{{ __('sheet') }}</option>
-                                            <option value="{{ __('unit') }}">{{ __('unit') }}</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <!-- Material Price / Unit -->
-                                <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Material Price') }} <span class="star">*</span></label>
-                                    <div class="input-group input-42">
-                                        <input type="text" step="0.01" class="form-control js-mc"
-                                            name="details[0][mc_price]" placeholder=".00" required
-                                            data-error-required="{{ __('Material cost or labor cost is required') }}"
-                                            data-error-number="{{ __('Please enter number only') }}">
-                                    </div>
-                                </div>
-
-                                <!-- Labor Price / Unit -->
-                                <div class="col-6 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Labor Price') }} <span class="star">*</span></label>
-                                    <div class="input-group input-42">
-                                        <input type="text" step="0.01" class="form-control js-lc"
-                                            name="details[0][lc_price]" placeholder=".00" required
-                                            data-error-required="{{ __('Material cost or labor cost is required') }}"
-                                            data-error-number="{{ __('Please enter number only') }}">
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            <!-- Line 2 -->
-                            <div class="row g-3 g-compact align-items-end pt-2 fields-line-2 justify-content-end">
-
-                                <!-- Material Total -->
-                                <div class="col-12 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Material Total') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="text"
-                                            class="form-control readonly-input js-mat-total"
-                                            placeholder="0.00" readonly>
-                                    </div>
-                                </div>
-
-                                <!-- Labor Total -->
-                                <div class="col-12 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Labor Total') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="text"
-                                            class="form-control readonly-input js-lab-total"
-                                            placeholder="0.00" readonly>
-                                    </div>
-                                </div>
-
-                                <!-- Grand Total -->
-                                <div class="col-12 col-md-2 field-col">
-                                    <label class="form-label">{{ __('Grand Total') }}</label>
-                                    <div class="input-group input-42">
-                                        <input type="text"
-                                            class="form-control readonly-input js-grand-total"
-                                            placeholder="0.00" readonly>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="row pt-2">
-                                <div class="col-12 d-flex justify-content-end">
-                                    <button type="button" class="btn btn-sm btn-danger remove-row">&times;</button>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Add New Item Button -->
+                        <div class="add-item-section">
+                            <button type="button" class="add-item-btn" id="add-row-btn">
+                                <i class="fas fa-plus"></i>
+                                {{ __('Add New Item') }}
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== Desktop Actions + Summary (>1024px) ===== -->
-                <div class="col-lg-12 d-none d-md-block desktop-controls">
-                    <div class="desktop-layout">
+                <!-- Enhanced Photos & Summary Section -->
+                <div class="col-12">
+                    <div class="photos-summary-container">
+                        <div class="photos-summary-title">
+                            <h2>{{ __('Project Photos & Cost Summary') }}</h2>
+                            <p>{{ __('Upload project photos and review the complete cost breakdown') }}</p>
+                        </div>
+                        
+                        <div class="photos-summary-layout">
+                            <!-- Photo Upload Section -->
+                            <div class="photo-upload-section">
+                                <div class="photo-upload-header">
+                                    <h3>
+                                        <span class="section-icon">
+                                            <i class="fas fa-images"></i>
+                                        </span>
+                                        {{ __('Project Photos') }}
+                                    </h3>
+                                </div>
+                                <div class="photo-upload-body">
+                                    <div class="photo-upload-area" id="photo-upload-area-desktop">
+                                        <div class="photo-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                                        <div class="photo-upload-text">{{ __('Upload Project Photos') }}</div>
+                                        <div class="photo-upload-subtext">{{ __('Drag & drop photos here or click to browse') }}</div>
+                                        <div class="photo-upload-subtext small">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</div>
+                                        
+                                        <div class="photo-counter" id="photo-counter-desktop">
+                                            <i class="fas fa-images me-2"></i>
+                                            <span id="photo-count-desktop">0</span> {{ __('photos selected') }}
+                                        </div>
+                                        
+                                        <div class="photo-actions">
+                                            <button type="button" class="photo-btn danger" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                                <i class="fas fa-trash"></i>
+                                                {{ __('Delete All') }}
+                                            </button>
+                                            <button type="button" class="photo-btn primary" onclick="document.getElementById('photo-input-desktop').click()">
+                                                <i class="fas fa-folder-open"></i>
+                                                {{ __('Browse Photos') }}
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="new-photos-section" id="new-photos-section-desktop" style="display:none;">
+                                            <div class="photo-list" id="photo-list-desktop" style="display:none;"></div>
+                                        </div>
+                                        <input type="file" id="photo-input-desktop" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display:none;">
+                                    </div>
+                                    
+                                    <div class="upload-loading" id="upload-loading-desktop">
+                                        <div class="spinner-border text-primary" role="status"></div>
+                                        <div class="upload-progress">
+                                            <div class="upload-progress-bar" id="upload-progress-bar-desktop"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                        <!-- Left Column: Add Row + Photo Upload -->
-                        <div class="desktop-left-column">
-                            <div class="desktop-add-row-above-photo">
-                                <div class="text-center">
-                                    <button type="button" class="btn btn-primary btn-lg desktop-add-row-btn" id="add-row-btn">
-                                        <i class="fas fa-plus-circle me-2"></i>{{ __('Add New Item') }}
+                            <!-- Cost Summary Section -->
+                            <div class="cost-summary-section">
+                                <div class="cost-summary-header">
+                                    <h3>
+                                        <span class="section-icon">
+                                            <i class="fas fa-calculator"></i>
+                                        </span>
+                                        {{ __('Cost Summary') }}
+                                    </h3>
+                                </div>
+                                <div class="cost-summary-body">
+                                    <div class="summary-item">
+                                        <div class="summary-label">{{ __('Total') }}</div>
+                                        <div class="summary-value" id="miscDisplay">0.00</div>
+                                    </div>
+                                    <div class="summary-item">
+                                        <div class="summary-label">{{ __('Operating + Profit (15%)') }}</div>
+                                        <div class="summary-value" id="operatingDisplay">0.00</div>
+                                    </div>
+                                    <div class="summary-item">
+                                        <div class="summary-label">{{ __('Category A,B Total') }}</div>
+                                        <div class="summary-value" id="abDisplay">0.00</div>
+                                    </div>
+                                    <div class="summary-item">
+                                        <div class="summary-label">{{ __('VAT (7%)') }}</div>
+                                        <div class="summary-value" id="vatDisplay">0.00</div>
+                                    </div>
+                                    <div class="summary-item total">
+                                        <div class="summary-label">{{ __('Total Price') }}</div>
+                                        <div class="summary-value" id="finalDisplay">0.00</div>
+                                    </div>
+                                    
+                                    <!-- Hidden inputs for form submission -->
+                                    <input type="hidden" id="misc_total" name="misc_total">
+                                    <input type="hidden" id="operating_expenses" name="operating_expenses">
+                                    <input type="hidden" id="category_ab_total" name="category_ab_total">
+                                    <input type="hidden" id="vat_total" name="vat_total">
+                                    <input type="hidden" id="final_total" name="final_total">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons Section -->
+                        <div class="action-buttons-section">
+                            <div class="action-buttons-header">
+                                <h3>
+                                    <span class="section-icon">
+                                        <i class="fas fa-tasks"></i>
+                                    </span>
+                                    {{ __('Actions') }}
+                                </h3>
+                            </div>
+                            <div class="action-buttons-body">
+                                <div class="action-buttons-group">
+                                    <button type="submit" class="action-btn preview" formaction="{{ route('home.preview') }}">
+                                        <i class="fas fa-eye"></i>
+                                        {{ __('Preview') }}
+                                    </button>
+                                    
+                                    <button type="submit" class="action-btn create" id="generate-btn-desktop">
+                                        <i class="fas fa-file-excel"></i>
+                                        {{ __('Create Excel') }}
+                                    </button>
+                                    
+                                    <button type="button" class="action-btn cancel" onclick="window.location.href='{{ route('home') }}'">
+                                        <i class="fas fa-times"></i>
+                                        {{ __('Cancel') }}
                                     </button>
                                 </div>
                             </div>
-                            <div class="form-section">
-                                <div class="card shadow-sm">
-                                    <div class="btn_div card-header bg-primary text-white">
-                                        <h5 class="mb-0"><i class="fas fa-images me-2"></i>{{ __('Project Photos') }}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="photo-upload-area" id="photo-upload-area-desktop">
-                                            <div class="photo-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                                            <h5>{{ __('Upload Project Photos') }}</h5>
-                                            <p class="text-muted">{{ __('Drag & drop photos here or click to browse') }}</p>
-                                            <p class="text-muted small mb-2">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</p>
-                                            <div class="photo-counter" id="photo-counter-desktop">
-                                                <i class="fas fa-images me-1"></i>
-                                                <span id="photo-count-desktop">0</span> {{ __('photos selected') }}
-                                            </div>
-                                            <div class="d-flex justify-content-end mb-2">
-                                                <button type="button" class="photo-remove delete-all-btn" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                            <div class="new-photos-section" id="new-photos-section-desktop" style="display:none;">
-                                                <div class="photo-list" id="photo-list-desktop" style="display:none;"></div>
-                                            </div>
-                                            <input type="file" id="photo-input-desktop" name="photos[]" multiple accept="image/*,.heic,.heif,.avif,.cr2,.nef,.arw,.dng,.raw,.orf,.rw2,.pef,.sr2,.raf" style="display:none;">
-                                            <button type="button" class="btn btn-primary mt-3" onclick="document.getElementById('photo-input-desktop').click()">
-                                                <i class="fas fa-folder-open me-2"></i>{{ __('Browse Photos') }}
-                                            </button>
-                                        </div>
-                                        <div class="upload-loading" id="upload-loading-desktop">
-                                            <div class="spinner-border text-primary" role="status"></div>
-                                            <div class="upload-progress">
-                                                <div class="upload-progress-bar" id="upload-progress-bar-desktop"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-
-                        <!-- Middle Column: Cost Summary -->
-                        <div class="desktop-middle-column">
-                            <div class="form-section">
-                                <div class="card shadow-sm">
-                                    <div class="btn_div card-header bg-primary text-white">
-                                        <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>{{ __('Cost Summary') }}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="summary-row">
-                                            <div class="summary-label">{{ __('Total') }}:</div>
-                                            <div class="summary-value" id="miscDisplay">0.00</div>
-                                        </div>
-                                        <div class="summary-row">
-                                            <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
-                                            <div class="summary-value" id="operatingDisplay">0.00</div>
-                                        </div>
-                                        <div class="summary-row">
-                                            <div class="summary-label">{{ __('Category A,B Total') }}:</div>
-                                            <div class="summary-value" id="abDisplay">0.00</div>
-                                        </div>
-                                        <div class="summary-row">
-                                            <div class="summary-label">{{ __('VAT (7%)') }}:</div>
-                                            <div class="summary-value" id="vatDisplay">0.00</div>
-                                        </div>
-                                        <div class="summary-row total-row">
-                                            <div class="summary-label" style="font-size:18px;color:#28a745;">{{ __('Total Price') }}:</div>
-                                            <div class="summary-value total-value" id="finalDisplay">0.00</div>
-                                        </div>
-                                        <input type="hidden" id="misc_total" name="misc_total">
-                                        <input type="hidden" id="operating_expenses" name="operating_expenses">
-                                        <input type="hidden" id="category_ab_total" name="category_ab_total">
-                                        <input type="hidden" id="vat_total" name="vat_total">
-                                        <input type="hidden" id="final_total" name="final_total">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Right Column: Actions -->
-                        <div class="desktop-right-column">
-                            <div class="form-section">
-                                <h5 class="btn_div form-section-title">
-                                    <i class="fas fa-tasks me-2"></i>{{ __('Actions') }}
-                                </h5>
-                                <div class="card shadow-sm">
-                                    <div class="card-body">
-                                        <div class="btn-group-vertical w-100" role="group">
-                                            <button type="submit" class="btn btn-primary btn-lg mb-3" formaction="{{ route('home.preview') }}">
-                                                <i class="fas fa-eye me-2"></i>{{ __('Preview') }}
-                                            </button>
-                                            <button type="submit" class="btn btn-success btn-lg mb-3" id="generate-btn">
-                                                <i class="fas fa-file-excel me-2"></i>{{ __('Create') }}
-                                            </button>
-                                            <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-lg">
-                                                <i class="fas fa-times me-2"></i>{{ __('Cancel') }}
-                                            </a>
-                                        </div>
-                                        <div class="mt-3 text-center">
-                                            <small class="text-muted">
-                                                <i class="fas fa-info-circle me-1"></i>
-                                                {{ __('Click Preview to review before generating') }}
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
+
+                <!-- Desktop Controls (Hidden - replaced by new layout) -->
                 <!-- ===== Mobile View Only (NEW - shows below rows) ===== -->
                 <div class="col-12 mobile-photo-section">
                     <!-- Mobile Add Row Button - Standalone (no grid/container) -->
@@ -661,6 +729,45 @@
 <script src="{{ asset('assets/js/chunked-upload.js') }}"></script>
 
 <script>
+// Handle desktop button
+const desktopAddBtn = document.getElementById('add-row-btn');
+if (desktopAddBtn) {
+    desktopAddBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof addRow === 'function') {
+            addRow();
+        } else {
+            console.error('addRow function not available');
+        }
+    });
+}
+
+// Handle mobile button
+const mobileAddBtn = document.getElementById('add-row-btn-mobile');
+if (mobileAddBtn) {
+    mobileAddBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof addRow === 'function') {
+            addRow();
+        } else {
+            console.error('addRow function not available');
+        }
+    });
+}
+
+// Handle iPad grid button
+const iPadGridAddBtn = document.getElementById('add-row-btn-ipad');
+if (iPadGridAddBtn) {
+    iPadGridAddBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof addRow === 'function') {
+            addRow();
+        } else {
+            console.error('addRow function not available');
+        }
+    });
+}
+
 // Sync iPad photo counter from phone counter on any change
 document.addEventListener('DOMContentLoaded', function() {
     const phoneCount = document.getElementById('photo-count');
@@ -671,7 +778,40 @@ document.addEventListener('DOMContentLoaded', function() {
         ipadCount.textContent = phoneCount.textContent;
     });
     observer.observe(phoneCount, { childList: true, characterData: true, subtree: true });
+    
+    // Only disable auto-save restore prompt, preserve photo data
+    const autoSaveData = localStorage.getItem('home_form_autosave');
+    if (autoSaveData) {
+        const parsed = JSON.parse(autoSaveData);
+        if (parsed.data && parsed.data.photos) {
+            // Keep photos but remove form fields to prevent restore prompt
+            parsed.data.details = [];
+            parsed.data.project_name = '';
+            parsed.data.list_name = '';
+            parsed.data.dear = '';
+            parsed.data.house_no = '';
+            parsed.data.street = '';
+            parsed.data.quarter = '';
+            parsed.data.trooper = '';
+            localStorage.setItem('home_form_autosave', JSON.stringify(parsed));
+        } else {
+            localStorage.removeItem('home_form_autosave');
+        }
+    }
 });
+
+// Handle iPad grid button
+const iPadGridAddBtn = document.getElementById('add-row-btn-ipad');
+if (iPadGridAddBtn) {
+    iPadGridAddBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof addRow === 'function') {
+            addRow();
+        } else {
+            console.error('addRow function not available');
+        }
+    });
+}
 </script>
 
 @if(isset($restoredData) && $restoredData)

@@ -281,11 +281,6 @@
     });
   }
 
-  const addBtns = [
-    $('#add-row-btn'),       // Create page
-    $('#add-row-btn-edit'),  // Edit page
-  ].filter(Boolean);
-
   const rowTemplate = $('#row-template'); // Present on Edit page
   const previewBtn  = $('#preview-btn');  // Present on Edit page
 
@@ -297,18 +292,62 @@
       alert('เบราว์เซอร์นี้ไม่รองรับการจดจำเสียง (Speech Recognition).');
       return;
     }
+    
+    // Check if already recording
+    if (btn.isRecording) {
+      // Stop recording
+      if (btn.recognition) {
+        btn.recognition.stop();
+        btn.recognition = null;
+      }
+      btn.isRecording = false;
+      btn.innerHTML = '<i class="fas fa-microphone"></i>';
+      btn.style.background = '';
+      return;
+    }
+    
+    // Start recording
     const r = new webkitSpeechRecognition();
-    r.lang = 'th-TH'; r.interimResults = false; r.maxAlternatives = 1;
+    r.lang = 'th-TH'; 
+    r.interimResults = false; 
+    r.maxAlternatives = 1;
+    
     r.onresult = e => {
       input.value = e.results[0][0].transcript;
-      input.dispatchEvent(new Event('input',{bubbles:true}));
     };
+    
+    r.onerror = () => {
+      r.stop();
+      btn.isRecording = false;
+      btn.innerHTML = '<i class="fas fa-microphone"></i>';
+      btn.style.background = '';
+    };
+    
+    r.onend = () => {
+      btn.isRecording = false;
+      btn.innerHTML = '<i class="fas fa-microphone"></i>';
+      btn.style.background = '';
+    };
+    
+    // Store recognition instance and update button state
+    btn.recognition = r;
+    btn.isRecording = true;
+    btn.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+    btn.style.background = '#dc3545';
+    btn.style.color = 'white';
+    
     r.start();
   }
+  
   // expose for inline buttons
   window.startDictation = startDictation;
 
-  // ====== Helpers about soft-delete (Edit page) ======
+const addBtns = [
+  $('#add-row-btn'),       // Create page
+  $('#add-row-btn-edit'),  // Edit page
+].filter(Boolean);
+
+// ====== Helpers about soft-delete (Edit page) ======
   const isSoftRow  = (row) => !!row.querySelector('.js-delete-flag');
   const isDeleted  = (row) => {
     const f = row.querySelector('.js-delete-flag');
