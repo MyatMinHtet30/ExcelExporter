@@ -132,6 +132,11 @@
         return;
       }
       
+      // Skip restore confirmation - don't show the alert
+      // Just clear the auto-save data silently
+      localStorage.removeItem('home_form_autosave');
+      return;
+      
       // Ask user if they want to restore only if form is truly empty
       if (confirm('Found unsaved form data. Would you like to restore it?')) {
         // Restore form fields
@@ -302,7 +307,9 @@
       }
       btn.isRecording = false;
       btn.innerHTML = '<i class="fas fa-microphone"></i>';
-      btn.style.background = '';
+      btn.style.background = '#e9ecef';
+      btn.style.color = '#495057';
+      btn.style.borderColor = '#ced4da';
       return;
     }
     
@@ -326,7 +333,9 @@
     r.onend = () => {
       btn.isRecording = false;
       btn.innerHTML = '<i class="fas fa-microphone"></i>';
-      btn.style.background = '';
+      btn.style.background = '#e9ecef';
+      btn.style.color = '#495057';
+      btn.style.borderColor = '#ced4da';
     };
     
     // Store recognition instance and update button state
@@ -445,16 +454,19 @@ function recalcSummary(){
 
     // Serial numbers for ACTIVE rows only
     let serialCounter = 1;
-    rows.forEach(row => {
+    console.log('reindexRows called, rows:', rows.length);
+    rows.forEach((row, index) => {
       const serial = $('.serial', row);
       const itemNumber = $('.item-number', row);
+      console.log(`Row ${index}: serial=${serial ? serial.value : 'null'}, itemNumber=${itemNumber ? itemNumber.textContent : 'null'}, isDeleted=${isDeleted(row)}`);
       if (!serial) return;
       if (!isDeleted(row)) {
-        serial.value = serialCounter++;
-        // Update item number display in header
+        serial.value = serialCounter;
+        // Update item number display in header - force update for all rows
         if (itemNumber) {
-          itemNumber.textContent = 'No. ' + (serialCounter - 1);
+          itemNumber.textContent = 'No. ' + serialCounter;
         }
+        serialCounter++;
       } else {
         // keep its shown number or blank—choose your UX
         // serial.value = '';
@@ -511,6 +523,11 @@ function recalcSummary(){
         }
       });
       
+      // Clear the item-number display for the new row (will be set by reindexRows)
+      const itemNumber = $('.item-number', newRow);
+      if (itemNumber) {
+        itemNumber.textContent = 'No. ';
+      }
             
       // Make sure it's not visually deleted
       newRow.classList.remove('row-deleted');
