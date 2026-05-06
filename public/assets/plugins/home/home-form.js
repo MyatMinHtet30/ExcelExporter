@@ -459,17 +459,14 @@ function recalcSummary(){
       const serial = $('.serial', row);
       const itemNumber = $('.item-number', row);
       console.log(`Row ${index}: serial=${serial ? serial.value : 'null'}, itemNumber=${itemNumber ? itemNumber.textContent : 'null'}, isDeleted=${isDeleted(row)}`);
-      if (!serial) return;
       if (!isDeleted(row)) {
-        serial.value = serialCounter;
-        // Update item number display in header - force update for all rows
+        // Update serial input if present (Edit page only)
+        if (serial) serial.value = serialCounter;
+        // Always update the visible item number badge
         if (itemNumber) {
           itemNumber.textContent = 'No. ' + serialCounter;
         }
         serialCounter++;
-      } else {
-        // keep its shown number or blank—choose your UX
-        // serial.value = '';
       }
     });
 
@@ -528,6 +525,16 @@ function recalcSummary(){
       if (itemNumber) {
         itemNumber.textContent = 'No. ';
       }
+      
+      // Remove any validation error messages from the cloned row
+      newRow.querySelectorAll('.js-error-msg').forEach(errEl => errEl.remove());
+
+      // Reassign IDs so each row's inputs have unique IDs for error targeting
+      const newIdx = document.querySelectorAll('#rows-container .item-row').length;
+      [['cat_', 'cat_'], ['amt_', 'amt_'], ['unit_', 'unit_'], ['mc_', 'mc_'], ['lc_', 'lc_']].forEach(function(pair) {
+        const el = newRow.querySelector('[id^="' + pair[0] + '"]');
+        if (el) el.id = pair[1] + newIdx;
+      });
             
       // Make sure it's not visually deleted
       newRow.classList.remove('row-deleted');

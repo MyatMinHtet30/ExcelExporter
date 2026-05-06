@@ -231,6 +231,7 @@
                                             <div class="input-group">
                                                 <input type="text" class="form-control"
                                                     name="details[0][category_name]"
+                                                    id="cat_0"
                                                     placeholder="{{ __('Category A / B / ...') }}" required
                                                     data-error-required="{{ __('Category is required') }}">
                                                 <button type="button" class="mic-btn"
@@ -244,7 +245,9 @@
                                         <div class="items-field-col amount-col">
                                             <label>{{ __('Amount') }} <span class="required-star">*</span></label>
                                             <input type="text" step="0.01" class="form-control js-amount"
-                                                name="details[0][amount]" placeholder=".00" required
+                                                name="details[0][amount]"
+                                                id="amt_0"
+                                                placeholder=".00" required
                                                 data-error-required="{{ __('Amount is required') }}"
                                                 data-error-number="{{ __('Please enter number only') }}">
                                         </div>
@@ -252,7 +255,9 @@
                                         <!-- Unit -->
                                         <div class="items-field-col unit-col">
                                             <label>{{ __('Unit') }} <span class="required-star">*</span></label>
-                                            <select class="form-select units" name="details[0][unit]" required
+                                            <select class="form-select units" name="details[0][unit]"
+                                                id="unit_0"
+                                                required
                                                 data-error-required="{{ __('Unit is required') }}">
                                                 <option value="" selected disabled>{{ __('Select Unit') }}</option>
                                                 <option value="{{ __('sq.m') }}">{{ __('sq.m') }}</option>
@@ -274,8 +279,10 @@
                                         <div class="items-field-col price-col">
                                             <label>{{ __('Material Price') }} <span class="required-star">*</span></label>
                                             <input type="text" step="0.01" class="form-control js-mc"
-                                                name="details[0][mc_price]" placeholder=".00" required
-                                                data-error-required="{{ __('Material cost or labor cost is required') }}"
+                                                name="details[0][mc_price]"
+                                                id="mc_0"
+                                                placeholder=".00" required
+                                                data-error-required="{{ __('Material price is required') }}"
                                                 data-error-number="{{ __('Please enter number only') }}">
                                         </div>
 
@@ -283,8 +290,10 @@
                                         <div class="items-field-col price-col">
                                             <label>{{ __('Labor Price') }} <span class="required-star">*</span></label>
                                             <input type="text" step="0.01" class="form-control js-lc"
-                                                name="details[0][lc_price]" placeholder=".00" required
-                                                data-error-required="{{ __('Material cost or labor cost is required') }}"
+                                                name="details[0][lc_price]"
+                                                id="lc_0"
+                                                placeholder=".00" required
+                                                data-error-required="{{ __('Labor price is required') }}"
                                                 data-error-number="{{ __('Please enter number only') }}">
                                         </div>
 
@@ -727,8 +736,8 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{{ asset('assets/plugins/validations/homeValidation.js') }}"></script>
-<script src="{{ asset('assets/plugins/home/home-form.js') }}"></script>
+<script src="{{ asset('assets/plugins/validations/homeValidation.js') }}?v={{ time() }}"></script>
+<script src="{{ asset('assets/plugins/home/home-form.js') }}?v={{ time() }}"></script>
 <script src="{{ asset('assets/js/chunked-upload.js') }}"></script>
 
 <script>
