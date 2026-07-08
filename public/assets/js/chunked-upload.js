@@ -594,12 +594,25 @@ function initializeChunkedUpload() {
                 if (window.photoUploaderIpad) {
                     window.photoUploaderIpad.clear();
                 }
+                if (window.photoUploaderDesktop) {
+                    window.photoUploaderDesktop.clear();
+                }
                 
                 // Update counter
                 updatePhotoCounter();
                 
                 // Hide new photos section
                 checkNewPhotosSection();
+
+                // Clear server-side session so deleted photos don't come back after preview
+                fetch('/homes/clear-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify({ clear_session: true })
+                }).catch(function() {}); // fire-and-forget
 
                 // Show success message
                 Swal.fire({

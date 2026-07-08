@@ -7,6 +7,522 @@
 <link href="{{ asset('assets/css/home-forminput-table.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/css/home-common.css') }}" rel="stylesheet" type="text/css">
 <link href="{{ asset('assets/css/photo-upload.css') }}" rel="stylesheet">
+<style>
+/* Compact Photos & Summary Layout */
+.compact-photos-summary {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    margin-bottom: 24px;
+}
+
+.compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid #f1f3f5;
+    gap: 20px;
+}
+
+.header-left h2 {
+    margin: 0 0 4px 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-left h2 i {
+    color: #667eea;
+    font-size: 1.1rem;
+}
+
+.header-left p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.compact-action-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.compact-action-btn.preview {
+    background: #f8f9fa;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.compact-action-btn.preview:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.compact-action-btn.create {
+    background: #28a745;
+    color: white;
+}
+
+.compact-action-btn.create:hover {
+    background: #218838;
+}
+
+/* Main Grid Layout */
+.compact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    padding: 20px 24px;
+}
+
+/* Compact Photo Section */
+.compact-photo-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.compact-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1rem;
+}
+
+.compact-section-title i {
+    color: #667eea;
+    font-size: 0.9rem;
+}
+
+.component-badge {
+    margin-left: auto;
+    background: #e7f3ff;
+    color: #0066cc;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.compact-photo-upload {
+    position: relative;
+}
+
+.photo-drop-zone {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 32px 20px;
+    text-align: center;
+    background: #fafbfc;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.photo-drop-zone:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+}
+
+.drop-zone-icon {
+    font-size: 2.5rem;
+    color: #667eea;
+    margin-bottom: 12px;
+}
+
+.drop-zone-text {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.drop-zone-hint {
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 16px;
+}
+
+.photo-stats {
+    margin-bottom: 16px;
+}
+
+.photo-count {
+    background: #e9ecef;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    color: #495057;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.drop-zone-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.compact-btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.compact-btn.primary {
+    background: #667eea;
+    color: white;
+}
+
+.compact-btn.primary:hover {
+    background: #5a6fd8;
+}
+
+.compact-btn.danger {
+    background: #dc3545;
+    color: white;
+}
+
+.compact-btn.danger:hover {
+    background: #c82333;
+}
+
+.compact-btn.outline {
+    background: transparent;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.compact-btn.outline:hover {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+/* Compact Cost Section */
+.compact-cost-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.compact-cost-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.option-toggle {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    margin: 0;
+    font-weight: 500;
+}
+
+.toggle-label input[type="checkbox"] {
+    display: none;
+}
+
+.toggle-custom {
+    width: 40px;
+    height: 20px;
+    background: #dee2e6;
+    border-radius: 20px;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.toggle-custom::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-label input:checked + .toggle-custom {
+    background: #28a745;
+}
+
+.toggle-label input:checked + .toggle-custom::before {
+    transform: translateX(20px);
+}
+
+.toggle-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+.toggle-text i {
+    color: #667eea;
+    font-size: 0.85rem;
+}
+
+.toggle-text small {
+    color: #6c757d;
+    font-weight: 400;
+}
+
+/* Compact Summary Items */
+.compact-summary-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.compact-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.compact-summary-row:hover {
+    background: #f8f9fa;
+}
+
+.compact-summary-row.base {
+    background: #f0f8ff;
+    border-left: 3px solid #0066cc;
+}
+
+.compact-summary-row.category {
+    background: #f8f9fa;
+    border-left: 3px solid #6c757d;
+}
+
+.compact-summary-row.optional {
+    background: #fff9e6;
+    border-left: 3px dashed #ffc107;
+    position: relative;
+}
+
+.compact-summary-row.optional.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+.compact-summary-row.optional.disabled::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #dc3545;
+    transform: translateY(-50%);
+}
+
+.compact-summary-row.total {
+    background: #f0fff4;
+    border-left: 3px solid #28a745;
+    margin-top: 8px;
+    padding: 12px;
+}
+
+.row-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.row-label i {
+    font-size: 0.8rem;
+    color: #667eea;
+}
+
+.optional-tag {
+    background: #fff3cd;
+    color: #856404;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.row-value {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #2c3e50;
+}
+
+.row-value.grand-total {
+    font-size: 1.1rem;
+    color: #28a745;
+    font-weight: 700;
+}
+
+/* Compact Footer */
+.compact-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid #f1f3f5;
+    background: #fafbfc;
+}
+
+.footer-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.footer-info i {
+    color: #667eea;
+}
+
+/* Upload Loading */
+.upload-loading {
+    text-align: center;
+    padding: 20px;
+    display: none;
+}
+
+.upload-progress {
+    margin-top: 12px;
+    background: #e9ecef;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.upload-progress-bar {
+    height: 100%;
+    background: #667eea;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Photo List */
+.new-photos-section {
+    margin-top: 16px;
+}
+
+.photo-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .compact-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .compact-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+    
+    .header-actions {
+        justify-content: stretch;
+    }
+    
+    .compact-action-btn {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .compact-grid {
+        padding: 16px 20px;
+        gap: 16px;
+    }
+    
+    .photo-drop-zone {
+        padding: 24px 16px;
+    }
+    
+    .drop-zone-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .compact-btn {
+        justify-content: center;
+    }
+    
+    .compact-footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .compact-photos-summary {
+        margin: 0 -16px 24px;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    
+    .compact-header,
+    .compact-grid,
+    .compact-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+}
+</style>
 @endpush
 
 @section('content')
@@ -334,45 +850,61 @@
                     </div>
                 </div>
 
-                <!-- Enhanced Photos & Summary Section -->
+                <!-- Compact Photos & Summary Section -->
                 <div class="col-12">
-                    <div class="photos-summary-container">
-                        <div class="photos-summary-title">
-                            <h2>{{ __('Project Photos & Cost Summary') }}</h2>
-                            <p>{{ __('Upload project photos and review the complete cost breakdown') }}</p>
+                    <div class="compact-photos-summary">
+                        <!-- Section Header -->
+                        <div class="compact-header">
+                            <div class="header-left">
+                                <h2>
+                                    <i class="fas fa-images"></i>
+                                    {{ __('Project Photos & Cost Summary') }}
+                                </h2>
+                                <p>{{ __('Upload photos and configure cost calculation') }}</p>
+                            </div>
+                            <div class="header-actions">
+                                <button type="submit" class="compact-action-btn preview" formaction="{{ route('home.preview') }}">
+                                    <i class="fas fa-eye"></i>
+                                    {{ __('Preview') }}
+                                </button>
+                                <button type="submit" class="compact-action-btn create" id="generate-btn-desktop">
+                                    <i class="fas fa-file-excel"></i>
+                                    {{ __('Create Excel') }}
+                                </button>
+                            </div>
                         </div>
-                        
-                        <div class="photos-summary-layout">
-                            <!-- Photo Upload Section -->
-                            <div class="photo-upload-section">
-                                <div class="photo-upload-header">
-                                    <h3>
-                                        <span class="section-icon">
-                                            <i class="fas fa-images"></i>
-                                        </span>
-                                        {{ __('Project Photos') }}
-                                    </h3>
+
+                        <!-- Main Content Grid -->
+                        <div class="compact-grid">
+                            <!-- Photo Upload Column -->
+                            <div class="compact-photo-section">
+                                <div class="compact-section-title">
+                                    <i class="fas fa-camera"></i>
+                                    <span>{{ __('Project Photos') }}</span>
                                 </div>
-                                <div class="photo-upload-body">
-                                    <div class="photo-upload-area" id="photo-upload-area-desktop">
-                                        <div class="photo-upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-                                        <div class="photo-upload-text">{{ __('Upload Project Photos') }}</div>
-                                        <div class="photo-upload-subtext">{{ __('Drag & drop photos here or click to browse') }}</div>
-                                        <div class="photo-upload-subtext small">{{ __('Supported formats: JPG, PNG, GIF, WebP, HEIC, AVIF, BMP, TIFF, SVG, RAW formats. Max 50MB per photo') }}</div>
+                                <div class="compact-photo-upload">
+                                    <div class="photo-drop-zone" id="photo-upload-area-desktop">
+                                        <div class="drop-zone-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <div class="drop-zone-text">{{ __('Drop photos here') }}</div>
+                                        <div class="drop-zone-hint">{{ __('or click to browse') }}</div>
                                         
-                                        <div class="photo-counter" id="photo-counter-desktop">
-                                            <i class="fas fa-images me-2"></i>
-                                            <span id="photo-count-desktop">0</span> {{ __('photos selected') }}
+                                        <div class="photo-stats">
+                                            <span class="photo-count">
+                                                <i class="fas fa-images"></i>
+                                                <span id="photo-count-desktop">0</span> {{ __('photos') }}
+                                            </span>
                                         </div>
                                         
-                                        <div class="photo-actions">
-                                            <button type="button" class="photo-btn danger" onclick="deleteAllNewPhotosAndClearSession()" title="{{ __('Delete All Photos') }}">
+                                        <div class="drop-zone-actions">
+                                            <button type="button" class="compact-btn danger" onclick="deleteAllNewPhotosAndClearSession()">
                                                 <i class="fas fa-trash"></i>
-                                                {{ __('Delete All') }}
+                                                {{ __('Clear') }}
                                             </button>
-                                            <button type="button" class="photo-btn primary" onclick="document.getElementById('photo-input-desktop').click()">
-                                                <i class="fas fa-folder-open"></i>
-                                                {{ __('Browse Photos') }}
+                                            <button type="button" class="compact-btn primary" onclick="document.getElementById('photo-input-desktop').click()">
+                                                <i class="fas fa-folder"></i>
+                                                {{ __('Browse') }}
                                             </button>
                                         </div>
                                         
@@ -391,75 +923,105 @@
                                 </div>
                             </div>
 
-                            <!-- Cost Summary Section -->
-                            <div class="cost-summary-section">
-                                <div class="cost-summary-header">
-                                    <h3>
-                                        <span class="section-icon">
-                                            <i class="fas fa-calculator"></i>
-                                        </span>
-                                        {{ __('Cost Summary') }}
-                                    </h3>
+                            <!-- Cost Summary Column -->
+                            <div class="compact-cost-section">
+                                <div class="compact-section-title">
+                                    <i class="fas fa-calculator"></i>
+                                    <span>{{ __('Cost Summary') }}</span>
+                                    <span class="component-badge" id="componentCount">4 {{ __('items') }}</span>
                                 </div>
-                                <div class="cost-summary-body">
-                                    <div class="summary-item">
-                                        <div class="summary-label">{{ __('Total') }}</div>
-                                        <div class="summary-value" id="miscDisplay">0.00</div>
+                                
+                                <!-- Compact Cost Options -->
+                                <div class="compact-cost-options">
+                                    <div class="option-toggle">
+                                        <label class="toggle-label">
+                                            <input type="checkbox" id="includeOperatingProfit" checked>
+                                            <span class="toggle-custom"></span>
+                                            <span class="toggle-text">
+                                                <i class="fas fa-chart-line"></i>
+                                                {{ __('Operating + Profit') }}
+                                                <small>(15%)</small>
+                                            </span>
+                                        </label>
                                     </div>
-                                    <div class="summary-item">
-                                        <div class="summary-label">{{ __('Operating + Profit (15%)') }}</div>
-                                        <div class="summary-value" id="operatingDisplay">0.00</div>
+                                    <div class="option-toggle">
+                                        <label class="toggle-label">
+                                            <input type="checkbox" id="includeVAT" checked>
+                                            <span class="toggle-custom"></span>
+                                            <span class="toggle-text">
+                                                <i class="fas fa-receipt"></i>
+                                                {{ __('VAT Tax') }}
+                                                <small>(7%)</small>
+                                            </span>
+                                        </label>
                                     </div>
-                                    <div class="summary-item">
-                                        <div class="summary-label">{{ __('Category A,B Total') }}</div>
-                                        <div class="summary-value" id="abDisplay">0.00</div>
-                                    </div>
-                                    <div class="summary-item">
-                                        <div class="summary-label">{{ __('VAT (7%)') }}</div>
-                                        <div class="summary-value" id="vatDisplay">0.00</div>
-                                    </div>
-                                    <div class="summary-item total">
-                                        <div class="summary-label">{{ __('Total Price') }}</div>
-                                        <div class="summary-value" id="finalDisplay">0.00</div>
+                                </div>
+
+                                <!-- Compact Summary Items -->
+                                <div class="compact-summary-items">
+                                    <div class="compact-summary-row base">
+                                        <span class="row-label">
+                                            <i class="fas fa-calculator"></i>
+                                            {{ __('Base Total') }}
+                                        </span>
+                                        <span class="row-value" id="miscDisplay">0.00</span>
                                     </div>
                                     
-                                    <!-- Hidden inputs for form submission -->
-                                    <input type="hidden" id="misc_total" name="misc_total">
-                                    <input type="hidden" id="operating_expenses" name="operating_expenses">
-                                    <input type="hidden" id="category_ab_total" name="category_ab_total">
-                                    <input type="hidden" id="vat_total" name="vat_total">
-                                    <input type="hidden" id="final_total" name="final_total">
+                                    <div class="compact-summary-row optional" id="operatingProfitRow">
+                                        <span class="row-label">
+                                            <i class="fas fa-chart-line"></i>
+                                            {{ __('Operating + Profit') }}
+                                            <span class="optional-tag">{{ __('Optional') }}</span>
+                                        </span>
+                                        <span class="row-value" id="operatingDisplay">0.00</span>
+                                    </div>
+                                    
+                                    <div class="compact-summary-row category">
+                                        <span class="row-label">
+                                            <i class="fas fa-layer-group"></i>
+                                            {{ __('Category A,B Total') }}
+                                        </span>
+                                        <span class="row-value" id="abDisplay">0.00</span>
+                                    </div>
+                                    
+                                    <div class="compact-summary-row optional" id="vatRow">
+                                        <span class="row-label">
+                                            <i class="fas fa-receipt"></i>
+                                            {{ __('VAT Tax') }}
+                                            <span class="optional-tag">{{ __('Optional') }}</span>
+                                        </span>
+                                        <span class="row-value" id="vatDisplay">0.00</span>
+                                    </div>
+                                    
+                                    <div class="compact-summary-row total">
+                                        <span class="row-label">
+                                            <i class="fas fa-coins"></i>
+                                            {{ __('Total Price') }}
+                                        </span>
+                                        <span class="row-value grand-total" id="finalDisplay">0.00</span>
+                                    </div>
                                 </div>
+
+                                <!-- Hidden inputs -->
+                                <input type="hidden" id="misc_total" name="misc_total">
+                                <input type="hidden" id="operating_expenses" name="operating_expenses">
+                                <input type="hidden" id="category_ab_total" name="category_ab_total">
+                                <input type="hidden" id="vat_total" name="vat_total">
+                                <input type="hidden" id="final_total" name="final_total">
+                                <input type="hidden" id="include_operating_profit" name="include_operating_profit" value="1">
+                                <input type="hidden" id="include_vat" name="include_vat" value="1">
                             </div>
                         </div>
 
-                        <!-- Action Buttons Section -->
-                        <div class="action-buttons-section">
-                            <div class="action-buttons-header">
-                                <h3>
-                                    <span class="section-icon">
-                                        <i class="fas fa-tasks"></i>
-                                    </span>
-                                    {{ __('Actions') }}
-                                </h3>
-                            </div>
-                            <div class="action-buttons-body">
-                                <div class="action-buttons-group">
-                                    <button type="submit" class="action-btn preview" formaction="{{ route('home.preview') }}">
-                                        <i class="fas fa-eye"></i>
-                                        {{ __('Preview') }}
-                                    </button>
-                                    
-                                    <button type="submit" class="action-btn create" id="generate-btn-desktop">
-                                        <i class="fas fa-file-excel"></i>
-                                        {{ __('Create Excel') }}
-                                    </button>
-                                    
-                                    <button type="button" class="action-btn cancel" onclick="window.location.href='{{ route('home') }}'">
-                                        <i class="fas fa-times"></i>
-                                        {{ __('Cancel') }}
-                                    </button>
-                                </div>
+                        <!-- Footer Actions -->
+                        <div class="compact-footer">
+                            <button type="button" class="compact-btn outline" onclick="window.location.href='{{ route('home') }}'">
+                                <i class="fas fa-arrow-left"></i>
+                                {{ __('Back to List') }}
+                            </button>
+                            <div class="footer-info">
+                                <i class="fas fa-info-circle"></i>
+                                {{ __('Click Preview to review before generating Excel') }}
                             </div>
                         </div>
                     </div>
@@ -542,16 +1104,27 @@
                                         <div class="summary-label">{{ __('Total') }}:</div>
                                         <div class="summary-value" id="miscDisplayMobile">0.00</div>
                                     </div>
-                                    <div class="summary-row">
-                                        <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
+                                    <div class="summary-row optional-item" id="operatingProfitRowMobile">
+                                        <div class="summary-label">
+                                            <i class="fas fa-chart-line"></i>
+                                            {{ __('Operating + Profit (15%)') }}:
+                                            <span class="item-badge success">{{ __('Optional') }}</span>
+                                        </div>
                                         <div class="summary-value" id="operatingDisplayMobile">0.00</div>
                                     </div>
-                                    <div class="summary-row">
-                                        <div class="summary-label">{{ __('Category A,B Total') }}:</div>
+                                    <div class="summary-row category-total">
+                                        <div class="summary-label">
+                                            <i class="fas fa-layer-group"></i>
+                                            {{ __('Category A,B Total') }}:
+                                        </div>
                                         <div class="summary-value" id="abDisplayMobile">0.00</div>
                                     </div>
-                                    <div class="summary-row">
-                                        <div class="summary-label">{{ __('VAT (7%)') }}:</div>
+                                    <div class="summary-row optional-item" id="vatRowMobile">
+                                        <div class="summary-label">
+                                            <i class="fas fa-receipt"></i>
+                                            {{ __('VAT (7%)') }}:
+                                            <span class="item-badge info">{{ __('Optional') }}</span>
+                                        </div>
                                         <div class="summary-value" id="vatDisplayMobile">0.00</div>
                                     </div>
                                     <div class="summary-row total-row" >
@@ -671,16 +1244,27 @@
                                             <div class="summary-label">{{ __('Total') }}:</div>
                                             <div class="summary-value" id="miscDisplayIpad">0.00</div>
                                         </div>
-                                        <div class="summary-row">
-                                            <div class="summary-label">{{ __('Operating + Profit (15%)') }}:</div>
+                                        <div class="summary-row optional-item" id="operatingProfitRowIpad">
+                                            <div class="summary-label">
+                                                <i class="fas fa-chart-line"></i>
+                                                {{ __('Operating + Profit (15%)') }}:
+                                                <span class="item-badge success">{{ __('Optional') }}</span>
+                                            </div>
                                             <div class="summary-value" id="operatingDisplayIpad">0.00</div>
                                         </div>
-                                        <div class="summary-row">
-                                            <div class="summary-label">{{ __('Category A,B Total') }}:</div>
+                                        <div class="summary-row category-total">
+                                            <div class="summary-label">
+                                                <i class="fas fa-layer-group"></i>
+                                                {{ __('Category A,B Total') }}:
+                                            </div>
                                             <div class="summary-value" id="abDisplayIpad">0.00</div>
                                         </div>
-                                        <div class="summary-row">
-                                            <div class="summary-label">{{ __('VAT (7%)') }}:</div>
+                                        <div class="summary-row optional-item" id="vatRowIpad">
+                                            <div class="summary-label">
+                                                <i class="fas fa-receipt"></i>
+                                                {{ __('VAT (7%)') }}:
+                                                <span class="item-badge info">{{ __('Optional') }}</span>
+                                            </div>
                                             <div class="summary-value" id="vatDisplayIpad">0.00</div>
                                         </div>
                                         <div class="summary-row total-row" >
@@ -898,13 +1482,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Restore photos
     if (restoredPhotos && restoredPhotos.length > 0) {
-        const photoCountElement = document.getElementById('photo-count');
         const photoList = document.getElementById('photo-list');
         const newPhotosSection = document.getElementById('new-photos-section');
-        
-        if (photoCountElement) {
-            photoCountElement.textContent = restoredPhotos.length;
-        }
         
         // Show new photos section if we have restored photos
         if (newPhotosSection && restoredPhotos.length > 0) {
@@ -949,6 +1528,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 form.appendChild(hiddenInput);
             });
         }
+
+        // Sync all photo counters (phone, iPad, desktop) after restoration
+        // Use a small delay to ensure initializeChunkedUpload has run and exposed window.updatePhotoCounter
+        setTimeout(function() {
+            if (typeof window.updatePhotoCounter === 'function') {
+                window.updatePhotoCounter();
+            } else {
+                // Fallback: set all counters manually
+                ['photo-count', 'photo-count-ipad', 'photo-count-desktop'].forEach(function(id) {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = restoredPhotos.length;
+                });
+            }
+        }, 100);
     }
     
     // Function to remove restored photos - now removes ALL restored photos
@@ -1013,6 +1606,230 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     };
+});
+
+// Cost Calculator Class for Optional Components
+class CostCalculator {
+    constructor() {
+        this.initializeElements();
+        this.attachEventListeners();
+        this.updateCalculations();
+    }
+    
+    initializeElements() {
+        this.operatingToggle = document.getElementById('includeOperatingProfit');
+        this.vatToggle = document.getElementById('includeVAT');
+        this.operatingRow = document.getElementById('operatingProfitRow');
+        this.vatRow = document.getElementById('vatRow');
+        this.componentCount = document.getElementById('componentCount');
+        
+        // Mobile elements
+        this.operatingRowMobile = document.getElementById('operatingProfitRowMobile');
+        this.vatRowMobile = document.getElementById('vatRowMobile');
+        
+        // iPad elements
+        this.operatingRowIpad = document.getElementById('operatingProfitRowIpad');
+        this.vatRowIpad = document.getElementById('vatRowIpad');
+    }
+    
+    attachEventListeners() {
+        if (this.operatingToggle) {
+            this.operatingToggle.addEventListener('change', () => {
+                this.handleToggleChange('operating');
+                this.updateCalculations();
+            });
+        }
+        
+        if (this.vatToggle) {
+            this.vatToggle.addEventListener('change', () => {
+                this.handleToggleChange('vat');
+                this.updateCalculations();
+            });
+        }
+    }
+    
+    handleToggleChange(type) {
+        const isOperating = type === 'operating';
+        const toggle = isOperating ? this.operatingToggle : this.vatToggle;
+        const row = isOperating ? this.operatingRow : this.vatRow;
+        const rowMobile = isOperating ? this.operatingRowMobile : this.vatRowMobile;
+        const rowIpad = isOperating ? this.operatingRowIpad : this.vatRowIpad;
+        
+        if (toggle.checked) {
+            if (row) row.classList.remove('disabled');
+            if (rowMobile) rowMobile.classList.remove('disabled');
+            if (rowIpad) rowIpad.classList.remove('disabled');
+            this.animateRowIn(row);
+            if (rowMobile) this.animateRowIn(rowMobile);
+            if (rowIpad) this.animateRowIn(rowIpad);
+        } else {
+            if (row) row.classList.add('disabled');
+            if (rowMobile) rowMobile.classList.add('disabled');
+            if (rowIpad) rowIpad.classList.add('disabled');
+            this.animateRowOut(row);
+            if (rowMobile) this.animateRowOut(rowMobile);
+            if (rowIpad) this.animateRowOut(rowIpad);
+        }
+        
+        this.updateComponentCount();
+        this.updateHiddenInputs();
+    }
+    
+    animateRowIn(row) {
+        if (!row) return;
+        row.style.display = 'flex';
+        row.style.opacity = '0';
+        row.style.transform = 'translateY(-10px)';
+        
+        setTimeout(() => {
+            row.style.transition = 'all 0.3s ease';
+            row.style.opacity = '1';
+            row.style.transform = 'translateY(0)';
+        }, 10);
+    }
+    
+    animateRowOut(row) {
+        if (!row) return;
+        row.style.transition = 'all 0.3s ease';
+        row.style.opacity = '0.4';
+        row.style.transform = 'translateY(0)';
+    }
+    
+    updateComponentCount() {
+        if (!this.componentCount) return;
+        
+        let count = 2; // Base total and Category A,B are always visible
+        count += this.operatingToggle && this.operatingToggle.checked ? 1 : 0;
+        count += this.vatToggle && this.vatToggle.checked ? 1 : 0;
+        
+        this.componentCount.textContent = count + ' items';
+        this.componentCount.style.transform = 'scale(1.1)';
+        setTimeout(() => {
+            this.componentCount.style.transform = 'scale(1)';
+        }, 200);
+    }
+    
+    updateCalculations() {
+        const baseTotal = this.getFloatValue('miscDisplay');
+        const includeOperating = this.operatingToggle && this.operatingToggle.checked;
+        const includeVAT = this.vatToggle && this.vatToggle.checked;
+        
+        let operatingAmount = 0;
+        let vatAmount = 0;
+        let finalTotal = baseTotal;
+        
+        // Calculate Operating + Profit
+        if (includeOperating) {
+            operatingAmount = baseTotal * 0.15;
+            finalTotal += operatingAmount;
+            this.animateValue('operatingDisplay', operatingAmount);
+            this.animateValue('operatingDisplayMobile', operatingAmount);
+            this.animateValue('operatingDisplayIpad', operatingAmount);
+        } else {
+            this.setValue('operatingDisplay', 0);
+            this.setValue('operatingDisplayMobile', 0);
+            this.setValue('operatingDisplayIpad', 0);
+        }
+        
+        // Calculate VAT
+        if (includeVAT) {
+            vatAmount = finalTotal * 0.07;
+            finalTotal += vatAmount;
+            this.animateValue('vatDisplay', vatAmount);
+            this.animateValue('vatDisplayMobile', vatAmount);
+            this.animateValue('vatDisplayIpad', vatAmount);
+        } else {
+            this.setValue('vatDisplay', 0);
+            this.setValue('vatDisplayMobile', 0);
+            this.setValue('vatDisplayIpad', 0);
+        }
+        
+        // Update final total with animation
+        this.animateValue('finalDisplay', finalTotal);
+        this.animateValue('finalDisplayMobile', finalTotal);
+        this.animateValue('finalDisplayIpad', finalTotal);
+        
+        // Update hidden inputs
+        this.updateHiddenInputs(operatingAmount, vatAmount, finalTotal);
+    }
+    
+    getFloatValue(elementId) {
+        const element = document.getElementById(elementId);
+        return element ? parseFloat(element.textContent) || 0 : 0;
+    }
+    
+    setValue(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = value.toFixed(2);
+        }
+    }
+    
+    animateValue(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        const startValue = parseFloat(element.textContent) || 0;
+        const endValue = value;
+        const duration = 300;
+        const startTime = performance.now();
+        
+        const animate = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const currentValue = startValue + (endValue - startValue) * progress;
+            
+            element.textContent = currentValue.toFixed(2);
+            
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    }
+    
+    updateHiddenInputs(operating, vat, final) {
+        const operatingInput = document.getElementById('operating_expenses');
+        const vatInput = document.getElementById('vat_total');
+        const finalInput = document.getElementById('final_total');
+        const includeOperatingInput = document.getElementById('include_operating_profit');
+        const includeVatInput = document.getElementById('include_vat');
+        
+        if (operatingInput) operatingInput.value = operating.toFixed(2);
+        if (vatInput) vatInput.value = vat.toFixed(2);
+        if (finalInput) finalInput.value = final.toFixed(2);
+        if (includeOperatingInput) includeOperatingInput.value = this.operatingToggle && this.operatingToggle.checked ? '1' : '0';
+        if (includeVatInput) includeVatInput.value = this.vatToggle && this.vatToggle.checked ? '1' : '0';
+    }
+}
+
+// Initialize Cost Calculator when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize cost calculator
+    window.costCalculator = new CostCalculator();
+    
+    // Hook into existing calculation updates
+    const originalUpdateSummary = window.updateSummary;
+    if (typeof originalUpdateSummary === 'function') {
+        window.updateSummary = function() {
+            originalUpdateSummary();
+            if (window.costCalculator) {
+                window.costCalculator.updateCalculations();
+            }
+        };
+    }
+    
+    // Hook into mobile calculation updates
+    const originalUpdateSummaryMobile = window.updateSummaryMobile;
+    if (typeof originalUpdateSummaryMobile === 'function') {
+        window.updateSummaryMobile = function() {
+            originalUpdateSummaryMobile();
+            if (window.costCalculator) {
+                window.costCalculator.updateCalculations();
+            }
+        };
+    }
 });
 </script>
 @endif
